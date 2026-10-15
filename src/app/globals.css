@@ -36,3 +36,18 @@ h4 {
   background-color: #99a0c1;
   color: #ffffff;
 }
+
+/* Ken Burns effect for hero slider */
+@keyframes kenburns {
+  0% {
+    transform: scale(1.0);
+  }
+  100% {
+    transform: scale(1.15);
+  }
+}
+
+.animate-ken-burns {
+  animation: kenburns 7000ms ease-out forwards;
+}
+
