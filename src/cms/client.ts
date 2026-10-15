@@ -1,4 +1,5 @@
 import { PricingConfig, BlockedDateRange, BookingInquiry, GuestbookEntry } from './types';
+import { sanityClient, isSanityLive } from './sanity.client';
 
 // Pricing rules for Plas Hafod Cottage
 export const defaultPricingConfig: PricingConfig = {
@@ -210,20 +211,70 @@ let mockInquiriesStore: BookingInquiry[] = [];
  */
 export const cmsClient = {
   async getPricingConfig(propertyId: 'plas-hafod' | 'bryn-bugeiliaid-bach' = 'plas-hafod'): Promise<PricingConfig> {
-    if (propertyId === 'bryn-bugeiliaid-bach') {
-      return bbbPricingConfig;
+    if (isSanityLive && sanityClient) {
+      try {
+        const query = `*[_type == "pricingConfig" && propertyId == $propertyId][0]`;
+        const data = await sanityClient.fetch(query, { propertyId });
+        if (data && typeof data.baseRate === 'number') {
+          return {
+            baseRate: data.baseRate,
+            depositPercentage: data.depositPercentage ?? 25,
+            cleaningFee: data.cleaningFee ?? (propertyId === 'bryn-bugeiliaid-bach' ? 35 : 45),
+            seasons: data.seasons || [],
+            discounts: data.discounts || [],
+          };
+        }
+      } catch (err) {
+        console.warn('Failed to fetch pricing from Sanity, using fallback:', err);
+      }
     }
-    return defaultPricingConfig;
+    return propertyId === 'bryn-bugeiliaid-bach' ? bbbPricingConfig : defaultPricingConfig;
   },
 
   async getBlockedDates(propertyId: 'plas-hafod' | 'bryn-bugeiliaid-bach' = 'plas-hafod'): Promise<BlockedDateRange[]> {
-    if (propertyId === 'bryn-bugeiliaid-bach') {
-      return bbbBlockedDates;
+    if (isSanityLive && sanityClient) {
+      try {
+        const query = `*[_type == "blockedDates" && (propertyId == $propertyId || propertyId == "both")]`;
+        const data = await sanityClient.fetch(query, { propertyId });
+        if (Array.isArray(data) && data.length > 0) {
+          return data.map((item: any) => ({
+            id: item._id,
+            startDate: item.startDate,
+            endDate: item.endDate,
+            reason: item.reason,
+            notes: item.notes || item.title,
+          }));
+        }
+      } catch (err) {
+        console.warn('Failed to fetch blocked dates from Sanity, using fallback:', err);
+      }
     }
-    return defaultBlockedDates;
+    return propertyId === 'bryn-bugeiliaid-bach' ? bbbBlockedDates : defaultBlockedDates;
   },
 
   async getGuestbookEntries(): Promise<GuestbookEntry[]> {
+    if (isSanityLive && sanityClient) {
+      try {
+        const query = `*[_type == "guestbookEntry"] | order(rating desc)`;
+        const data = await sanityClient.fetch(query);
+        if (Array.isArray(data) && data.length > 0) {
+          return data.map((entry: any) => ({
+            id: entry._id,
+            author: entry.author,
+            location: entry.location,
+            stayDate: entry.stayDate,
+            rating: entry.rating || 5,
+            comment: {
+              en: entry.reviewTextEn,
+              cy: entry.reviewTextCy || entry.reviewTextEn,
+            },
+            imageUrl: entry.photo?.asset?.url || '/images/hero.jpg',
+          }));
+        }
+      } catch (err) {
+        console.warn('Failed to fetch guestbook from Sanity, using fallback:', err);
+      }
+    }
     return defaultGuestbook;
   },
 
@@ -239,15 +290,18 @@ export const cmsClient = {
       createdAt: new Date().toISOString(),
     };
 
-    if (process.env.SANITY_PROJECT_ID && process.env.SANITY_API_WRITE_TOKEN) {
-      // Direct Sanity Mutation API call:
-      const sanityUrl = `https://${process.env.SANITY_PROJECT_ID}.api.sanity.io/v2024-01-01/data/mutate/${process.env.SANITY_DATASET || 'production'}`;
+    const token = process.env.SANITY_API_WRITE_TOKEN;
+    const projId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID || process.env.SANITY_PROJECT_ID;
+    const dataset = process.env.NEXT_PUBLIC_SANITY_DATASET || process.env.SANITY_DATASET || 'production';
+
+    if (projId && projId !== 'demo-project' && token) {
+      const sanityUrl = `https://${projId}.api.sanity.io/v2024-01-01/data/mutate/${dataset}`;
       try {
         await fetch(sanityUrl, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            Authorization: `Bearer ${process.env.SANITY_API_WRITE_TOKEN}`,
+            Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify({
             mutations: [
@@ -270,6 +324,17 @@ export const cmsClient = {
   },
 
   async getBookingInquiries(): Promise<BookingInquiry[]> {
+    if (isSanityLive && sanityClient) {
+      try {
+        const query = `*[_type == "bookingInquiry"] | order(createdAt desc)`;
+        const data = await sanityClient.fetch(query);
+        if (Array.isArray(data)) {
+          return data;
+        }
+      } catch (err) {
+        console.warn('Failed to fetch inquiries from Sanity, using fallback:', err);
+      }
+    }
     return mockInquiriesStore;
   },
 };

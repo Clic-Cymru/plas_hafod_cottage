@@ -8,6 +8,21 @@ export const pricingSchema = {
   type: 'document',
   fields: [
     {
+      name: 'propertyId',
+      title: 'Property / Cottage',
+      type: 'string',
+      options: {
+        list: [
+          { title: 'Plas Hafod Cottage (Main House)', value: 'plas-hafod' },
+          { title: 'Bryn Bugeiliaid Bach (Annexe)', value: 'bryn-bugeiliaid-bach' },
+        ],
+        layout: 'radio',
+      },
+      initialValue: 'plas-hafod',
+      validation: (Rule: any) => Rule.required(),
+      description: 'Select which cottage this pricing configuration applies to.',
+    },
+    {
       name: 'baseRate',
       title: 'Standard Nightly Base Rate (£)',
       type: 'number',
@@ -97,4 +112,20 @@ export const pricingSchema = {
       ],
     },
   ],
+  preview: {
+    select: {
+      propertyId: 'propertyId',
+      baseRate: 'baseRate',
+    },
+    prepare({ propertyId, baseRate }: any) {
+      const name =
+        propertyId === 'bryn-bugeiliaid-bach'
+          ? 'Bryn Bugeiliaid Bach (Annexe)'
+          : 'Plas Hafod Cottage (Main)';
+      return {
+        title: name,
+        subtitle: `Standard Rate: £${baseRate || 0} / night`,
+      };
+    },
+  },
 };

@@ -8,6 +8,21 @@ export const blockedDatesSchema = {
   type: 'document',
   fields: [
     {
+      name: 'propertyId',
+      title: 'Property',
+      type: 'string',
+      options: {
+        list: [
+          { title: 'Plas Hafod Cottage', value: 'plas-hafod' },
+          { title: 'Bryn Bugeiliaid Bach', value: 'bryn-bugeiliaid-bach' },
+          { title: 'Both Cottages', value: 'both' },
+        ],
+        layout: 'radio',
+      },
+      initialValue: 'plas-hafod',
+      validation: (Rule: any) => Rule.required(),
+    },
+    {
       name: 'title',
       title: 'Label / Reference',
       type: 'string',
@@ -53,10 +68,17 @@ export const blockedDatesSchema = {
       start: 'startDate',
       end: 'endDate',
       reason: 'reason',
+      propertyId: 'propertyId',
     },
-    prepare({ title, start, end, reason }: any) {
+    prepare({ title, start, end, reason, propertyId }: any) {
+      const propLabel =
+        propertyId === 'bryn-bugeiliaid-bach'
+          ? '[BBB]'
+          : propertyId === 'both'
+          ? '[Both]'
+          : '[Plas Hafod]';
       return {
-        title: title || 'Blocked Period',
+        title: `${propLabel} ${title || 'Blocked Period'}`,
         subtitle: `${start} → ${end} (${reason || 'booked'})`,
       };
     },

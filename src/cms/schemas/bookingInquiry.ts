@@ -8,6 +8,20 @@ export const bookingInquirySchema = {
   type: 'document',
   fields: [
     {
+      name: 'propertyId',
+      title: 'Property Booked',
+      type: 'string',
+      options: {
+        list: [
+          { title: 'Plas Hafod Cottage (Main)', value: 'plas-hafod' },
+          { title: 'Bryn Bugeiliaid Bach (Annexe)', value: 'bryn-bugeiliaid-bach' },
+        ],
+        layout: 'radio',
+      },
+      initialValue: 'plas-hafod',
+      validation: (Rule: any) => Rule.required(),
+    },
+    {
       name: 'status',
       title: 'Status',
       type: 'string',
@@ -116,11 +130,13 @@ export const bookingInquirySchema = {
       checkOut: 'checkOut',
       total: 'calculatedTotal',
       status: 'status',
+      propertyId: 'propertyId',
     },
-    prepare({ guestName, checkIn, checkOut, total, status }: any) {
+    prepare({ guestName, checkIn, checkOut, total, status, propertyId }: any) {
+      const propBadge = propertyId === 'bryn-bugeiliaid-bach' ? '[BBB]' : '[Plas Hafod]';
       return {
-        title: `${guestName} (${status?.toUpperCase() || 'NEW'})`,
-        subtitle: `${checkIn} → ${checkOut} • £${total || 0}`,
+        title: `${propBadge} ${guestName} (${status?.toUpperCase() || 'NEW'})`,
+        subtitle: `${checkIn} → ${checkOut} • Total: £${total || 0}`,
       };
     },
   },
