@@ -45,10 +45,10 @@ export function LiveSiteNavbar({ currentPath = '/', isCymraeg = false }: NavbarP
           : 'bg-transparent text-white py-4'
       }`}
     >
-      <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
+      <div className="w-full max-w-[1540px] mx-auto px-3 sm:px-4 lg:px-6 flex items-center justify-between gap-2 lg:gap-3 xl:gap-5">
         {/* Left: Logo */}
         <Link href={isCymraeg ? '/cy' : '/'} className="flex items-center shrink-0">
-          <div className="relative w-36 sm:w-44 h-12">
+          <div className="relative w-28 sm:w-36 xl:w-44 h-10 xl:h-12 shrink-0">
             <Image
               src={scrolled ? '/images/wp/logo-color.png' : '/images/wp/logo-white.png'}
               alt="Plas Hafod Cottage"
@@ -59,9 +59,9 @@ export function LiveSiteNavbar({ currentPath = '/', isCymraeg = false }: NavbarP
           </div>
         </Link>
 
-        {/* Center: Navigation Links with Architects Daughter font */}
+        {/* Center: Navigation Links with Architects Daughter font (single line, no wrap) */}
         <nav
-          className="hidden lg:flex items-center space-x-4 xl:space-x-5 text-[17px] xl:text-[18px] tracking-wide uppercase font-architects"
+          className="hidden lg:flex items-center space-x-2 xl:space-x-3.5 2xl:space-x-5 text-[14px] xl:text-[16px] 2xl:text-[17px] tracking-wide uppercase font-architects whitespace-nowrap shrink-0"
           style={{ fontFamily: "'Architects Daughter', cursive, sans-serif" }}
         >
           {navLinks.map((item, idx) => {
@@ -71,7 +71,9 @@ export function LiveSiteNavbar({ currentPath = '/', isCymraeg = false }: NavbarP
               <React.Fragment key={item.label}>
                 {idx > 0 && !isActive && !prevIsActive && (
                   <span
-                    className={`select-none ${scrolled ? 'text-stone-300' : 'text-white/60'}`}
+                    className={`select-none whitespace-nowrap ${
+                      scrolled ? 'text-stone-300' : 'text-white/60'
+                    }`}
                   >
                     |
                   </span>
@@ -79,7 +81,7 @@ export function LiveSiteNavbar({ currentPath = '/', isCymraeg = false }: NavbarP
                 <Link
                   href={item.href}
                   style={{ fontFamily: "'Architects Daughter', cursive, sans-serif" }}
-                  className={`transition duration-200 font-architects text-[17px] xl:text-[18px] tracking-wider ${
+                  className={`transition duration-200 font-architects whitespace-nowrap tracking-wider ${
                     isActive
                       ? scrolled
                         ? 'text-[#99a0c1] font-bold'
@@ -89,7 +91,13 @@ export function LiveSiteNavbar({ currentPath = '/', isCymraeg = false }: NavbarP
                       : 'text-white hover:text-[#efda07]'
                   }`}
                 >
-                  {isActive && !scrolled ? `| ${item.label} |` : item.label}
+                  {isActive && !scrolled ? (
+                    <span className="whitespace-nowrap font-bold text-[#efda07]">
+                      {`| ${item.label} |`}
+                    </span>
+                  ) : (
+                    item.label
+                  )}
                 </Link>
               </React.Fragment>
             );
@@ -97,13 +105,13 @@ export function LiveSiteNavbar({ currentPath = '/', isCymraeg = false }: NavbarP
         </nav>
 
         {/* Right: Social Icons + Book Now Button */}
-        <div className="hidden lg:flex items-center space-x-4">
+        <div className="hidden lg:flex items-center space-x-2.5 xl:space-x-3.5 shrink-0">
           <a
             href="https://facebook.com"
             target="_blank"
             rel="noopener noreferrer"
             aria-label="Facebook"
-            className={`transition hover:text-[#99a0c1] ${
+            className={`transition hover:text-[#99a0c1] shrink-0 ${
               scrolled ? 'text-stone-600' : 'text-white'
             }`}
           >
@@ -116,7 +124,7 @@ export function LiveSiteNavbar({ currentPath = '/', isCymraeg = false }: NavbarP
             target="_blank"
             rel="noopener noreferrer"
             aria-label="Instagram"
-            className={`transition hover:text-[#99a0c1] ${
+            className={`transition hover:text-[#99a0c1] shrink-0 ${
               scrolled ? 'text-stone-600' : 'text-white'
             }`}
           >
@@ -136,7 +144,7 @@ export function LiveSiteNavbar({ currentPath = '/', isCymraeg = false }: NavbarP
                 : '/#book'
             }
             style={{ fontFamily: "'Architects Daughter', cursive, sans-serif" }}
-            className="px-6 py-2.5 rounded-full text-[15px] sm:text-[16px] font-architects font-bold uppercase tracking-wider text-white bg-[#99a0c1] hover:bg-[#323149] transition shadow-sm"
+            className="whitespace-nowrap shrink-0 px-4 xl:px-5 py-2 xl:py-2.5 rounded-full text-xs xl:text-sm font-architects font-bold uppercase tracking-wider text-white bg-[#99a0c1] hover:bg-[#323149] transition shadow-sm"
           >
             {isCymraeg ? 'ARCHEBWCH NAWR' : 'BOOK NOW'}
           </a>

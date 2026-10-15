@@ -92,8 +92,8 @@ export function LiveSiteHero({ isCymraeg = false }: HeroProps) {
             );
           })}
 
-          {/* Darker Vignette & Contrast Overlay */}
-          <div className="absolute inset-0 z-20 bg-black/55 bg-gradient-to-b from-stone-950/75 via-stone-950/45 to-stone-950/80 pointer-events-none" />
+          {/* Subtle Balanced Contrast Overlay - bright and scenic, not overly dark */}
+          <div className="absolute inset-0 z-20 bg-black/25 bg-gradient-to-b from-stone-950/45 via-transparent to-stone-950/40 pointer-events-none" />
         </div>
 
         {/* Main Content & Center Watermark Logo */}
