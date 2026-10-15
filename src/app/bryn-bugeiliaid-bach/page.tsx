@@ -31,8 +31,8 @@ const bbbAwards = [
 
 export default async function BrynBugeiliaidBachPage() {
   const [pricingConfig, blockedDates] = await Promise.all([
-    cmsClient.getPricingConfig(),
-    cmsClient.getBlockedDates(),
+    cmsClient.getPricingConfig('bryn-bugeiliaid-bach'),
+    cmsClient.getBlockedDates('bryn-bugeiliaid-bach'),
   ]);
 
   return (
@@ -193,13 +193,14 @@ export default async function BrynBugeiliaidBachPage() {
 
         {/* BBB Booking Widget */}
         <LiveSiteBooking
+          propertyId="bryn-bugeiliaid-bach"
           isCymraeg={false}
           pricingConfig={pricingConfig}
           blockedDates={blockedDates}
         />
 
-        {/* Accreditations & Footer */}
-        <LiveSiteSisterPropertyAndAccreditations isCymraeg={false} />
+        {/* Accreditations & Footer (promotes main Plas Hafod cottage) */}
+        <LiveSiteSisterPropertyAndAccreditations isCymraeg={false} isBBBPage={true} />
       </main>
     </div>
   );

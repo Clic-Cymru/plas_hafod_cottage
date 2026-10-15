@@ -1,6 +1,6 @@
 import { PricingConfig, BlockedDateRange, BookingInquiry, GuestbookEntry } from './types';
 
-// Default / fallback pricing rules as specified for Plas Hafod
+// Pricing rules for Plas Hafod Cottage
 export const defaultPricingConfig: PricingConfig = {
   baseRate: 175, // £175 per night standard rate
   depositPercentage: 25, // 25% deposit to secure booking
@@ -49,35 +49,116 @@ export const defaultPricingConfig: PricingConfig = {
   ],
 };
 
-// Default blocked dates for testing & calendar display
+// Pricing rules for Bryn Bugeiliaid Bach (Annexe)
+export const bbbPricingConfig: PricingConfig = {
+  baseRate: 145, // £145 per night standard rate for annexe
+  depositPercentage: 25,
+  cleaningFee: 35,
+  seasons: [
+    {
+      id: 'bbb-summer-peak-2026',
+      name: 'Summer Peak (Haf)',
+      startDate: '2026-06-01',
+      endDate: '2026-08-31',
+      nightlyRate: 195,
+      minStay: 3,
+    },
+    {
+      id: 'bbb-autumn-escape-2026',
+      name: 'Autumn Gold (Hydref)',
+      startDate: '2026-09-01',
+      endDate: '2026-10-31',
+      nightlyRate: 160,
+      minStay: 2,
+    },
+    {
+      id: 'bbb-christmas-2026',
+      name: 'Festive Season (Nadolig & Blwyddyn Newydd)',
+      startDate: '2026-12-20',
+      endDate: '2027-01-05',
+      nightlyRate: 225,
+      minStay: 3,
+    },
+  ],
+  discounts: [
+    {
+      id: 'bbb-weekly-stay-7',
+      name: 'Full Week Annexe Retreat (7+ Nights)',
+      minNights: 7,
+      discountType: 'percentage',
+      value: 10,
+    },
+    {
+      id: 'bbb-fortnight-stay-14',
+      name: 'Extended Annexe Stay (14+ Nights)',
+      minNights: 14,
+      discountType: 'percentage',
+      value: 18,
+    },
+  ],
+};
+
+// Blocked dates for Plas Hafod Cottage
 export const defaultBlockedDates: BlockedDateRange[] = [
   {
-    id: 'block-1',
+    id: 'block-ph-1',
     startDate: '2026-10-22',
     endDate: '2026-10-26',
     reason: 'booked',
-    notes: 'Guest Booking #PH-1092',
+    notes: 'Plas Hafod Booking #PH-1092',
   },
   {
-    id: 'block-2',
+    id: 'block-ph-2',
     startDate: '2026-11-05',
     endDate: '2026-11-09',
     reason: 'booked',
-    notes: 'Guest Booking #PH-1099',
+    notes: 'Plas Hafod Booking #PH-1099',
   },
   {
-    id: 'block-3',
+    id: 'block-ph-3',
     startDate: '2026-11-20',
     endDate: '2026-11-22',
     reason: 'maintenance',
-    notes: 'Chimney Sweep & Deep Clean',
+    notes: 'Plas Hafod Chimney Sweep & Clean',
   },
   {
-    id: 'block-4',
+    id: 'block-ph-4',
     startDate: '2026-12-24',
     endDate: '2026-12-29',
     reason: 'booked',
-    notes: 'Christmas Holiday Stay',
+    notes: 'Plas Hafod Christmas Holiday Stay',
+  },
+];
+
+// Blocked dates for Bryn Bugeiliaid Bach
+export const bbbBlockedDates: BlockedDateRange[] = [
+  {
+    id: 'block-bbb-1',
+    startDate: '2026-10-17',
+    endDate: '2026-10-20',
+    reason: 'booked',
+    notes: 'Bryn Bugeiliaid Bach Booking #BBB-501',
+  },
+  {
+    id: 'block-bbb-2',
+    startDate: '2026-10-28',
+    endDate: '2026-10-31',
+    reason: 'booked',
+    notes: 'Bryn Bugeiliaid Bach Booking #BBB-504',
+  },
+  {
+    id: 'block-bbb-3',
+    startDate: '2026-11-12',
+    endDate: '2026-11-16',
+    reason: 'booked',
+    notes: 'Bryn Bugeiliaid Bach Booking #BBB-510',
+  },
+  {
+    id: 'block-bbb-4',
+    startDate: '2026-12-21',
+    endDate: '2026-12-27',
+    reason: 'booked',
+    notes: 'Bryn Bugeiliaid Bach Christmas Retreat',
   },
 ];
 
@@ -128,17 +209,16 @@ let mockInquiriesStore: BookingInquiry[] = [];
  * Handles fetching CMS content & executing Mutation API calls.
  */
 export const cmsClient = {
-  async getPricingConfig(): Promise<PricingConfig> {
-    // If Sanity or external CMS is configured via env vars, fetch via CMS API here
-    if (process.env.SANITY_PROJECT_ID) {
-      // In production with Sanity, run GROQ query: *[_type == "pricingConfig"][0]
+  async getPricingConfig(propertyId: 'plas-hafod' | 'bryn-bugeiliaid-bach' = 'plas-hafod'): Promise<PricingConfig> {
+    if (propertyId === 'bryn-bugeiliaid-bach') {
+      return bbbPricingConfig;
     }
     return defaultPricingConfig;
   },
 
-  async getBlockedDates(): Promise<BlockedDateRange[]> {
-    if (process.env.SANITY_PROJECT_ID) {
-      // In production with Sanity, run GROQ query: *[_type == "blockedDates"]
+  async getBlockedDates(propertyId: 'plas-hafod' | 'bryn-bugeiliaid-bach' = 'plas-hafod'): Promise<BlockedDateRange[]> {
+    if (propertyId === 'bryn-bugeiliaid-bach') {
+      return bbbBlockedDates;
     }
     return defaultBlockedDates;
   },

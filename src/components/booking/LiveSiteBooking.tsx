@@ -17,24 +17,31 @@ import {
   parseISO,
   isWithinInterval,
 } from 'date-fns';
-import { CheckCircle2, AlertCircle, Loader2 } from 'lucide-react';
+import { CheckCircle2, AlertCircle, Loader2, Dog, Ban } from 'lucide-react';
 
 interface LiveSiteBookingProps {
+  propertyId?: 'plas-hafod' | 'bryn-bugeiliaid-bach';
   isCymraeg?: boolean;
   pricingConfig: PricingConfig;
   blockedDates: BlockedDateRange[];
 }
 
 export function LiveSiteBooking({
+  propertyId = 'plas-hafod',
   isCymraeg = false,
   pricingConfig,
   blockedDates,
 }: LiveSiteBookingProps) {
+  const isBBB = propertyId === 'bryn-bugeiliaid-bach';
+  const propertyNameEn = isBBB ? 'Bryn Bugeiliaid Bach' : 'Bwthyn Plas Hafod Cottage';
+  const propertyNameCy = isBBB ? 'Bryn Bugeiliaid Bach' : 'Fwthyn Plas Hafod';
+
   const [currentCalendarDate, setCurrentCalendarDate] = useState(new Date(2026, 9, 1)); // October 2026
   const [checkIn, setCheckIn] = useState('');
   const [checkOut, setCheckOut] = useState('');
   const [adults, setAdults] = useState(2);
   const [children, setChildren] = useState(0);
+  const [pets, setPets] = useState(0);
 
   // Form submission states
   const [guestName, setGuestName] = useState('');
@@ -63,30 +70,36 @@ export function LiveSiteBooking({
   const renderMonth = (monthDate: Date) => {
     const monthStart = startOfMonth(monthDate);
     const monthEnd = endOfMonth(monthDate);
-    const calendarStart = startOfWeek(monthStart, { weekStartsOn: 1 }); // Monday
-    const calendarEnd = endOfWeek(monthEnd, { weekStartsOn: 1 });
-    const days = eachDayOfInterval({ start: calendarStart, end: calendarEnd });
+    const startDate = startOfWeek(monthStart, { weekStartsOn: 1 });
+    const endDate = endOfWeek(monthEnd, { weekStartsOn: 1 });
+    const days = eachDayOfInterval({ start: startDate, end: endDate });
 
     return (
-      <div className="flex-1 min-w-[280px]">
-        <h4 className="text-center font-sans font-medium text-stone-700 py-2 border-b border-stone-200 text-sm">
+      <div className="flex-1 min-w-[260px] p-2">
+        <h4 className="text-center font-architects text-lg font-bold text-stone-900 mb-3">
           {format(monthDate, 'MMMM yyyy')}
         </h4>
-        <div className="grid grid-cols-7 text-center text-xs font-semibold text-stone-500 py-2">
-          <span>MO</span>
-          <span>TU</span>
-          <span>WE</span>
-          <span>TH</span>
-          <span>FR</span>
-          <span>SA</span>
-          <span>SU</span>
+        <div className="grid grid-cols-7 gap-1 text-center text-xs font-semibold text-stone-500 mb-2 font-sans">
+          <span>Mo</span>
+          <span>Tu</span>
+          <span>We</span>
+          <span>Th</span>
+          <span>Fr</span>
+          <span>Sa</span>
+          <span>Su</span>
         </div>
-        <div className="grid grid-cols-7 text-center text-xs">
+        <div className="grid grid-cols-7 gap-1 text-xs">
           {days.map((d, i) => {
             const inMonth = isSameMonth(d, monthDate);
-            const occupied = inMonth && isOccupied(d);
+            const occupied = isOccupied(d);
             const formatted = format(d, 'yyyy-MM-dd');
-            const isSelected = formatted === checkIn || formatted === checkOut;
+            const isSelected =
+              formatted === checkIn ||
+              formatted === checkOut ||
+              (checkIn &&
+                checkOut &&
+                formatted >= checkIn &&
+                formatted <= checkOut);
 
             return (
               <button
@@ -94,6 +107,7 @@ export function LiveSiteBooking({
                 type="button"
                 disabled={!inMonth || occupied}
                 onClick={() => {
+                  if (!inMonth || occupied) return;
                   if (!checkIn || (checkIn && checkOut)) {
                     setCheckIn(formatted);
                     setCheckOut('');
@@ -107,12 +121,12 @@ export function LiveSiteBooking({
                 }}
                 className={`h-9 flex items-center justify-center font-mono border border-stone-100 transition ${
                   !inMonth
-                    ? 'text-stone-300 bg-stone-50'
+                    ? 'text-stone-300 bg-stone-50 cursor-default'
                     : occupied
                     ? 'bg-[#efda07] text-stone-900 font-semibold cursor-not-allowed'
                     : isSelected
                     ? 'bg-[#99a0c1] text-white font-bold'
-                    : 'text-stone-700 hover:bg-[#99a0c1]/20'
+                    : 'text-stone-700 hover:bg-[#99a0c1]/20 cursor-pointer'
                 }`}
               >
                 {format(d, 'd')}
@@ -141,6 +155,7 @@ export function LiveSiteBooking({
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          propertyId,
           guestName,
           guestEmail,
           guestPhone,
@@ -148,7 +163,7 @@ export function LiveSiteBooking({
           checkOut,
           adults,
           children,
-          pets: 0,
+          pets: isBBB ? 0 : pets,
           notes,
         }),
       });
@@ -167,17 +182,17 @@ export function LiveSiteBooking({
   return (
     <section id="book" className="scroll-mt-24 py-16 bg-[#fbfbfd]">
       <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Title */}
-        <h2 className="text-3xl sm:text-5xl font-architects text-center tracking-wide uppercase text-stone-900 mb-10">
-          {isCymraeg ? 'GWIRIO ARGAELEDD' : 'CHECK AVAILABILITY'}{' '}
+        {/* Main Section Title */}
+        <h2 className="text-2xl sm:text-4xl md:text-5xl font-architects text-center tracking-wide uppercase text-stone-900 mb-10">
+          {isCymraeg ? 'GWIRIO ARGAELEDD AC ARCHEBU AR GYFER' : 'CHECK AVAILABILITY AND MAKE A BOOKING FOR'}{' '}
           <span className="text-[#99a0c1]">
-            {isCymraeg ? 'AC ARCHEBU' : 'AND MAKE A BOOKING'}
+            {isCymraeg ? propertyNameCy.toUpperCase() : propertyNameEn.toUpperCase()}
           </span>
         </h2>
 
         {/* Dual Calendar Box */}
-        <div className="max-w-2xl mx-auto bg-white border border-stone-200 rounded-xl shadow-md p-4 mb-8">
-          <div className="flex items-center justify-between px-2 mb-2">
+        <div className="max-w-2xl mx-auto bg-white border border-stone-200 rounded-2xl shadow-md p-4 sm:p-6 mb-10">
+          <div className="flex items-center justify-between px-2 mb-3">
             <button
               onClick={prevMonth}
               aria-label="Previous Month"
@@ -185,8 +200,8 @@ export function LiveSiteBooking({
             >
               &larr;
             </button>
-            <span className="text-xs font-semibold text-stone-500 uppercase tracking-wider font-sans">
-              Plas Hafod Calendar
+            <span className="text-xs font-semibold text-stone-600 uppercase tracking-wider font-sans">
+              {isBBB ? 'Bryn Bugeiliaid Bach Calendar' : 'Plas Hafod Cottage Calendar'}
             </span>
             <button
               onClick={nextMonth}
@@ -205,15 +220,15 @@ export function LiveSiteBooking({
           {/* Occupied Legend */}
           <div className="flex items-center justify-center gap-2 pt-4 mt-2 border-t border-stone-100 text-xs text-stone-600 font-sans">
             <span className="w-4 h-4 bg-[#efda07] inline-block rounded-sm" />
-            <span>{isCymraeg ? 'Wedi ei archebu / Neilltuedig' : 'Occupied'}</span>
+            <span>{isCymraeg ? 'Wedi ei archebu / Neilltuedig' : 'Occupied / Booked'}</span>
           </div>
         </div>
 
-        {/* Search & Rates Bar */}
+        {/* Search & Rates Bar Header */}
         <h3 className="text-xl sm:text-2xl font-architects uppercase tracking-wider text-center text-stone-800 mb-6">
           {isCymraeg
-            ? 'GWIRIAD PRIS AC ARGAELEDD AR GYFER BWTHYN PLAS HAFOD'
-            : 'CHECK PRICE AND AVAILABILITY FOR BWTHYN PLAS HAFOD COTTAGE'}
+            ? `GWIRIAD PRIS AC ARGAELEDD AR GYFER ${propertyNameCy.toUpperCase()}`
+            : `CHECK PRICE AND AVAILABILITY FOR ${propertyNameEn.toUpperCase()}`}
         </h3>
 
         <div className="max-w-4xl mx-auto bg-white border border-stone-200 rounded-2xl p-6 sm:p-8 shadow-sm">
@@ -252,7 +267,7 @@ export function LiveSiteBooking({
                 onChange={(e) => setAdults(Number(e.target.value))}
                 className="w-full bg-white border border-stone-300 rounded-lg px-3 py-2 text-stone-800 text-sm focus:outline-none focus:border-[#99a0c1]"
               >
-                {[1, 2, 3, 4, 5, 6].map((n) => (
+                {[1, 2, 3, 4].map((n) => (
                   <option key={n} value={n}>
                     {n}
                   </option>
@@ -260,22 +275,33 @@ export function LiveSiteBooking({
               </select>
             </div>
 
-            <div>
-              <label className="block text-xs font-bold text-stone-700 uppercase tracking-wider font-sans mb-1">
-                {isCymraeg ? 'Plant' : 'Children'}
-              </label>
-              <select
-                value={children}
-                onChange={(e) => setChildren(Number(e.target.value))}
-                className="w-full bg-white border border-stone-300 rounded-lg px-3 py-2 text-stone-800 text-sm focus:outline-none focus:border-[#99a0c1]"
-              >
-                {[0, 1, 2, 3, 4].map((n) => (
-                  <option key={n} value={n}>
-                    {n}
-                  </option>
-                ))}
-              </select>
-            </div>
+            {/* Pets Selection (Dogs allowed at Plas Hafod, strictly no pets at BBB) */}
+            {!isBBB ? (
+              <div>
+                <label className="block text-xs font-bold text-stone-700 uppercase tracking-wider font-sans mb-1">
+                  {isCymraeg ? 'Cŵn / Anifeiliaid' : 'Dogs'}
+                </label>
+                <select
+                  value={pets}
+                  onChange={(e) => setPets(Number(e.target.value))}
+                  className="w-full bg-white border border-stone-300 rounded-lg px-3 py-2 text-stone-800 text-sm focus:outline-none focus:border-[#99a0c1]"
+                >
+                  <option value={0}>{isCymraeg ? '0 Ci' : '0 Dogs'}</option>
+                  <option value={1}>{isCymraeg ? '1 Ci (£30)' : '1 Dog (£30)'}</option>
+                  <option value={2}>{isCymraeg ? '2 Gi (£60)' : '2 Dogs (£60)'}</option>
+                </select>
+              </div>
+            ) : (
+              <div>
+                <label className="block text-xs font-bold text-stone-500 uppercase tracking-wider font-sans mb-1">
+                  {isCymraeg ? 'Anifeiliaid' : 'Pets Policy'}
+                </label>
+                <div className="flex items-center gap-1.5 px-3 py-2 bg-stone-100 rounded-lg text-xs text-stone-600 border border-stone-200">
+                  <Ban className="w-3.5 h-3.5 text-stone-400 shrink-0" />
+                  <span>No pets allowed</span>
+                </div>
+              </div>
+            )}
 
             <div>
               <button
@@ -296,13 +322,14 @@ export function LiveSiteBooking({
                   <div className="bg-stone-50 border border-stone-200 rounded-xl p-5 flex flex-col sm:flex-row justify-between items-center gap-4">
                     <div>
                       <p className="font-architects text-xl text-stone-900">
-                        {calculation.totalNights} {isCymraeg ? 'Noson' : 'Nights'} (
+                        {propertyNameEn}: {calculation.totalNights} {isCymraeg ? 'Noson' : 'Nights'} (
                         {checkIn} &rarr; {checkOut})
                       </p>
                       <p className="text-xs text-stone-500 font-sans mt-1">
                         Average rate: £{calculation.baseRateAverage} / night
                         {calculation.discountAmount > 0 &&
                           ` • Includes ${calculation.appliedDiscountName}`}
+                        {!isBBB && pets > 0 && ` • Includes £${pets * 30} pet fee`}
                       </p>
                     </div>
 
@@ -311,7 +338,7 @@ export function LiveSiteBooking({
                         {isCymraeg ? 'Cyfanswm' : 'Total Price'}
                       </p>
                       <p className="text-3xl font-architects text-stone-900 font-bold">
-                        £{calculation.totalPrice}
+                        £{calculation.totalPrice + (!isBBB ? pets * 30 : 0)}
                       </p>
                       <p className="text-xs text-[#99a0c1] font-semibold mt-0.5">
                         {isCymraeg ? 'Blaendal: ' : 'Deposit: '}£{calculation.depositAmount}
@@ -328,17 +355,17 @@ export function LiveSiteBooking({
                       </h4>
                       <p className="text-sm font-sans mt-2">
                         {isCymraeg
-                          ? 'Rydym wedi derbyn eich ymholiad am Plas Hafod a byddwn mewn cysylltiad o fewn 24 awr.'
-                          : 'We have received your booking inquiry for Plas Hafod and will reply within 24 hours with deposit confirmation.'}
+                          ? `Rydym wedi derbyn eich ymholiad am ${propertyNameCy} a byddwn mewn cysylltiad o fewn 24 awr gyda chadarnhad y blaendal.`
+                          : `We have received your booking inquiry for ${propertyNameEn} and will reply within 24 hours with deposit confirmation.`}
                       </p>
                       <p className="font-mono text-xs text-emerald-700 mt-2">
-                        Ref: {submittedId}
+                        Ref: {submittedId} ({propertyId})
                       </p>
                     </div>
                   ) : (
                     <form onSubmit={handleSubmit} className="space-y-4">
                       <h4 className="font-architects text-lg text-stone-800 uppercase tracking-wide">
-                        {isCymraeg ? 'Cwblhewch Eich Ymholiad' : 'Complete Your Booking Inquiry'}
+                        {isCymraeg ? `Cwblhewch Eich Ymholiad am ${propertyNameCy}` : `Complete Your Booking Inquiry for ${propertyNameEn}`}
                       </h4>
 
                       {errorMsg && (
@@ -397,7 +424,7 @@ export function LiveSiteBooking({
                             <span>{isCymraeg ? 'Yn anfon...' : 'Submitting...'}</span>
                           </>
                         ) : (
-                          <span>{isCymraeg ? 'Cadarnhau Archeb' : 'Submit Booking Request'}</span>
+                          <span>{isCymraeg ? `Cadarnhau Archeb ar gyfer ${propertyNameCy}` : `Submit Booking Request for ${propertyNameEn}`}</span>
                         )}
                       </button>
                     </form>

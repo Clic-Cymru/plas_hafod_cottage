@@ -6,6 +6,7 @@ export async function POST(request: Request) {
   try {
     const body = await request.json();
     const {
+      propertyId = 'plas-hafod',
       guestName,
       guestEmail,
       guestPhone,
@@ -17,6 +18,9 @@ export async function POST(request: Request) {
       notes = '',
     } = body;
 
+    const validatedPropertyId: 'plas-hafod' | 'bryn-bugeiliaid-bach' =
+      propertyId === 'bryn-bugeiliaid-bach' ? 'bryn-bugeiliaid-bach' : 'plas-hafod';
+
     // Basic validation
     if (!guestName || !guestEmail || !guestPhone || !checkIn || !checkOut) {
       return NextResponse.json(
@@ -25,9 +29,9 @@ export async function POST(request: Request) {
       );
     }
 
-    // Retrieve active pricing & blocked calendar from CMS
-    const pricingConfig = await cmsClient.getPricingConfig();
-    const blockedDates = await cmsClient.getBlockedDates();
+    // Retrieve active pricing & blocked calendar from CMS for specific property
+    const pricingConfig = await cmsClient.getPricingConfig(validatedPropertyId);
+    const blockedDates = await cmsClient.getBlockedDates(validatedPropertyId);
 
     // Verify calculation independently on server to ensure pricing integrity
     const calculation = calculateStayPrice(checkIn, checkOut, pricingConfig, blockedDates);
@@ -41,6 +45,7 @@ export async function POST(request: Request) {
 
     // Action 1: Save Inquiry to CMS via Mutation API
     const inquiryRecord = await cmsClient.createBookingInquiry({
+      propertyId: validatedPropertyId,
       guestName,
       guestEmail,
       guestPhone,
@@ -60,6 +65,11 @@ export async function POST(request: Request) {
       notes,
     });
 
+    const propertyTitle =
+      validatedPropertyId === 'bryn-bugeiliaid-bach'
+        ? 'Bryn Bugeiliaid Bach'
+        : 'Plas Hafod Cottage';
+
     // Action 2: Trigger Email API (Resend / SendGrid / notification webhook)
     if (process.env.RESEND_API_KEY) {
       try {
@@ -72,9 +82,10 @@ export async function POST(request: Request) {
           body: JSON.stringify({
             from: 'Plas Hafod Bookings <bookings@plashafod.co.uk>',
             to: [process.env.NOTIFICATION_EMAIL || 'info@plashafod.co.uk'],
-            subject: `New Booking Inquiry from ${guestName} (${checkIn} to ${checkOut})`,
+            subject: `New Booking Inquiry for ${propertyTitle} from ${guestName} (${checkIn} to ${checkOut})`,
             html: `
-              <h2>New Booking Inquiry: Plas Hafod</h2>
+              <h2>New Booking Inquiry: ${propertyTitle}</h2>
+              <p><strong>Property:</strong> ${propertyTitle}</p>
               <p><strong>Guest:</strong> ${guestName} (${guestEmail}, ${guestPhone})</p>
               <p><strong>Dates:</strong> ${checkIn} to ${checkOut} (${calculation.totalNights} nights)</p>
               <p><strong>Guests:</strong> ${adults} Adults, ${children} Children, ${pets} Pets</p>

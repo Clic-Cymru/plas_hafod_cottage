@@ -4,6 +4,7 @@ import Link from 'next/link';
 
 interface SisterProps {
   isCymraeg?: boolean;
+  isBBBPage?: boolean;
 }
 
 const accreditationImages = [
@@ -22,7 +23,10 @@ const croesoBadges = [
   { id: 10, src: '/images/wp/croeso-walkers.jpg', alt: 'Croeso Cerddwyr Walkers Welcome' },
 ];
 
-export function LiveSiteSisterPropertyAndAccreditations({ isCymraeg = false }: SisterProps) {
+export function LiveSiteSisterPropertyAndAccreditations({
+  isCymraeg = false,
+  isBBBPage = false,
+}: SisterProps) {
   return (
     <div className="bg-[#fbfbfd] text-[#333333]">
       {/* Wave Separator */}
@@ -39,26 +43,35 @@ export function LiveSiteSisterPropertyAndAccreditations({ isCymraeg = false }: S
         </svg>
       </div>
 
-      {/* 1. Sister Property: Bryn Bugeiliaid Bach */}
+      {/* 1. Sister Property Section */}
       <section className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <h2 className="text-2xl sm:text-4xl font-architects text-center uppercase tracking-wide text-stone-900 mb-12">
-          {isCymraeg
-            ? 'A YDYCH WEDI YSTYRIED EIN HEIDDO ARALL - '
-            : 'HAVE YOU CONSIDERED OUR OTHER PROPERTY - '}{' '}
-          <span className="text-[#99a0c1]">BRYN BUGEILIAID BACH</span>
+          {isBBBPage ? (
+            <>
+              {isCymraeg ? 'A YDYCH WEDI YSTYRIED EIN PRIF FWTHYN - ' : 'HAVE YOU CONSIDERED OUR MAIN COTTAGE - '}{' '}
+              <span className="text-[#99a0c1]">PLAS HAFOD COTTAGE</span>
+            </>
+          ) : (
+            <>
+              {isCymraeg
+                ? 'A YDYCH WEDI YSTYRIED EIN HEIDDO ARALL - '
+                : 'HAVE YOU CONSIDERED OUR OTHER PROPERTY - '}{' '}
+              <span className="text-[#99a0c1]">BRYN BUGEILIAID BACH</span>
+            </>
+          )}
         </h2>
 
         <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-center bg-white border border-stone-200 rounded-3xl p-6 sm:p-10 shadow-sm">
           {/* Left Photo with Click here to book button */}
           <div className="md:col-span-6 relative aspect-[16/11] rounded-2xl overflow-hidden shadow-md group">
             <Image
-              src="/images/wp/bbb-living.jpg"
-              alt="Bryn Bugeiliaid Bach sister accommodation"
+              src={isBBBPage ? '/images/wp/gallery-1.jpg' : '/images/wp/bbb-living.jpg'}
+              alt={isBBBPage ? 'Plas Hafod Cottage Exterior' : 'Bryn Bugeiliaid Bach sister accommodation'}
               fill
               className="object-cover group-hover:scale-105 transition duration-500"
             />
             <Link
-              href="/bryn-bugeiliaid-bach"
+              href={isBBBPage ? (isCymraeg ? '/cy#book' : '/#book') : '/bryn-bugeiliaid-bach#book'}
               className="absolute bottom-5 left-1/2 -translate-x-1/2 px-6 py-2.5 rounded-full text-xs font-semibold uppercase tracking-wider text-white bg-[#99a0c1] hover:bg-[#323149] transition shadow-lg"
             >
               {isCymraeg ? 'CLICIWCH YMA I ARCHEBU' : 'CLICK HERE TO BOOK'}
@@ -69,16 +82,22 @@ export function LiveSiteSisterPropertyAndAccreditations({ isCymraeg = false }: S
           <div className="md:col-span-6 flex flex-col items-center text-center px-4">
             <div className="relative w-72 sm:w-80 h-24 mb-6">
               <Image
-                src="/images/wp/bbb-logo.jpg"
-                alt="Bryn Bugeiliaid Bach Logo"
+                src={isBBBPage ? '/images/wp/logo-color.png' : '/images/wp/bbb-logo.jpg'}
+                alt={isBBBPage ? 'Plas Hafod Cottage Logo' : 'Bryn Bugeiliaid Bach Logo'}
                 fill
                 className="object-contain"
               />
             </div>
             <p className="text-stone-700 text-sm sm:text-base leading-relaxed font-sans max-w-md">
-              {isCymraeg
-                ? 'Llety 2 wely wedi&#39;i adfer yn hyfryd yn edrych dros Ddyffryn Nantlle ac yn swatio ychydig o dan Grib Nantlle drawiadol yn Eryri hardd.'
-                : 'A beautifully restored 2 bed accommodation overlooking Dyffryn Nantlle and nestled just below the impressive Nantlle Ridge in beautiful Snowdonia.'}
+              {isBBBPage ? (
+                isCymraeg
+                  ? 'Bwthyn traddodiadol moethus 5 seren yn Nyffryn Nantlle gyda lle tân agored, golygfeydd panoramig ac yn croesawu cŵn.'
+                  : 'Our traditional 5-star detached Welsh stone cottage with inglenook fireplace, panoramic mountain & sea views, and pet-friendly garden.'
+              ) : (
+                isCymraeg
+                  ? 'Llety 2 wely wedi&#39;i adfer yn hyfryd yn edrych dros Ddyffryn Nantlle ac yn swatio ychydig o dan Grib Nantlle drawiadol yn Eryri hardd.'
+                  : 'A beautifully restored 2 bed accommodation overlooking Dyffryn Nantlle and nestled just below the impressive Nantlle Ridge in beautiful Snowdonia.'
+              )}
             </p>
           </div>
         </div>

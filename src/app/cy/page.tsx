@@ -62,6 +62,7 @@ export default async function WelshHomePage() {
           <LiveSiteHero isCymraeg={true} />
           <LiveSiteAboutAndGallery isCymraeg={true} />
           <LiveSiteBooking
+            propertyId="plas-hafod"
             isCymraeg={true}
             pricingConfig={pricingConfig}
             blockedDates={blockedDates}

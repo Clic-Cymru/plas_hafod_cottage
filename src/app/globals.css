@@ -1,9 +1,10 @@
+@import url('https://fonts.googleapis.com/css2?family=Architects+Daughter&family=Montserrat:wght@300;400;500;600;700&family=Roboto:wght@300;400;500;700&display=swap');
 @import "tailwindcss";
 
-@theme inline {
-  --font-architects: var(--font-architects);
-  --font-montserrat: var(--font-montserrat);
-  --font-roboto: var(--font-roboto);
+@theme {
+  --font-architects: "Architects Daughter", cursive, sans-serif;
+  --font-montserrat: "Montserrat", sans-serif;
+  --font-roboto: "Roboto", sans-serif;
 }
 
 :root {
@@ -17,15 +18,20 @@
 body {
   background-color: var(--background);
   color: var(--foreground);
-  font-family: var(--font-montserrat), var(--font-roboto), sans-serif;
+  font-family: 'Montserrat', 'Roboto', sans-serif;
   overflow-x: hidden;
 }
 
-h1, h2, h3, h4, .font-architects {
-  font-family: var(--font-architects), cursive, sans-serif;
+/* Force Architects Daughter font onto all headings and .font-architects classes */
+.font-architects,
+h1,
+h2,
+h3,
+h4 {
+  font-family: 'Architects Daughter', cursive, sans-serif !important;
 }
 
-/* Custom scrollbar and animations */
+/* Custom selection */
 ::selection {
   background-color: #99a0c1;
   color: #ffffff;

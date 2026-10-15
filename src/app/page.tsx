@@ -63,6 +63,7 @@ export default async function HomePage() {
           <LiveSiteHero isCymraeg={false} />
           <LiveSiteAboutAndGallery isCymraeg={false} />
           <LiveSiteBooking
+            propertyId="plas-hafod"
             isCymraeg={false}
             pricingConfig={pricingConfig}
             blockedDates={blockedDates}

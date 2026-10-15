@@ -42,6 +42,14 @@ export default function RootLayout({
       lang="en-GB"
       className={`${architectsDaughter.variable} ${montserrat.variable} ${roboto.variable} scroll-smooth`}
     >
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Architects+Daughter&family=Montserrat:wght@400;500;600;700&family=Roboto:wght@300;400;500;700&display=swap"
+          rel="stylesheet"
+        />
+      </head>
       <body className="min-h-screen bg-[#fcfcfd] text-[#333333] antialiased font-sans">
         {children}
       </body>

@@ -119,7 +119,15 @@ export function LiveSiteNavbar({ currentPath = '/', isCymraeg = false }: NavbarP
           </a>
 
           <a
-            href={currentPath === '/' || currentPath === '/cy' ? '#book' : isCymraeg ? '/cy#book' : '/#book'}
+            href={
+              currentPath === '/bryn-bugeiliaid-bach'
+                ? '#book'
+                : currentPath === '/' || currentPath === '/cy'
+                ? '#book'
+                : isCymraeg
+                ? '/cy#book'
+                : '/#book'
+            }
             className="px-5 py-2.5 rounded-full text-xs font-semibold uppercase tracking-wider text-white bg-[#99a0c1] hover:bg-[#323149] transition shadow-sm"
           >
             {isCymraeg ? 'ARCHEBWCH NAWR' : 'BOOK NOW'}
@@ -129,7 +137,15 @@ export function LiveSiteNavbar({ currentPath = '/', isCymraeg = false }: NavbarP
         {/* Mobile menu hamburger */}
         <div className="flex lg:hidden items-center space-x-2">
           <a
-            href={currentPath === '/' || currentPath === '/cy' ? '#book' : isCymraeg ? '/cy#book' : '/#book'}
+            href={
+              currentPath === '/bryn-bugeiliaid-bach'
+                ? '#book'
+                : currentPath === '/' || currentPath === '/cy'
+                ? '#book'
+                : isCymraeg
+                ? '/cy#book'
+                : '/#book'
+            }
             className="px-3 py-1.5 rounded-full text-xs font-semibold uppercase text-white bg-[#99a0c1]"
           >
             {isCymraeg ? 'Archebu' : 'Book'}

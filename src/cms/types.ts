@@ -36,6 +36,7 @@ export interface PricingConfig {
 
 export interface BookingInquiry {
   id?: string;
+  propertyId?: 'plas-hafod' | 'bryn-bugeiliaid-bach';
   guestName: string;
   guestEmail: string;
   guestPhone: string;
