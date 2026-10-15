@@ -1,34 +1,35 @@
 import { Metadata } from 'next';
 import { cmsClient } from '@/cms/client';
-import { Navbar } from '@/components/navigation/Navbar';
-import { CottageOverview } from '@/components/cottage/CottageOverview';
-import { BookingWidget } from '@/components/booking/BookingWidget';
-import { GuestbookGallery } from '@/components/reviews/GuestbookGallery';
-import { Footer } from '@/components/navigation/Footer';
+import { LiveSiteNavbar } from '@/components/navigation/LiveSiteNavbar';
+import { LiveSiteHero } from '@/components/cottage/LiveSiteHero';
+import { LiveSiteAboutAndGallery } from '@/components/cottage/LiveSiteAboutAndGallery';
+import { LiveSiteBooking } from '@/components/booking/LiveSiteBooking';
+import { LiveSiteSisterPropertyAndAccreditations } from '@/components/cottage/LiveSiteSisterPropertyAndAccreditations';
 import { generateCottageJsonLd } from '@/lib/seo/jsonld';
-import { cyDictionary } from '@/lib/i18n/dictionaries/cy';
 
 export const metadata: Metadata = {
-  title: cyDictionary.meta.siteTitle,
-  description: cyDictionary.meta.siteDescription,
+  title: 'Bwthyn Plas Hafod - Bwthyn Gwyliau Clyd gyda Golygfeydd Rhyfeddol yn Eryri',
+  description:
+    'Profwch Plas Hafod, bwthyn gwyliau 5 seren Croeso Cymru ar ymyl Parc Cenedlaethol Eryri yn Nebo gyda golygfeydd panoramig o fynyddoedd a&#39;r môr.',
   alternates: {
-    canonical: 'https://plashafod.co.uk/cy',
+    canonical: 'https://plashafodcottage.co.uk/cy',
     languages: {
-      'en-GB': 'https://plashafod.co.uk',
-      'cy-GB': 'https://plashafod.co.uk/cy',
+      'en-GB': 'https://plashafodcottage.co.uk',
+      'cy-GB': 'https://plashafodcottage.co.uk/cy',
     },
   },
   openGraph: {
-    title: cyDictionary.meta.siteTitle,
-    description: cyDictionary.meta.siteDescription,
-    url: 'https://plashafod.co.uk/cy',
-    siteName: 'Plas Hafod',
+    title: 'Bwthyn Plas Hafod - Bwthyn Clyd gyda Golygfeydd Rhyfeddol',
+    description:
+      'Bwthyn gwyliau 5 seren Croeso Cymru ar ymyl Parc Cenedlaethol Eryri yn Nebo gyda golygfeydd godidog o Eryri, Ynys Môn, a Môr Iwerddon.',
+    url: 'https://plashafodcottage.co.uk/cy',
+    siteName: 'Bwthyn Plas Hafod',
     images: [
       {
-        url: '/images/hero.jpg',
-        width: 1200,
-        height: 675,
-        alt: 'Plas Hafod Bwthyn Gwyliau Moethus',
+        url: '/images/wp/hero-bg.jpg',
+        width: 1920,
+        height: 1080,
+        alt: 'Golygfeydd mynydd Plas Hafod yn Eryri',
       },
     ],
     locale: 'cy_GB',
@@ -37,17 +38,15 @@ export const metadata: Metadata = {
 };
 
 export default async function WelshHomePage() {
-  const [pricingConfig, blockedDates, guestbookEntries] = await Promise.all([
+  const [pricingConfig, blockedDates] = await Promise.all([
     cmsClient.getPricingConfig(),
     cmsClient.getBlockedDates(),
-    cmsClient.getGuestbookEntries(),
   ]);
 
   const { lodgingBusiness, breadcrumbs } = generateCottageJsonLd({ locale: 'cy' });
 
   return (
     <>
-      {/* Inject Technical & Local SEO JSON-LD Markup */}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(lodgingBusiness) }}
@@ -57,18 +56,18 @@ export default async function WelshHomePage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbs) }}
       />
 
-      <div className="min-h-screen bg-stone-950 text-stone-100 flex flex-col font-sans selection:bg-amber-500 selection:text-stone-950">
-        <Navbar currentLocale="cy" />
+      <div className="min-h-screen bg-[#fbfbfd] text-[#333333] flex flex-col font-sans selection:bg-[#efda07]/30 selection:text-stone-900">
+        <LiveSiteNavbar currentPath="/cy" isCymraeg={true} />
         <main className="flex-1">
-          <CottageOverview currentLocale="cy" />
-          <BookingWidget
-            currentLocale="cy"
+          <LiveSiteHero isCymraeg={true} />
+          <LiveSiteAboutAndGallery isCymraeg={true} />
+          <LiveSiteBooking
+            isCymraeg={true}
             pricingConfig={pricingConfig}
             blockedDates={blockedDates}
           />
-          <GuestbookGallery currentLocale="cy" entries={guestbookEntries} />
+          <LiveSiteSisterPropertyAndAccreditations isCymraeg={true} />
         </main>
-        <Footer currentLocale="cy" />
       </div>
     </>
   );

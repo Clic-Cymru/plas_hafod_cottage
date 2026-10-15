@@ -1,21 +1,32 @@
 @import "tailwindcss";
 
 @theme inline {
-  --font-serif: var(--font-serif);
-  --font-sans: var(--font-sans);
+  --font-architects: var(--font-architects);
+  --font-montserrat: var(--font-montserrat);
+  --font-roboto: var(--font-roboto);
 }
 
 :root {
-  --background: #0c0a09;
-  --foreground: #f5f5f4;
+  --background: #fbfbfd;
+  --foreground: #333333;
+  --brand-blue: #99a0c1;
+  --brand-blue-dark: #323149;
+  --brand-yellow: #efda07;
 }
 
 body {
-  background: var(--background);
+  background-color: var(--background);
   color: var(--foreground);
-  font-family: var(--font-sans), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-family: var(--font-montserrat), var(--font-roboto), sans-serif;
+  overflow-x: hidden;
 }
 
-h1, h2, h3, .font-serif {
-  font-family: var(--font-serif), Georgia, serif;
+h1, h2, h3, h4, .font-architects {
+  font-family: var(--font-architects), cursive, sans-serif;
+}
+
+/* Custom scrollbar and animations */
+::selection {
+  background-color: #99a0c1;
+  color: #ffffff;
 }

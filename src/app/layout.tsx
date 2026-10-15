@@ -1,24 +1,35 @@
 import type { Metadata } from 'next';
-import { Playfair_Display, Inter } from 'next/font/google';
+import { Architects_Daughter, Montserrat, Roboto } from 'next/font/google';
 import './globals.css';
 
-const playfair = Playfair_Display({
-  variable: '--font-serif',
+const architectsDaughter = Architects_Daughter({
+  weight: '400',
   subsets: ['latin'],
+  variable: '--font-architects',
   display: 'swap',
 });
 
-const inter = Inter({
-  variable: '--font-sans',
+const montserrat = Montserrat({
   subsets: ['latin'],
+  variable: '--font-montserrat',
+  display: 'swap',
+});
+
+const roboto = Roboto({
+  weight: ['300', '400', '500', '700'],
+  subsets: ['latin'],
+  variable: '--font-roboto',
   display: 'swap',
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://plashafod.co.uk'),
-  title: 'Plas Hafod | Luxury Welsh Cottage Retreat in Eryri (Snowdonia)',
+  metadataBase: new URL('https://plashafodcottage.co.uk'),
+  title: 'Bwthyn Plas Hafod Cottage - Cozy Cottage with Amazing Views',
   description:
-    'Experience authentic Welsh tranquility at Plas Hafod, a restored 18th-century stone holiday cottage with inglenook fireplace, mountain views, and luxury comforts.',
+    'Plas Hafod Cottage offers a warm and cozy traditional Welsh cottage in a location with views that will take your breath away. Book now to secure your stay.',
+  icons: {
+    icon: '/images/wp/logo-color.png',
+  },
 };
 
 export default function RootLayout({
@@ -27,8 +38,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`${playfair.variable} ${inter.variable} scroll-smooth`}>
-      <body className="min-h-screen bg-stone-950 text-stone-100 antialiased font-sans">
+    <html
+      lang="en-GB"
+      className={`${architectsDaughter.variable} ${montserrat.variable} ${roboto.variable} scroll-smooth`}
+    >
+      <body className="min-h-screen bg-[#fcfcfd] text-[#333333] antialiased font-sans">
         {children}
       </body>
     </html>
