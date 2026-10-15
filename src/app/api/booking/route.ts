@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { cmsClient } from '@/cms/client';
 import { calculateStayPrice } from '@/lib/pricing-engine';
+import { sendBookingEmails } from '@/lib/email/resend';
 
 export async function POST(request: Request) {
   try {
@@ -70,34 +71,25 @@ export async function POST(request: Request) {
         ? 'Bryn Bugeiliaid Bach'
         : 'Plas Hafod Cottage';
 
-    // Action 2: Trigger Email API (Resend / SendGrid / notification webhook)
-    if (process.env.RESEND_API_KEY) {
-      try {
-        await fetch('https://api.resend.com/emails', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${process.env.RESEND_API_KEY}`,
-          },
-          body: JSON.stringify({
-            from: 'Plas Hafod Bookings <bookings@plashafod.co.uk>',
-            to: [process.env.NOTIFICATION_EMAIL || 'info@plashafod.co.uk'],
-            subject: `New Booking Inquiry for ${propertyTitle} from ${guestName} (${checkIn} to ${checkOut})`,
-            html: `
-              <h2>New Booking Inquiry: ${propertyTitle}</h2>
-              <p><strong>Property:</strong> ${propertyTitle}</p>
-              <p><strong>Guest:</strong> ${guestName} (${guestEmail}, ${guestPhone})</p>
-              <p><strong>Dates:</strong> ${checkIn} to ${checkOut} (${calculation.totalNights} nights)</p>
-              <p><strong>Guests:</strong> ${adults} Adults, ${children} Children, ${pets} Pets</p>
-              <p><strong>Total:</strong> £${calculation.totalPrice} (Deposit: £${calculation.depositAmount})</p>
-              <p><strong>Notes:</strong> ${notes || 'None'}</p>
-            `,
-          }),
-        });
-      } catch (emailErr) {
-        console.error('Email delivery error:', emailErr);
-      }
-    }
+    // Action 2: Trigger Resend Email API (Owner Alert + Guest Auto-Confirmation)
+    const emailResult = await sendBookingEmails({
+      propertyTitle,
+      guestName,
+      guestEmail,
+      guestPhone,
+      checkIn,
+      checkOut,
+      totalNights: calculation.totalNights,
+      adults: Number(adults),
+      children: Number(children),
+      pets: Number(pets),
+      totalPrice: calculation.totalPrice,
+      depositAmount: calculation.depositAmount,
+      balanceDue: calculation.balanceDue,
+      notes,
+      inquiryId: inquiryRecord.id,
+    });
+
 
     return NextResponse.json({
       success: true,

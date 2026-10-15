@@ -1,5 +1,6 @@
-import { PricingConfig, BlockedDateRange, BookingInquiry, GuestbookEntry } from './types';
+import { PricingConfig, BlockedDateRange, BookingInquiry, GuestbookEntry, ContactMessage } from './types';
 import { sanityClient, isSanityLive } from './sanity.client';
+
 
 // Pricing rules for Plas Hafod Cottage
 export const defaultPricingConfig: PricingConfig = {
@@ -204,6 +205,8 @@ export const defaultGuestbook: GuestbookEntry[] = [
 
 // In-memory inquiry store for local simulation
 let mockInquiriesStore: BookingInquiry[] = [];
+let mockContactStore: ContactMessage[] = [];
+
 
 /**
  * Headless CMS Client Bridge
@@ -337,4 +340,61 @@ export const cmsClient = {
     }
     return mockInquiriesStore;
   },
+
+  async createContactMessage(message: Omit<ContactMessage, 'id' | 'createdAt' | 'status'>): Promise<ContactMessage> {
+    const newRecord: ContactMessage = {
+      ...message,
+      id: `msg-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`,
+      status: 'unread',
+      createdAt: new Date().toISOString(),
+    };
+
+    const token = process.env.SANITY_API_WRITE_TOKEN;
+    const projId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID || process.env.SANITY_PROJECT_ID;
+    const dataset = process.env.NEXT_PUBLIC_SANITY_DATASET || process.env.SANITY_DATASET || 'production';
+
+    if (projId && projId !== 'demo-project' && token) {
+      const sanityUrl = `https://${projId}.api.sanity.io/v2024-01-01/data/mutate/${dataset}`;
+      try {
+        await fetch(sanityUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            mutations: [
+              {
+                create: {
+                  _type: 'contactMessage',
+                  ...newRecord,
+                },
+              },
+            ],
+          }),
+        });
+      } catch (err) {
+        console.error('Failed to submit contact message to Sanity:', err);
+      }
+    }
+
+    mockContactStore.unshift(newRecord);
+    return newRecord;
+  },
+
+  async getContactMessages(): Promise<ContactMessage[]> {
+    if (isSanityLive && sanityClient) {
+      try {
+        const query = `*[_type == "contactMessage"] | order(createdAt desc)`;
+        const data = await sanityClient.fetch(query);
+        if (Array.isArray(data)) {
+          return data;
+        }
+      } catch (err) {
+        console.warn('Failed to fetch contact messages from Sanity, using fallback:', err);
+      }
+    }
+    return mockContactStore;
+  },
 };
+

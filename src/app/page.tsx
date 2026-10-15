@@ -7,8 +7,11 @@ import { LiveSiteBooking } from '@/components/booking/LiveSiteBooking';
 import { LiveSiteSisterPropertyAndAccreditations } from '@/components/cottage/LiveSiteSisterPropertyAndAccreditations';
 import { generateCottageJsonLd } from '@/lib/seo/jsonld';
 
+export const instant = false;
+
 export const metadata: Metadata = {
   title: 'Bwthyn Plas Hafod Cottage - Cozy Cottage with Amazing Views in Snowdonia',
+
   description:
     'Experience Plas Hafod, a 5-star Visit Wales certified holiday cottage nestled on the edge of Snowdonia National Park in Nebo with panoramic sea and mountain views.',
   alternates: {

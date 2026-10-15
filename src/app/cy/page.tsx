@@ -7,8 +7,11 @@ import { LiveSiteBooking } from '@/components/booking/LiveSiteBooking';
 import { LiveSiteSisterPropertyAndAccreditations } from '@/components/cottage/LiveSiteSisterPropertyAndAccreditations';
 import { generateCottageJsonLd } from '@/lib/seo/jsonld';
 
+export const instant = false;
+
 export const metadata: Metadata = {
   title: 'Bwthyn Plas Hafod - Bwthyn Gwyliau Clyd gyda Golygfeydd Rhyfeddol yn Eryri',
+
   description:
     'Profwch Plas Hafod, bwthyn gwyliau 5 seren Croeso Cymru ar ymyl Parc Cenedlaethol Eryri yn Nebo gyda golygfeydd panoramig o fynyddoedd a&#39;r môr.',
   alternates: {

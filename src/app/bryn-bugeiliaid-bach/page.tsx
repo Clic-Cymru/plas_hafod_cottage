@@ -6,11 +6,14 @@ import { LiveSiteSisterPropertyAndAccreditations } from '@/components/cottage/Li
 import { cmsClient } from '@/cms/client';
 import { Sparkles, Flame, Bed, Bath, Coffee, Ban } from 'lucide-react';
 
+export const instant = false;
+
 export const metadata: Metadata = {
   title: 'Bryn Bugeiliaid Bach - Luxury Annexe in Snowdonia',
   description:
     'A beautifully restored 2-bed self-contained annexe overlooking Dyffryn Nantlle with cozy log burner, conservatory, underfloor heating, and 5-star comfort.',
 };
+
 
 const bbbGallery = [
   { id: 1, src: '/images/wp/bbb-gallery-1.jpg', alt: 'Bryn Bugeiliaid Bach Living Room' },

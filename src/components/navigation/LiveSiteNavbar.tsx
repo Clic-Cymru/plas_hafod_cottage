@@ -35,7 +35,9 @@ export function LiveSiteNavbar({ currentPath = '/', isCymraeg = false }: NavbarP
     { label: isCymraeg ? 'ARDAL LEOL' : 'LOCAL AREA', href: '/local-area' },
     { label: isCymraeg ? 'ADOLYGIADAU' : 'REVIEWS', href: '/reviews' },
     { label: 'BRYN BUGEILIAID BACH', href: '/bryn-bugeiliaid-bach' },
+    { label: isCymraeg ? 'CYSYLLTU' : 'CONTACT', href: '/contact' },
   ];
+
 
   return (
     <header

@@ -195,9 +195,13 @@ export function LiveSiteSisterPropertyAndAccreditations({
             <Link href="/bryn-bugeiliaid-bach" className="hover:text-stone-900 transition">
               Bryn Bugeiliaid Bach
             </Link>
+            <Link href="/contact" className="hover:text-stone-900 transition font-semibold text-[#99a0c1]">
+              {isCymraeg ? 'Cysylltu' : 'Contact Us'}
+            </Link>
             <Link href="/terms" className="hover:text-stone-900 transition underline underline-offset-2">
               {isCymraeg ? 'Telerau ac Amodau' : 'Terms & Conditions'}
             </Link>
+
           </div>
 
           <div className="text-center text-xs text-stone-500 font-sans space-y-1">
