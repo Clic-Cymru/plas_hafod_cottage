@@ -40,6 +40,27 @@ export function LiveSiteHero({ isCymraeg = false }: HeroProps) {
 
   return (
     <div className="relative min-h-[92vh] sm:min-h-screen flex flex-col justify-between overflow-hidden bg-stone-950">
+      {/* Self-contained Ken Burns keyframes style tag */}
+      <style
+        dangerouslySetInnerHTML={{
+          __html: `
+            @keyframes heroKenBurns {
+              0% {
+                transform: scale(1.0);
+              }
+              100% {
+                transform: scale(1.22);
+              }
+            }
+            .ken-burns-slide {
+              animation: heroKenBurns 8000ms cubic-bezier(0.2, 0, 0.4, 1) forwards;
+              transform-origin: center center;
+              will-change: transform;
+            }
+          `,
+        }}
+      />
+
       {/* 3-Image Background Slider with Ken Burns Effect */}
       <div className="absolute inset-0 z-0 overflow-hidden">
         {slides.map((slide, index) => {
@@ -48,12 +69,14 @@ export function LiveSiteHero({ isCymraeg = false }: HeroProps) {
             <div
               key={slide.id}
               className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
-                isActive ? 'opacity-100 z-10' : 'opacity-0 z-0'
+                isActive ? 'opacity-100 z-10' : 'opacity-0 z-0 pointer-events-none'
               }`}
             >
+              {/* Inner wrapper with dynamic key to restart Ken Burns animation on each activation */}
               <div
+                key={`${slide.id}-${isActive ? currentSlide : 'idle'}`}
                 className={`relative w-full h-full ${
-                  isActive ? 'animate-ken-burns' : 'scale-100'
+                  isActive ? 'ken-burns-slide' : 'scale-100'
                 }`}
               >
                 <Image
