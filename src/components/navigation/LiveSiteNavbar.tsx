@@ -59,30 +59,37 @@ export function LiveSiteNavbar({ currentPath = '/', isCymraeg = false }: NavbarP
           </div>
         </Link>
 
-        {/* Center: Navigation Links */}
-        <nav className="hidden lg:flex items-center space-x-6 text-[13px] tracking-wider uppercase font-medium font-sans">
+        {/* Center: Navigation Links with Architects Daughter font */}
+        <nav
+          className="hidden lg:flex items-center space-x-4 xl:space-x-5 text-[17px] xl:text-[18px] tracking-wide uppercase font-architects"
+          style={{ fontFamily: "'Architects Daughter', cursive, sans-serif" }}
+        >
           {navLinks.map((item, idx) => {
             const isActive = currentPath === item.href;
+            const prevIsActive = idx > 0 && currentPath === navLinks[idx - 1].href;
             return (
               <React.Fragment key={item.label}>
-                {idx > 0 && (
-                  <span className={`select-none ${scrolled ? 'text-stone-300' : 'text-stone-400/60'}`}>
+                {idx > 0 && !isActive && !prevIsActive && (
+                  <span
+                    className={`select-none ${scrolled ? 'text-stone-300' : 'text-white/60'}`}
+                  >
                     |
                   </span>
                 )}
                 <Link
                   href={item.href}
-                  className={`transition duration-200 hover:text-[#99a0c1] ${
+                  style={{ fontFamily: "'Architects Daughter', cursive, sans-serif" }}
+                  className={`transition duration-200 font-architects text-[17px] xl:text-[18px] tracking-wider ${
                     isActive
                       ? scrolled
                         ? 'text-[#99a0c1] font-bold'
-                        : 'text-amber-300 font-bold'
+                        : 'text-[#efda07] font-bold'
                       : scrolled
-                      ? 'text-stone-700'
-                      : 'text-stone-100'
+                      ? 'text-stone-700 hover:text-[#99a0c1]'
+                      : 'text-white hover:text-[#efda07]'
                   }`}
                 >
-                  {item.label}
+                  {isActive && !scrolled ? `| ${item.label} |` : item.label}
                 </Link>
               </React.Fragment>
             );
@@ -128,7 +135,8 @@ export function LiveSiteNavbar({ currentPath = '/', isCymraeg = false }: NavbarP
                 ? '/cy#book'
                 : '/#book'
             }
-            className="px-5 py-2.5 rounded-full text-xs font-semibold uppercase tracking-wider text-white bg-[#99a0c1] hover:bg-[#323149] transition shadow-sm"
+            style={{ fontFamily: "'Architects Daughter', cursive, sans-serif" }}
+            className="px-6 py-2.5 rounded-full text-[15px] sm:text-[16px] font-architects font-bold uppercase tracking-wider text-white bg-[#99a0c1] hover:bg-[#323149] transition shadow-sm"
           >
             {isCymraeg ? 'ARCHEBWCH NAWR' : 'BOOK NOW'}
           </a>
@@ -146,7 +154,8 @@ export function LiveSiteNavbar({ currentPath = '/', isCymraeg = false }: NavbarP
                 ? '/cy#book'
                 : '/#book'
             }
-            className="px-3 py-1.5 rounded-full text-xs font-semibold uppercase text-white bg-[#99a0c1]"
+            style={{ fontFamily: "'Architects Daughter', cursive, sans-serif" }}
+            className="px-3 py-1.5 rounded-full text-xs font-architects font-bold uppercase text-white bg-[#99a0c1]"
           >
             {isCymraeg ? 'Archebu' : 'Book'}
           </a>
@@ -168,7 +177,8 @@ export function LiveSiteNavbar({ currentPath = '/', isCymraeg = false }: NavbarP
               key={item.label}
               href={item.href}
               onClick={() => setMobileMenuOpen(false)}
-              className="block py-2 text-sm font-semibold tracking-wider uppercase border-b border-stone-100 hover:text-[#99a0c1]"
+              style={{ fontFamily: "'Architects Daughter', cursive, sans-serif" }}
+              className="block py-2 text-lg font-architects font-bold tracking-wider uppercase border-b border-stone-100 hover:text-[#99a0c1]"
             >
               {item.label}
             </Link>

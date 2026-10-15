@@ -22,8 +22,12 @@ body {
   overflow-x: hidden;
 }
 
-/* Force Architects Daughter font onto all headings and .font-architects classes */
+/* Force Architects Daughter font onto all headings, navbar items, and .font-architects classes */
 .font-architects,
+header nav,
+header nav a,
+header nav span,
+header a.font-architects,
 h1,
 h2,
 h3,
