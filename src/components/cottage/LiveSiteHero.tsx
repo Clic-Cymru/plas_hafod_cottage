@@ -40,7 +40,7 @@ export function LiveSiteHero({ isCymraeg = false }: HeroProps) {
 
   return (
     <>
-      <div className="relative h-[470px] sm:h-[500px] md:h-[516px] lg:h-[520px] max-h-[530px] flex flex-col justify-between overflow-hidden bg-stone-950">
+      <div className="relative h-[540px] sm:h-[575px] md:h-[595px] lg:h-[600px] max-h-[610px] flex flex-col justify-between overflow-hidden bg-stone-950">
         {/* Slow, gentle, cinematic Ken Burns keyframes */}
         <style
           dangerouslySetInnerHTML={{
@@ -99,7 +99,7 @@ export function LiveSiteHero({ isCymraeg = false }: HeroProps) {
         {/* Main Content & Center Watermark Logo */}
         <div className="relative z-20 flex-1 flex flex-col items-center justify-center px-4 pt-16 sm:pt-20 pb-4 text-center">
           {/* Bigger White Watermark Logo */}
-          <div className="relative w-full max-w-[650px] sm:max-w-[780px] md:max-w-[860px] lg:max-w-[920px] h-[280px] sm:h-[330px] md:h-[370px] lg:h-[390px] select-none pointer-events-none drop-shadow-2xl">
+          <div className="relative w-full max-w-[680px] sm:max-w-[800px] md:max-w-[900px] lg:max-w-[960px] h-[320px] sm:h-[380px] md:h-[425px] lg:h-[450px] select-none pointer-events-none drop-shadow-2xl">
             <Image
               src="/images/wp/logo-white.png"
               alt="Bwthyn Plas Hafod Cottage"
