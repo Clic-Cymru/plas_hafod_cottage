@@ -151,6 +151,18 @@ export interface SiteSettings {
   trustindexEnabled?: boolean;
   trustindexScriptUrl?: string;
   trustindexEmbedCode?: string;
+  // Special Offer Popup / Modal Controls
+  offerPopupEnabled?: boolean;
+  offerPosition?: 'center' | 'bottom-right';
+  offerBadgeEn?: string;
+  offerBadgeCy?: string;
+  offerTitleEn?: string;
+  offerTitleCy?: string;
+  offerDescriptionEn?: string;
+  offerDescriptionCy?: string;
+  offerButtonTextEn?: string;
+  offerButtonTextCy?: string;
+  offerButtonLink?: string;
 }
 
 export interface HeroSlide {

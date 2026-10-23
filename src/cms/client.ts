@@ -567,6 +567,18 @@ export const cmsClient = {
               rev?.trustindexScriptUrl || site.trustindexScriptUrl || defaultSiteSettings.trustindexScriptUrl,
             trustindexEmbedCode:
               rev?.trustindexEmbedCode || site.trustindexEmbedCode || defaultSiteSettings.trustindexEmbedCode,
+            offerPopupEnabled:
+              site.offerPopupEnabled !== undefined ? site.offerPopupEnabled : defaultSiteSettings.offerPopupEnabled,
+            offerPosition: site.offerPosition || defaultSiteSettings.offerPosition,
+            offerBadgeEn: site.offerBadgeEn || defaultSiteSettings.offerBadgeEn,
+            offerBadgeCy: site.offerBadgeCy || defaultSiteSettings.offerBadgeCy,
+            offerTitleEn: site.offerTitleEn || defaultSiteSettings.offerTitleEn,
+            offerTitleCy: site.offerTitleCy || defaultSiteSettings.offerTitleCy,
+            offerDescriptionEn: site.offerDescriptionEn || defaultSiteSettings.offerDescriptionEn,
+            offerDescriptionCy: site.offerDescriptionCy || defaultSiteSettings.offerDescriptionCy,
+            offerButtonTextEn: site.offerButtonTextEn || defaultSiteSettings.offerButtonTextEn,
+            offerButtonTextCy: site.offerButtonTextCy || defaultSiteSettings.offerButtonTextCy,
+            offerButtonLink: site.offerButtonLink || defaultSiteSettings.offerButtonLink,
           };
         }
       } catch (err) {
@@ -800,6 +812,19 @@ export const defaultSiteSettings: SiteSettings = {
   facebookUrl: 'https://facebook.com',
   instagramUrl: 'https://instagram.com',
   trustindexEnabled: false,
+  offerPopupEnabled: true,
+  offerPosition: 'center',
+  offerBadgeEn: 'SPECIAL AUTUMN 2026 OFFER!',
+  offerBadgeCy: 'CYNNIG ARBENNIG HYDREF 2026!',
+  offerTitleEn: 'Book 3 Nights, Get 4th Night Free!',
+  offerTitleCy: 'Archebwch 3 Noson, Cewch y 4edd Noson am Ddim!',
+  offerDescriptionEn:
+    'Book 3 nights between 1st October and 18th December (excluding 24/10/26 to 31/10/26) and get your 4th night completely FREE!',
+  offerDescriptionCy:
+    'Archebwch 3 noson rhwng 1af Hydref a 18fed Rhagfyr (ac eithrio 24/10/26 i 31/10/26) a chewch y 4edd noson AM DDIM!',
+  offerButtonTextEn: 'Book Now',
+  offerButtonTextCy: 'Archebwch Nawr',
+  offerButtonLink: '#book',
 };
 
 export const defaultHeroSlides: HeroSlide[] = [

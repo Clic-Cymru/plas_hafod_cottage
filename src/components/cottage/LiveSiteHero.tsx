@@ -32,7 +32,19 @@ export function LiveSiteHero({
 
   const [currentSlide, setCurrentSlide] = useState(0);
   const [prevSlide, setPrevSlide] = useState<number | null>(null);
-  const [promoVisible, setPromoVisible] = useState(siteSettings.bannerEnabled !== false);
+  const isOfferEnabled = siteSettings.offerPopupEnabled !== false;
+  const [promoVisible, setPromoVisible] = useState(isOfferEnabled);
+  const position = siteSettings.offerPosition || 'center';
+
+  // Allow Escape key to dismiss centered offer modal
+  useEffect(() => {
+    if (!promoVisible) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setPromoVisible(false);
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [promoVisible]);
 
   // Rotate hero slides every 8.5 seconds with seamless dissolved cross-fade
   useEffect(() => {
@@ -191,34 +203,101 @@ export function LiveSiteHero({
       </div>
     </div>
 
-      {/* Floating Special Autumn Offer Card (bottom-right toast, unobtrusive to hero logo) */}
+      {/* Special Offer Presentation (Configurable in Sanity: Centered Modal vs Bottom-Right Toast) */}
       {promoVisible && (
-        <div className="fixed bottom-6 right-6 z-40 max-w-sm sm:max-w-md bg-[#525d73]/95 backdrop-blur-md border-[3px] border-[#efda07] rounded-2xl p-4 sm:p-5 text-white shadow-2xl animate-in fade-in slide-in-from-bottom-5 duration-500">
-          <button
-            onClick={() => setPromoVisible(false)}
-            className="absolute top-2.5 right-2.5 text-white/80 hover:text-white p-1 rounded-full transition"
-            aria-label="Close Offer"
+        position === 'center' ? (
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/60 backdrop-blur-md animate-in fade-in duration-300"
+            onClick={(e) => {
+              if (e.target === e.currentTarget) setPromoVisible(false);
+            }}
+            role="dialog"
+            aria-modal="true"
           >
-            <X className="w-4 h-4" />
-          </button>
+            <div className="relative w-full max-w-lg bg-[#525d73]/95 border-[3px] border-[#efda07] rounded-3xl p-6 sm:p-8 text-white shadow-2xl animate-in zoom-in-95 duration-300 text-center">
+              <button
+                onClick={() => setPromoVisible(false)}
+                className="absolute top-3.5 right-3.5 text-white/80 hover:text-white p-2 rounded-full hover:bg-white/10 transition"
+                aria-label={isCymraeg ? 'Cau’r Cynnig' : 'Close Offer'}
+              >
+                <X className="w-5 h-5" />
+              </button>
 
-          <h2 className="text-lg sm:text-xl font-architects text-white tracking-wide uppercase mb-2">
-            {isCymraeg ? 'CYNNIG ARBENNIG HYDREF 2026!' : 'SPECIAL AUTUMN 2026 OFFER!'}
-          </h2>
+              <div className="inline-block px-3.5 py-1 rounded-full text-xs font-bold tracking-widest uppercase bg-[#efda07] text-[#333333] shadow-md mb-3">
+                {isCymraeg
+                  ? (siteSettings.offerBadgeCy || 'CYNNIG ARBENNIG HYDREF 2026!')
+                  : (siteSettings.offerBadgeEn || 'SPECIAL AUTUMN 2026 OFFER!')}
+              </div>
 
-          <p className="text-xs sm:text-sm font-architects text-white/95 leading-relaxed mb-3">
-            {isCymraeg
-              ? 'Archebwch 3 noson rhwng 1af Hydref a 18fed Rhagfyr (ac eithrio 24/10/26 i 31/10/26) a chewch y 4edd noson AM DDIM!'
-              : 'Book 3 nights between 1st October and 18th December (excluding 24/10/26 to 31/10/26) and get 4th night FREE!'}
-          </p>
+              <h2 className="text-2xl sm:text-3xl font-architects text-white tracking-wide uppercase mb-3 leading-tight">
+                {isCymraeg
+                  ? (siteSettings.offerTitleCy || 'Archebwch 3 Noson, Cewch y 4edd Noson am Ddim!')
+                  : (siteSettings.offerTitleEn || 'Book 3 Nights, Get 4th Night Free!')}
+              </h2>
 
-          <a
-            href="#book"
-            className="inline-block px-5 py-2 rounded-md font-architects text-xs font-bold uppercase tracking-wider bg-[#efda07] text-[#333333] hover:bg-[#ffe600] transition shadow-md"
-          >
-            {isCymraeg ? 'Archebwch Nawr' : 'Book Now'}
-          </a>
-        </div>
+              <p className="text-sm sm:text-base font-architects text-white/90 leading-relaxed mb-6 max-w-md mx-auto">
+                {isCymraeg
+                  ? (siteSettings.offerDescriptionCy ||
+                    'Archebwch 3 noson rhwng 1af Hydref a 18fed Rhagfyr (ac eithrio 24/10/26 i 31/10/26) a chewch y 4edd noson AM DDIM!')
+                  : (siteSettings.offerDescriptionEn ||
+                    'Book 3 nights between 1st October and 18th December (excluding 24/10/26 to 31/10/26) and get your 4th night completely FREE!')}
+              </p>
+
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+                <a
+                  href={siteSettings.offerButtonLink || '#book'}
+                  onClick={() => setPromoVisible(false)}
+                  className="w-full sm:w-auto inline-flex items-center justify-center px-8 py-3 rounded-xl font-architects text-sm sm:text-base font-bold uppercase tracking-wider bg-[#efda07] text-[#333333] hover:bg-[#ffe600] hover:scale-105 active:scale-95 transition-all shadow-lg shadow-[#efda07]/20"
+                >
+                  {isCymraeg
+                    ? (siteSettings.offerButtonTextCy || 'Archebwch Nawr')
+                    : (siteSettings.offerButtonTextEn || 'Book Now')}
+                </a>
+                <button
+                  type="button"
+                  onClick={() => setPromoVisible(false)}
+                  className="text-xs text-white/70 hover:text-white underline underline-offset-4 py-2 px-3 transition"
+                >
+                  {isCymraeg ? 'Gwrthod / Parhau i bori' : 'Dismiss / Continue to site'}
+                </button>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div className="fixed bottom-6 right-6 z-40 max-w-sm sm:max-w-md bg-[#525d73]/95 backdrop-blur-md border-[3px] border-[#efda07] rounded-2xl p-4 sm:p-5 text-white shadow-2xl animate-in fade-in slide-in-from-bottom-5 duration-500">
+            <button
+              onClick={() => setPromoVisible(false)}
+              className="absolute top-2.5 right-2.5 text-white/80 hover:text-white p-1 rounded-full transition"
+              aria-label={isCymraeg ? 'Cau’r Cynnig' : 'Close Offer'}
+            >
+              <X className="w-4 h-4" />
+            </button>
+
+            <h2 className="text-lg sm:text-xl font-architects text-white tracking-wide uppercase mb-2">
+              {isCymraeg
+                ? (siteSettings.offerTitleCy || 'CYNNIG ARBENNIG HYDREF 2026!')
+                : (siteSettings.offerTitleEn || 'SPECIAL AUTUMN 2026 OFFER!')}
+            </h2>
+
+            <p className="text-xs sm:text-sm font-architects text-white/95 leading-relaxed mb-3">
+              {isCymraeg
+                ? (siteSettings.offerDescriptionCy ||
+                  'Archebwch 3 noson rhwng 1af Hydref a 18fed Rhagfyr (ac eithrio 24/10/26 i 31/10/26) a chewch y 4edd noson AM DDIM!')
+                : (siteSettings.offerDescriptionEn ||
+                  'Book 3 nights between 1st October and 18th December (excluding 24/10/26 to 31/10/26) and get 4th night FREE!')}
+            </p>
+
+            <a
+              href={siteSettings.offerButtonLink || '#book'}
+              onClick={() => setPromoVisible(false)}
+              className="inline-block px-5 py-2 rounded-md font-architects text-xs font-bold uppercase tracking-wider bg-[#efda07] text-[#333333] hover:bg-[#ffe600] transition shadow-md"
+            >
+              {isCymraeg
+                ? (siteSettings.offerButtonTextCy || 'Archebwch Nawr')
+                : (siteSettings.offerButtonTextEn || 'Book Now')}
+            </a>
+          </div>
+        )
       )}
     </>
   );

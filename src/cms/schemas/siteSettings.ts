@@ -95,6 +95,84 @@ export const siteSettingsSchema = {
       title: 'Instagram Profile URL',
       type: 'url',
     },
+    // Special Offer Popup / Modal Settings
+    {
+      name: 'offerPopupEnabled',
+      title: 'Enable Special Offer Popup / Galluogi Ffenestr Cynnig Arbennig',
+      type: 'boolean',
+      description: 'Display an interactive special offer card/modal when guests visit the homepage.',
+      initialValue: true,
+    },
+    {
+      name: 'offerPosition',
+      title: 'Popup Screen Position / Lleoliad y Ffenestr',
+      type: 'string',
+      description: 'Choose whether the offer appears right in the center of the screen with a focused backdrop, or in the bottom-right corner.',
+      options: {
+        list: [
+          { title: 'Centered Modal Overlay (Canol y Dudalen gydag Arlliw Cefndir)', value: 'center' },
+          { title: 'Bottom-Right Floating Toast (Cornel Isaf ar y Dde)', value: 'bottom-right' },
+        ],
+        layout: 'radio',
+      },
+      initialValue: 'center',
+    },
+    {
+      name: 'offerBadgeEn',
+      title: 'Offer Badge Tag (English)',
+      type: 'string',
+      initialValue: 'SPECIAL AUTUMN 2026 OFFER!',
+    },
+    {
+      name: 'offerBadgeCy',
+      title: 'Bathodyn y Cynnig (Cymraeg)',
+      type: 'string',
+      initialValue: 'CYNNIG ARBENNIG HYDREF 2026!',
+    },
+    {
+      name: 'offerTitleEn',
+      title: 'Offer Main Heading (English)',
+      type: 'string',
+      initialValue: 'Book 3 Nights, Get 4th Night Free!',
+    },
+    {
+      name: 'offerTitleCy',
+      title: 'Prif Deitl y Cynnig (Cymraeg)',
+      type: 'string',
+      initialValue: 'Archebwch 3 Noson, Cewch y 4edd Noson am Ddim!',
+    },
+    {
+      name: 'offerDescriptionEn',
+      title: 'Offer Description & Terms (English)',
+      type: 'text',
+      rows: 3,
+      initialValue: 'Book 3 nights between 1st October and 18th December (excluding 24/10/26 to 31/10/26) and get your 4th night completely FREE!',
+    },
+    {
+      name: 'offerDescriptionCy',
+      title: 'Disgrifiad a Thelerau’r Cynnig (Cymraeg)',
+      type: 'text',
+      rows: 3,
+      initialValue: 'Archebwch 3 noson rhwng 1af Hydref a 18fed Rhagfyr (ac eithrio 24/10/26 i 31/10/26) a chewch y 4edd noson AM DDIM!',
+    },
+    {
+      name: 'offerButtonTextEn',
+      title: 'Offer Button Text (English)',
+      type: 'string',
+      initialValue: 'Book Now',
+    },
+    {
+      name: 'offerButtonTextCy',
+      title: 'Testun y Botwm (Cymraeg)',
+      type: 'string',
+      initialValue: 'Archebwch Nawr',
+    },
+    {
+      name: 'offerButtonLink',
+      title: 'Offer Button Link (e.g. #book or /contact)',
+      type: 'string',
+      initialValue: '#book',
+    },
   ],
   preview: {
     prepare() {
