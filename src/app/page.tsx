@@ -63,7 +63,7 @@ export default async function HomePage() {
       />
 
       <div className="min-h-screen bg-[#fbfbfd] text-[#333333] flex flex-col font-sans selection:bg-[#efda07]/30 selection:text-stone-900">
-        <LiveSiteNavbar currentPath="/" isCymraeg={false} />
+        <LiveSiteNavbar currentPath="/" isCymraeg={false} siteSettings={siteSettings} />
         <main className="flex-1">
           <LiveSiteHero
             isCymraeg={false}

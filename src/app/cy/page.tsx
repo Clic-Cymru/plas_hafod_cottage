@@ -62,7 +62,7 @@ export default async function WelshHomePage() {
       />
 
       <div className="min-h-screen bg-[#fbfbfd] text-[#333333] flex flex-col font-sans selection:bg-[#efda07]/30 selection:text-stone-900">
-        <LiveSiteNavbar currentPath="/cy" isCymraeg={true} />
+        <LiveSiteNavbar currentPath="/cy" isCymraeg={true} siteSettings={siteSettings} />
         <main className="flex-1">
           <LiveSiteHero
             isCymraeg={true}

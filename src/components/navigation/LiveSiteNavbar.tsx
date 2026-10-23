@@ -5,13 +5,16 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { Menu, X } from 'lucide-react';
+import { SiteSettings } from '@/cms/types';
+import { defaultSiteSettings } from '@/cms/client';
 
 interface NavbarProps {
   currentPath?: string;
   isCymraeg?: boolean;
+  siteSettings?: SiteSettings;
 }
 
-export function LiveSiteNavbar({ currentPath, isCymraeg = false }: NavbarProps) {
+export function LiveSiteNavbar({ currentPath, isCymraeg = false, siteSettings }: NavbarProps) {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const pathname = usePathname();
@@ -93,15 +96,48 @@ export function LiveSiteNavbar({ currentPath, isCymraeg = false }: NavbarProps) 
       ? '/cy#book'
       : '/#book';
 
+  const currentSettings = siteSettings || defaultSiteSettings;
+  const mode = currentSettings.offerDisplayMode || (currentSettings.bannerEnabled !== false ? 'banner' : 'none');
+  const showBanner = (mode === 'banner' || mode === 'both') && Boolean(currentSettings.bannerAnnouncementEn || currentSettings.bannerAnnouncementCy);
+  const bannerText = isCymraeg
+    ? (currentSettings.bannerAnnouncementCy || currentSettings.bannerAnnouncementEn)
+    : (currentSettings.bannerAnnouncementEn || currentSettings.bannerAnnouncementCy);
+
   return (
-    <header
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        isSticky
-          ? 'bg-white/95 text-stone-800 shadow-sm backdrop-blur-md py-2.5 border-b border-stone-200'
-          : 'bg-transparent text-white py-4'
-      }`}
-    >
-      <div className="w-full max-w-[1540px] mx-auto px-3 sm:px-4 lg:px-6 flex items-center justify-between gap-2 lg:gap-3 xl:gap-5">
+    <header className="fixed top-0 left-0 right-0 z-50">
+      {/* 1. Golden Announcement Banner - Sits above navigation to push header down */}
+      {showBanner && bannerText && (
+        <aside
+          role="region"
+          aria-label={isCymraeg ? 'Cynnig Arbennig' : 'Special Offer Announcement'}
+          className="w-full bg-[#efda07] text-[#1c1c1c] border-b border-[#d8c504] shadow-sm py-2 px-3 sm:px-4 text-center select-none transition-all"
+        >
+          <div className="max-w-7xl mx-auto flex items-center justify-center gap-2 sm:gap-3 flex-wrap font-architects text-xs sm:text-sm font-bold tracking-wide uppercase">
+            <span className="inline-block text-stone-900" aria-hidden="true">
+              ✨
+            </span>
+            <a
+              href={currentSettings.bannerLink || bookHref}
+              className="hover:underline flex items-center gap-2 transition"
+            >
+              <span>{bannerText}</span>
+              <span className="text-[11px] underline font-sans font-semibold tracking-normal normal-case text-stone-900/80 hover:text-stone-950">
+                {isCymraeg ? '(archebwch nawr →)' : '(book direct →)'}
+              </span>
+            </a>
+          </div>
+        </aside>
+      )}
+
+      {/* 2. Main Navigation Bar Row - Clean background with logo, links and CTAs */}
+      <div
+        className={`w-full transition-all duration-300 ${
+          isSticky
+            ? 'bg-white/95 text-stone-800 shadow-sm backdrop-blur-md py-2.5 border-b border-stone-200'
+            : 'bg-transparent text-white py-3 sm:py-4'
+        }`}
+      >
+        <div className="w-full max-w-[1540px] mx-auto px-3 sm:px-4 lg:px-6 flex items-center justify-between gap-2 lg:gap-3 xl:gap-5">
         {/* Left: Logo */}
         <Link href={isCymraeg ? '/cy' : '/'} className="flex items-center shrink-0">
           <div className="relative w-28 sm:w-36 xl:w-44 h-10 xl:h-12 shrink-0">
@@ -287,6 +323,7 @@ export function LiveSiteNavbar({ currentPath, isCymraeg = false }: NavbarProps) 
           </button>
         </div>
       </div>
+    </div>
 
       {/* Mobile Drawer */}
       {mobileMenuOpen && (

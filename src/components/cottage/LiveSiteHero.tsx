@@ -77,30 +77,6 @@ export function LiveSiteHero({
 
   return (
     <>
-      {/* Top Golden Highlight Announcement Banner */}
-      {showBanner && bannerText && (
-        <aside
-          role="region"
-          aria-label={isCymraeg ? 'Cynnig Arbennig' : 'Special Offer Announcement'}
-          className="relative z-30 w-full bg-[#efda07] text-[#1c1c1c] border-b border-[#d8c504] shadow-sm py-2 px-4 text-center select-none animate-in fade-in slide-in-from-top-1 duration-300"
-        >
-          <div className="max-w-7xl mx-auto flex items-center justify-center gap-2 sm:gap-3 flex-wrap font-architects text-xs sm:text-sm font-bold tracking-wide uppercase">
-            <span className="inline-block text-stone-900" aria-hidden="true">
-              ✨
-            </span>
-            <a
-              href={siteSettings.bannerLink || '#book'}
-              className="hover:underline flex items-center gap-2 transition"
-            >
-              <span>{bannerText}</span>
-              <span className="text-[11px] underline font-sans font-semibold tracking-normal normal-case text-stone-900/80 hover:text-stone-950">
-                {isCymraeg ? '(archebwch nawr →)' : '(book direct →)'}
-              </span>
-            </a>
-          </div>
-        </aside>
-      )}
-
       <div className="relative h-[540px] sm:h-[575px] md:h-[595px] lg:h-[600px] max-h-[610px] flex flex-col justify-between overflow-hidden bg-stone-950">
         {/* Cinematic, prominent Ken Burns keyframes for each slide */}
         <style
@@ -201,7 +177,7 @@ export function LiveSiteHero({
         </div>
 
         {/* Main Content & Center Watermark Logo */}
-        <div className="relative z-20 flex-1 flex flex-col items-center justify-center px-4 pt-16 sm:pt-20 pb-4 text-center">
+        <div className={`relative z-20 flex-1 flex flex-col items-center justify-center px-4 pb-4 text-center ${showBanner ? 'pt-24 sm:pt-28' : 'pt-16 sm:pt-20'}`}>
           {/* Bigger White Watermark Logo */}
           <div className="relative w-full max-w-[680px] sm:max-w-[800px] md:max-w-[900px] lg:max-w-[960px] h-[320px] sm:h-[380px] md:h-[425px] lg:h-[450px] select-none pointer-events-none drop-shadow-2xl">
             <Image
