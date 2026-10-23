@@ -5,7 +5,7 @@ import { NextStudio } from 'next-sanity/studio';
 import config from '../../../../sanity.config';
 import '@/cms/studio/studio.css';
 
-const projectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID;
+const projectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID || 'iji5mij0';
 const isConfigured = Boolean(projectId && projectId !== 'demo-project');
 
 export default function StudioPage() {

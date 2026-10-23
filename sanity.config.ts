@@ -4,7 +4,7 @@ import { schemaTypes } from './src/cms/schemas';
 import { ClicCymruLogo } from './src/cms/studio/ClicCymruLogo';
 import { ClicCymruNavbar } from './src/cms/studio/ClicCymruNavbar';
 
-const projectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID || 'demo-project';
+const projectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID || 'iji5mij0';
 const dataset = process.env.NEXT_PUBLIC_SANITY_DATASET || 'production';
 
 export default defineConfig({
