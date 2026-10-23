@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { usePathname } from 'next/navigation';
 import { Menu, X } from 'lucide-react';
 
 interface NavbarProps {
@@ -10,40 +11,93 @@ interface NavbarProps {
   isCymraeg?: boolean;
 }
 
-export function LiveSiteNavbar({ currentPath = '/', isCymraeg = false }: NavbarProps) {
+export function LiveSiteNavbar({ currentPath, isCymraeg = false }: NavbarProps) {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const pathname = usePathname();
+
+  // Determine current active route
+  const effectivePath = currentPath || pathname || '/';
+  const isHomePage =
+    effectivePath === '/' ||
+    effectivePath === '/cy' ||
+    effectivePath === '/bwthyn-plas-hafod-cymraeg';
+
+  // All pages start with a floating transparent header over the hero banner,
+  // and smoothly turn into a solid sticky header when scrolled down.
+  const isSticky = scrolled;
 
   useEffect(() => {
     const handleScroll = () => {
-      if (window.scrollY > 40) {
+      if (window.scrollY > 30) {
         setScrolled(true);
       } else {
         setScrolled(false);
       }
     };
-    window.addEventListener('scroll', handleScroll);
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    handleScroll();
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const navLinks = [
-    { label: isCymraeg ? 'HAFAN' : 'HOME', href: isCymraeg ? '/cy' : '/' },
-    {
-      label: isCymraeg ? 'ENGLISH VERSION' : 'BWTHYN PLAS HAFOD – CYMRAEG',
-      href: isCymraeg ? '/' : '/cy',
-    },
-    { label: isCymraeg ? 'ARDAL LEOL' : 'LOCAL AREA', href: '/local-area' },
-    { label: isCymraeg ? 'ADOLYGIADAU' : 'REVIEWS', href: '/reviews' },
-    { label: 'BRYN BUGEILIAID BACH', href: '/bryn-bugeiliaid-bach' },
-    { label: isCymraeg ? 'CYSYLLTU' : 'CONTACT', href: '/contact' },
-  ];
+  // Compute corresponding URLs for EN and CY for the current page
+  const getLocaleUrls = (path: string) => {
+    const cleanPath = path.split('?')[0].split('#')[0] || '/';
+    if (
+      cleanPath === '/' ||
+      cleanPath === '/cy' ||
+      cleanPath === '/bwthyn-plas-hafod-cymraeg'
+    ) {
+      return { en: '/', cy: '/cy' };
+    }
 
+    if (cleanPath.startsWith('/cy')) {
+      const rest = cleanPath.replace(/^\/cy/, '') || '/';
+      let en = rest;
+      if (rest === '/ardal-leol') en = '/local-area';
+      else if (rest === '/adolygiadau') en = '/reviews';
+      else if (rest === '/cysylltu') en = '/contact';
+      else if (rest === '/telerau') en = '/terms';
+      return { en, cy: cleanPath };
+    } else {
+      let cy = `/cy${cleanPath}`;
+      return { en: cleanPath, cy };
+    }
+  };
+
+  const localeUrls = getLocaleUrls(effectivePath);
+
+  const navLinks = isCymraeg
+    ? [
+        { label: 'HAFAN', href: '/cy' },
+        { label: 'ARDAL LEOL', href: '/cy/local-area' },
+        { label: 'ADOLYGIADAU', href: '/cy/reviews' },
+        { label: 'BRYN BUGEILIAID BACH', href: '/cy/bryn-bugeiliaid-bach' },
+        { label: 'CYSYLLTU', href: '/cy/contact' },
+      ]
+    : [
+        { label: 'HOME', href: '/' },
+        { label: 'LOCAL AREA', href: '/local-area' },
+        { label: 'REVIEWS', href: '/reviews' },
+        { label: 'BRYN BUGEILIAID BACH', href: '/bryn-bugeiliaid-bach' },
+        { label: 'CONTACT', href: '/contact' },
+      ];
+
+  const bookHref =
+    effectivePath === '/bryn-bugeiliaid-bach' ||
+    effectivePath === '/cy/bryn-bugeiliaid-bach' ||
+    effectivePath === '/' ||
+    effectivePath === '/cy'
+      ? '#book'
+      : isCymraeg
+      ? '/cy#book'
+      : '/#book';
 
   return (
     <header
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        scrolled
-          ? 'bg-white/95 text-stone-800 shadow-sm backdrop-blur-md py-2 border-b border-stone-200'
+        isSticky
+          ? 'bg-white/95 text-stone-800 shadow-sm backdrop-blur-md py-2.5 border-b border-stone-200'
           : 'bg-transparent text-white py-4'
       }`}
     >
@@ -52,7 +106,7 @@ export function LiveSiteNavbar({ currentPath = '/', isCymraeg = false }: NavbarP
         <Link href={isCymraeg ? '/cy' : '/'} className="flex items-center shrink-0">
           <div className="relative w-28 sm:w-36 xl:w-44 h-10 xl:h-12 shrink-0">
             <Image
-              src={scrolled ? '/images/wp/logo-color.png' : '/images/wp/logo-white.png'}
+              src={isSticky ? '/images/wp/logo-color.png' : '/images/wp/logo-white.png'}
               alt="Plas Hafod Cottage"
               fill
               className="object-contain"
@@ -61,60 +115,105 @@ export function LiveSiteNavbar({ currentPath = '/', isCymraeg = false }: NavbarP
           </div>
         </Link>
 
-        {/* Center: Navigation Links with Architects Daughter font (single line, no wrap) */}
+        {/* Center: Navigation Links with Architects Daughter font & vertical separators */}
         <nav
-          className="hidden lg:flex items-center space-x-2 xl:space-x-3.5 2xl:space-x-5 text-[14px] xl:text-[16px] 2xl:text-[17px] tracking-wide uppercase font-architects whitespace-nowrap shrink-0"
+          className="hidden lg:flex items-center gap-1.5 xl:gap-2.5 2xl:gap-3 text-[13px] xl:text-[15px] 2xl:text-[16px] tracking-wide uppercase font-architects whitespace-nowrap shrink-0"
           style={{ fontFamily: "'Architects Daughter', cursive, sans-serif" }}
         >
-          {navLinks.map((item, idx) => {
-            const isActive = currentPath === item.href;
-            const prevIsActive = idx > 0 && currentPath === navLinks[idx - 1].href;
+          {/* Leading separator before first item */}
+          <span
+            className={`select-none font-sans font-light transition-colors ${
+              isSticky ? 'text-stone-300' : 'text-white/70'
+            }`}
+            aria-hidden="true"
+          >
+            |
+          </span>
+
+          {navLinks.map((item) => {
+            const isActive =
+              effectivePath === item.href ||
+              (item.href !== '/' &&
+                item.href !== '/cy' &&
+                effectivePath.startsWith(item.href));
+
             return (
               <React.Fragment key={item.label}>
-                {idx > 0 && !isActive && !prevIsActive && (
-                  <span
-                    className={`select-none whitespace-nowrap ${
-                      scrolled ? 'text-stone-300' : 'text-white/60'
-                    }`}
-                  >
-                    |
-                  </span>
-                )}
                 <Link
                   href={item.href}
                   style={{ fontFamily: "'Architects Daughter', cursive, sans-serif" }}
                   className={`transition duration-200 font-architects whitespace-nowrap tracking-wider ${
                     isActive
-                      ? scrolled
-                        ? 'text-[#99a0c1] font-bold'
+                      ? isSticky
+                        ? 'text-[#99A0C1] font-bold'
                         : 'text-[#efda07] font-bold'
-                      : scrolled
-                      ? 'text-stone-700 hover:text-[#99a0c1]'
+                      : isSticky
+                      ? 'text-stone-700 hover:text-[#99A0C1]'
                       : 'text-white hover:text-[#efda07]'
                   }`}
                 >
-                  {isActive && !scrolled ? (
-                    <span className="whitespace-nowrap font-bold text-[#efda07]">
-                      {`| ${item.label} |`}
-                    </span>
-                  ) : (
-                    item.label
-                  )}
+                  {item.label}
                 </Link>
+
+                {/* Separator after each item */}
+                <span
+                  className={`select-none font-sans font-light transition-colors ${
+                    isSticky ? 'text-stone-300' : 'text-white/70'
+                  }`}
+                  aria-hidden="true"
+                >
+                  |
+                </span>
               </React.Fragment>
             );
           })}
         </nav>
 
-        {/* Right: Social Icons + Book Now Button */}
+        {/* Right: Language Toggle + Social Icons + Book Now Button */}
         <div className="hidden lg:flex items-center space-x-2.5 xl:space-x-3.5 shrink-0">
+          {/* Language Toggle Pill */}
+          <div
+            className={`flex items-center rounded-full p-0.5 border text-xs font-bold tracking-wider transition ${
+              isSticky
+                ? 'bg-stone-100/90 border-stone-300/80 shadow-xs'
+                : 'bg-black/35 backdrop-blur-sm border-white/30'
+            }`}
+          >
+            <Link
+              href={localeUrls.en}
+              aria-label="Switch to English"
+              className={`px-2.5 py-1 rounded-full text-[11px] font-sans font-bold transition duration-200 ${
+                !isCymraeg
+                  ? 'bg-white text-stone-900 shadow-sm'
+                  : isSticky
+                  ? 'text-stone-600 hover:text-stone-900'
+                  : 'text-white/80 hover:text-white'
+              }`}
+            >
+              EN
+            </Link>
+            <Link
+              href={localeUrls.cy}
+              aria-label="Newid i'r Gymraeg"
+              className={`px-2.5 py-1 rounded-full text-[11px] font-sans font-bold transition duration-200 ${
+                isCymraeg
+                  ? 'bg-[#99A0C1] text-white shadow-sm'
+                  : isSticky
+                  ? 'text-stone-600 hover:text-stone-900'
+                  : 'text-white/80 hover:text-white'
+              }`}
+            >
+              CY
+            </Link>
+          </div>
+
           <a
             href="https://facebook.com"
             target="_blank"
             rel="noopener noreferrer"
             aria-label="Facebook"
-            className={`transition hover:text-[#99a0c1] shrink-0 ${
-              scrolled ? 'text-stone-600' : 'text-white'
+            className={`transition hover:text-[#99A0C1] shrink-0 ${
+              isSticky ? 'text-stone-600' : 'text-white'
             }`}
           >
             <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
@@ -126,8 +225,8 @@ export function LiveSiteNavbar({ currentPath = '/', isCymraeg = false }: NavbarP
             target="_blank"
             rel="noopener noreferrer"
             aria-label="Instagram"
-            className={`transition hover:text-[#99a0c1] shrink-0 ${
-              scrolled ? 'text-stone-600' : 'text-white'
+            className={`transition hover:text-[#99A0C1] shrink-0 ${
+              isSticky ? 'text-stone-600' : 'text-white'
             }`}
           >
             <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
@@ -136,42 +235,52 @@ export function LiveSiteNavbar({ currentPath = '/', isCymraeg = false }: NavbarP
           </a>
 
           <a
-            href={
-              currentPath === '/bryn-bugeiliaid-bach'
-                ? '#book'
-                : currentPath === '/' || currentPath === '/cy'
-                ? '#book'
-                : isCymraeg
-                ? '/cy#book'
-                : '/#book'
-            }
+            href={bookHref}
             style={{ fontFamily: "'Architects Daughter', cursive, sans-serif" }}
-            className="whitespace-nowrap shrink-0 px-4 xl:px-5 py-2 xl:py-2.5 rounded-full text-xs xl:text-sm font-architects font-bold uppercase tracking-wider text-white bg-[#99a0c1] hover:bg-[#323149] transition shadow-sm"
+            className="whitespace-nowrap shrink-0 px-4 xl:px-5 py-2 xl:py-2.5 rounded-full text-xs xl:text-sm font-architects font-bold uppercase tracking-wider text-white bg-[#99A0C1] hover:bg-[#323149] transition shadow-sm"
           >
             {isCymraeg ? 'ARCHEBWCH NAWR' : 'BOOK NOW'}
           </a>
         </div>
 
-        {/* Mobile menu hamburger */}
+        {/* Mobile menu controls: Language toggle + Book button + Hamburger */}
         <div className="flex lg:hidden items-center space-x-2">
+          {/* Mobile Language Toggle */}
+          <div className="flex items-center rounded-full p-0.5 border border-stone-300 bg-white/90 text-[11px] font-bold">
+            <Link
+              href={localeUrls.en}
+              className={`px-2 py-0.5 rounded-full font-sans transition ${
+                !isCymraeg
+                  ? 'bg-stone-900 text-white'
+                  : 'text-stone-600 hover:text-stone-900'
+              }`}
+            >
+              EN
+            </Link>
+            <Link
+              href={localeUrls.cy}
+              className={`px-2 py-0.5 rounded-full font-sans transition ${
+                isCymraeg
+                  ? 'bg-[#99A0C1] text-white'
+                  : 'text-stone-600 hover:text-stone-900'
+              }`}
+            >
+              CY
+            </Link>
+          </div>
+
           <a
-            href={
-              currentPath === '/bryn-bugeiliaid-bach'
-                ? '#book'
-                : currentPath === '/' || currentPath === '/cy'
-                ? '#book'
-                : isCymraeg
-                ? '/cy#book'
-                : '/#book'
-            }
+            href={bookHref}
             style={{ fontFamily: "'Architects Daughter', cursive, sans-serif" }}
-            className="px-3 py-1.5 rounded-full text-xs font-architects font-bold uppercase text-white bg-[#99a0c1]"
+            className="px-3 py-1.5 rounded-full text-xs font-architects font-bold uppercase text-white bg-[#99A0C1]"
           >
             {isCymraeg ? 'Archebu' : 'Book'}
           </a>
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className={`p-2 rounded-lg ${scrolled ? 'text-stone-800' : 'text-white'}`}
+            className={`p-2 rounded-lg transition ${
+              isSticky ? 'text-stone-800' : 'text-white'
+            }`}
             aria-label="Toggle Menu"
           >
             {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
@@ -182,17 +291,57 @@ export function LiveSiteNavbar({ currentPath = '/', isCymraeg = false }: NavbarP
       {/* Mobile Drawer */}
       {mobileMenuOpen && (
         <div className="lg:hidden bg-white text-stone-900 border-b border-stone-200 px-6 py-4 space-y-3 shadow-lg">
-          {navLinks.map((item) => (
-            <Link
-              key={item.label}
-              href={item.href}
-              onClick={() => setMobileMenuOpen(false)}
-              style={{ fontFamily: "'Architects Daughter', cursive, sans-serif" }}
-              className="block py-2 text-lg font-architects font-bold tracking-wider uppercase border-b border-stone-100 hover:text-[#99a0c1]"
-            >
-              {item.label}
-            </Link>
-          ))}
+          {/* Mobile Drawer Language Pill */}
+          <div className="pb-3 border-b border-stone-100 flex items-center justify-between">
+            <span className="text-xs font-semibold text-stone-500 uppercase tracking-wider font-sans">
+              {isCymraeg ? 'Iaith / Language:' : 'Language / Iaith:'}
+            </span>
+            <div className="flex items-center rounded-full p-1 border border-stone-300 bg-stone-50 text-xs font-bold">
+              <Link
+                href={localeUrls.en}
+                onClick={() => setMobileMenuOpen(false)}
+                className={`px-3 py-1 rounded-full font-sans transition ${
+                  !isCymraeg
+                    ? 'bg-stone-900 text-white shadow-xs'
+                    : 'text-stone-600 hover:text-stone-900'
+                }`}
+              >
+                English
+              </Link>
+              <Link
+                href={localeUrls.cy}
+                onClick={() => setMobileMenuOpen(false)}
+                className={`px-3 py-1 rounded-full font-sans transition ${
+                  isCymraeg
+                    ? 'bg-[#99A0C1] text-white shadow-xs'
+                    : 'text-stone-600 hover:text-stone-900'
+                }`}
+              >
+                Cymraeg
+              </Link>
+            </div>
+          </div>
+
+          {navLinks.map((item) => {
+            const isActive =
+              effectivePath === item.href ||
+              (item.href !== '/' &&
+                item.href !== '/cy' &&
+                effectivePath.startsWith(item.href));
+            return (
+              <Link
+                key={item.label}
+                href={item.href}
+                onClick={() => setMobileMenuOpen(false)}
+                style={{ fontFamily: "'Architects Daughter', cursive, sans-serif" }}
+                className={`block py-2 text-lg font-architects font-bold tracking-wider uppercase border-b border-stone-100 transition ${
+                  isActive ? 'text-[#99A0C1]' : 'text-stone-800 hover:text-[#99A0C1]'
+                }`}
+              >
+                {item.label}
+              </Link>
+            );
+          })}
         </div>
       )}
     </header>

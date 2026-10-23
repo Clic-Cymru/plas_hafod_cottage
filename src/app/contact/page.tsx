@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 import { LiveSiteNavbar } from '@/components/navigation/LiveSiteNavbar';
-import { LiveSiteSisterPropertyAndAccreditations } from '@/components/cottage/LiveSiteSisterPropertyAndAccreditations';
+import { LiveSiteFooter } from '@/components/navigation/LiveSiteFooter';
+import { SubpageHero } from '@/components/navigation/SubpageHero';
 import { ContactForm } from '@/components/contact/ContactForm';
 import { Mail, Phone, MapPin, Clock, Compass, ShieldCheck } from 'lucide-react';
 
@@ -15,23 +16,14 @@ export default function ContactPage() {
     <div className="min-h-screen bg-[#fbfbfd] text-[#333333] flex flex-col font-sans selection:bg-[#efda07]/30 selection:text-stone-900">
       <LiveSiteNavbar currentPath="/contact" isCymraeg={false} />
 
-      <main className="flex-1 pt-24 sm:pt-28">
-        {/* Hero Section */}
-        <section className="bg-gradient-to-b from-stone-900 to-stone-800 text-white py-16 sm:py-20 text-center">
-          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h1
-              className="text-3xl sm:text-5xl md:text-6xl font-architects uppercase tracking-wider text-white mb-4"
-              style={{ fontFamily: "'Architects Daughter', cursive, sans-serif" }}
-            >
-              GET IN <span className="text-[#99a0c1]">TOUCH</span>
-            </h1>
-            <div className="w-20 h-1 bg-[#efda07] mx-auto mb-6" />
-            <p className="text-base sm:text-lg text-stone-300 font-sans max-w-2xl mx-auto">
-              Have a question about booking dates, bringing your dog, or planning your Snowdonia holiday?
-              Siwsan and Neil are here to help.
-            </p>
-          </div>
-        </section>
+      <main className="flex-1">
+        {/* Floating Subpage Hero with Landscape Background & Wave Divider */}
+        <SubpageHero
+          title="CONTACT"
+          subtitle="Have a question about booking dates, bringing your dog, or planning your Snowdonia holiday? Siwsan and Neil are here to help."
+          imageSrc="/images/wp/hero-bg.jpg"
+          imageAlt="Plas Hafod mountain views"
+        />
 
         {/* Contact Form & Information Cards Section */}
         <section className="max-w-[1300px] mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20">
@@ -187,8 +179,8 @@ export default function ContactPage() {
           </div>
         </section>
 
-        {/* Sister property and footer */}
-        <LiveSiteSisterPropertyAndAccreditations isCymraeg={false} />
+        {/* Footer */}
+        <LiveSiteFooter isCymraeg={false} />
       </main>
     </div>
   );

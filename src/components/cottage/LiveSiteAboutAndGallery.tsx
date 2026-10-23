@@ -1,97 +1,211 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import Image from 'next/image';
 import {
   ChevronLeft,
   ChevronRight,
-  Sparkles,
+  Paintbrush,
   Key,
   Armchair,
   Bed,
   Bath,
   Coffee,
-  Paintbrush
+  X,
+  Maximize2,
+  Play,
+  Pause,
 } from 'lucide-react';
+import { liveCarouselImages, CarouselSlide } from '@/data/carouselImages';
 
 interface AboutAndGalleryProps {
   isCymraeg?: boolean;
 }
 
-const galleryImages = [
-  { id: 1, src: '/images/wp/gallery-1.jpg', alt: 'Plas Hafod Cottage Exterior' },
-  { id: 2, src: '/images/wp/gallery-2.jpg', alt: 'Plas Hafod Garden Pod' },
-  { id: 3, src: '/images/wp/gallery-3.jpg', alt: 'Plas Hafod Covered Outdoor Seating' },
-  { id: 4, src: '/images/wp/gallery-4.jpg', alt: 'Plas Hafod Mountain Panorama' },
-  { id: 5, src: '/images/wp/gallery-5.jpg', alt: 'Plas Hafod Patio Seating' },
-  { id: 6, src: '/images/wp/gallery-6.jpg', alt: 'Plas Hafod Cozy Inglenook Fireplace' },
-  { id: 7, src: '/images/wp/gallery-7.jpg', alt: 'Plas Hafod Lounge Beams' },
-  { id: 8, src: '/images/wp/gallery-8.jpg', alt: 'Plas Hafod Master King Bedroom' },
-  { id: 9, src: '/images/wp/gallery-9.jpg', alt: 'Plas Hafod Twin Bedroom' },
-  { id: 10, src: '/images/wp/gallery-10.jpg', alt: 'Plas Hafod Modern Bathroom' },
-  { id: 11, src: '/images/wp/gallery-11.jpg', alt: 'Plas Hafod Farmhouse Kitchen' },
-  { id: 12, src: '/images/wp/gallery-12.jpg', alt: 'Plas Hafod Garden Sunset' },
-];
-
 export function LiveSiteAboutAndGallery({ isCymraeg = false }: AboutAndGalleryProps) {
-  const [currentSlide, setCurrentSlide] = useState(0);
+  const total = liveCarouselImages.length; // 44
+  const CLONE_COUNT = 4;
 
-  const prevSlide = () => {
-    setCurrentSlide((prev) => (prev === 0 ? galleryImages.length - 3 : prev - 1));
-  };
+  // Extended slides array with clones at both ends for infinite seamless loop
+  const extendedSlides = useMemo(
+    () => [
+      ...liveCarouselImages.slice(-CLONE_COUNT),
+      ...liveCarouselImages,
+      ...liveCarouselImages.slice(0, CLONE_COUNT),
+    ],
+    [total]
+  );
 
-  const nextSlide = () => {
-    setCurrentSlide((prev) => (prev >= galleryImages.length - 3 ? 0 : prev + 1));
-  };
+  // Carousel state
+  const [trackIndex, setTrackIndex] = useState(CLONE_COUNT);
+  const [isAnimating, setIsAnimating] = useState(true);
+  const [isHovered, setIsHovered] = useState(false);
+  const [isAutoPlaying, setIsAutoPlaying] = useState(true);
+  const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
+  const [visibleCount, setVisibleCount] = useState(4);
+  const carouselTrackRef = useRef<HTMLDivElement>(null);
 
-  const visibleImages = galleryImages.slice(currentSlide, currentSlide + 3);
+  // Dynamically adjust visible slides per viewport
+  useEffect(() => {
+    function updateVisible() {
+      if (window.innerWidth < 640) {
+        setVisibleCount(1);
+      } else if (window.innerWidth < 1024) {
+        setVisibleCount(2);
+      } else if (window.innerWidth < 1280) {
+        setVisibleCount(3);
+      } else {
+        setVisibleCount(4);
+      }
+    }
+    updateVisible();
+    window.addEventListener('resize', updateVisible);
+    return () => window.removeEventListener('resize', updateVisible);
+  }, []);
+
+  const nextSlide = useCallback(() => {
+    setIsAnimating(true);
+    setTrackIndex((prev) => prev + 1);
+  }, []);
+
+  const prevSlide = useCallback(() => {
+    setIsAnimating(true);
+    setTrackIndex((prev) => prev - 1);
+  }, []);
+
+  const handleTransitionEnd = useCallback(() => {
+    if (trackIndex >= total + CLONE_COUNT) {
+      setIsAnimating(false);
+      setTrackIndex(trackIndex - total);
+    } else if (trackIndex < CLONE_COUNT) {
+      setIsAnimating(false);
+      setTrackIndex(trackIndex + total);
+    }
+  }, [trackIndex, total]);
+
+  // Re-enable animation after instant loop snap
+  useEffect(() => {
+    if (!isAnimating) {
+      const raf1 = requestAnimationFrame(() => {
+        const raf2 = requestAnimationFrame(() => {
+          setIsAnimating(true);
+        });
+      });
+      return () => {
+        cancelAnimationFrame(raf1);
+      };
+    }
+  }, [isAnimating]);
+
+  // Autoplay timer - paused when hovered or in lightbox
+  useEffect(() => {
+    if (!isAutoPlaying || isHovered || lightboxIndex !== null) return;
+    const interval = setInterval(nextSlide, 4200);
+    return () => clearInterval(interval);
+  }, [isAutoPlaying, isHovered, lightboxIndex, nextSlide]);
+
+  // Lightbox keyboard navigation
+  useEffect(() => {
+    if (lightboxIndex === null) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setLightboxIndex(null);
+      if (e.key === 'ArrowRight') {
+        setLightboxIndex((prev) => (prev !== null ? (prev + 1) % total : null));
+      }
+      if (e.key === 'ArrowLeft') {
+        setLightboxIndex((prev) => (prev !== null ? (prev - 1 + total) % total : null));
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [lightboxIndex, total]);
+
+  const currentPhotoNumber = ((trackIndex - CLONE_COUNT) % total + total) % total + 1;
 
   return (
     <div className="bg-[#fbfbfd] text-[#333333]">
-      {/* 1. Welcome Section */}
-      <section className="max-w-[1300px] mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-          {/* Left: Window View Croeso Photo */}
+      {/* ========================================================= */}
+      {/* 1. WELCOME TO PLAS HAFOD COTTAGE SECTION                  */}
+      {/* Matches WordPress Elementor .elementor-element-2b9d01dd   */}
+      {/* Image style: border: 4px solid #99A0C1;                   */}
+      {/* border-radius: 90px 30px 90px 30px; box-shadow: 4px 4px 10px rgba(0,0,0,0.5) */}
+      {/* ========================================================= */}
+      <section className="max-w-[1240px] mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
+          {/* Left: Plas Hafod Cottage Exterior Photo */}
           <div className="lg:col-span-5 flex justify-center">
-            <div className="relative w-full max-w-[460px] aspect-[4/5] rounded-[36px] overflow-hidden shadow-xl border-4 border-white ring-1 ring-stone-200">
+            <div
+              className="relative w-full max-w-[420px] aspect-[3/4] overflow-hidden transition-transform duration-500 hover:scale-[1.01]"
+              style={{
+                borderRadius: '90px 30px 90px 30px',
+                border: '4px solid #99A0C1',
+                boxShadow: '4px 4px 10px 0px rgba(0, 0, 0, 0.5)',
+              }}
+            >
               <Image
-                src="/images/wp/croeso-window.jpg"
-                alt="Plas Hafod Croeso Window with Eryri Valley View"
+                src="/images/wp/plas-hafod-welcome.jpg"
+                alt={
+                  isCymraeg
+                    ? 'Bwthyn Plas Hafod - Bwthyn Traddodiadol Cymreig'
+                    : 'Plas Hafod Cottage - Traditional Welsh Stone Holiday Cottage'
+                }
                 fill
+                priority
+                sizes="(max-width: 768px) 100vw, 420px"
                 className="object-cover"
               />
             </div>
           </div>
 
-          {/* Right: Text and Narrative */}
+          {/* Right: Text Narrative */}
           <div className="lg:col-span-7">
-            <h2 className="text-3xl sm:text-5xl font-architects tracking-wide uppercase text-stone-900 leading-tight">
-              {isCymraeg ? 'CROESO I' : 'WELCOME TO'}{' '}
-              <span className="text-[#99a0c1]">
+            <h2 className="text-3xl sm:text-5xl font-architects tracking-wide uppercase text-[#323149] leading-tight">
+              {isCymraeg ? 'CROESO I' : 'WELCOME TO'}
+              <br />
+              <span className="text-[#99A0C1]">
                 {isCymraeg ? 'FWTHYN PLAS HAFOD' : 'PLAS HAFOD COTTAGE'}
               </span>
             </h2>
 
-            {/* Gold Underline Bar */}
-            <div className="w-20 h-1 bg-[#efda07] mt-3 mb-6" />
+            {/* Gold Accent Divider (Elementor divider #EFDA07) */}
+            <div className="w-20 h-1 bg-[#EFDA07] mt-3 mb-6" />
 
-            <div className="space-y-4 text-stone-700 text-sm sm:text-base leading-relaxed font-sans">
+            <div className="space-y-4 text-stone-700 text-base sm:text-lg leading-relaxed font-sans font-light">
               {isCymraeg ? (
                 <>
                   <p>
-                    Wedi&#39;i adeiladu yn y 1800au, mae Plas Hafod wedi&#39;i adnewyddu, ei ymestyn a&#39;i ddodrefnu&#39;n feddylgar i&#39;n safon uchel arferol. Wedi&#39;i leoli oddi ar y llwybr arferol gyda llawer o nodweddion gwreiddiol. Encil rhamantus a chlyd delfrydol ar gyfer cyplau sy&#39;n chwilio am y dihangfa berffaith neu ar gyfer selogion cerdded/dringo neu deuluoedd/ffrindiau sy&#39;n mwynhau ac yn gwerthfawrogi bywyd gwyllt a ffyrdd o fyw gwledig.
+                    Wedi&#39;i adeiladu yn y 1800au, mae Plas Hafod wedi&#39;i adnewyddu, ei ymestyn
+                    a&#39;i ddodrefnu&#39;n feddylgar i&#39;n safon uchel arferol. Wedi&#39;i leoli
+                    oddi ar y llwybr arferol gyda llawer o nodweddion gwreiddiol. Encil rhamantus a
+                    chlyd delfrydol ar gyfer cyplau sy&#39;n chwilio am y dihangfa berffaith neu ar
+                    gyfer selogion cerdded/dringo neu deuluoedd/ffrindiau sy&#39;n mwynhau ac yn
+                    gwerthfawrogi bywyd gwyllt a ffyrdd o fyw gwledig.
                   </p>
                   <p>
-                    Wedi&#39;i leoli ar ymyl Parc Cenedlaethol Eryri, gyda llwybr cerdded Crib Nantlle ychydig lathenni o&#39;n mynedfa â gatiau, ym mhentref heddychlon Nebo uwchben Dyffryn Nantlle, mae&#39;r Bwthyn hwn yn mwynhau golygfeydd ysblennydd a bythgofiadwy o fryniau a mynyddoedd mawreddog Gogledd Cymru, cefn gwlad garw, arfordiroedd euraidd, Ynys Môn ac ar ddiwrnodau clir gellir gweld hyd yn oed Mynyddoedd Wicklow mawreddog Iwerddon ar y gorwel.
+                    Wedi&#39;i leoli ar ymyl Parc Cenedlaethol Eryri, gyda llwybr cerdded Crib Nantlle
+                    ychydig lathenni o&#39;n mynedfa â gatiau, ym mhentref heddychlon Nebo uwchben
+                    Dyffryn Nantlle, mae&#39;r Bwthyn hwn yn mwynhau golygfeydd ysblennydd a
+                    bythgofiadwy o fryniau a mynyddoedd mawreddog Gogledd Cymru, cefn gwlad garw,
+                    arfordiroedd euraidd, Ynys Môn ac ar ddiwrnodau clir gellir gweld hyd yn oed
+                    Mynyddoedd Wicklow mawreddog Iwerddon ar y gorwel.
                   </p>
                 </>
               ) : (
                 <>
                   <p>
-                    Built in 1800&#39;s Plas Hafod has been carefully and thoughtfully renovated, extended and furnished to our usual high standard. Situated off the beaten track with many original features. Ideal romantic and cosy retreat for couples looking for the perfect getaway break or for walking/climbing enthusiasts or families/friends whom enjoy and appreciate wildlife and rural lifestyles.
+                    Built in 1800&#39;s Plas Hafod has been carefully and thoughtfully renovated,
+                    extended and furnished to our usual high standard. Situated off the beaten
+                    track with many original features. Ideal romantic and cosy retreat for couples
+                    looking for the perfect getaway break or for walking/climbing enthusiasts or
+                    families/friends whom enjoy and appreciate wildlife and rural lifestyles.
                   </p>
                   <p>
-                    Situated on the edge of the Snowdonia National Park, with the walkway of the Nantlle Ridge just yards from our gated entrance, in the peaceful hamlet of Nebo above the Nantlle Valleys, this Cottage enjoying spectacular and unforgettable views of the North Wales hills and magnificent mountains, rugged countryside, golden coastlines, the Isle of Anglesey and on clear days even the majestic Wicklow Mountains of Ireland can be seen on the horizon.
+                    Situated on the edge of the Snowdonia National Park, with the walkway of the
+                    Nantlle Ridge just yards from our gated entrance, in the peaceful hamlet of Nebo
+                    above the Nantlle Valleys, this Cottage enjoying spectacular and unforgettable
+                    views of the North Wales hills and magnificent mountains, rugged countryside,
+                    golden coastlines, the Isle of Anglesey and on clear days even the majestic
+                    Wicklow Mountains of Ireland can be seen on the horizon.
                   </p>
                 </>
               )}
@@ -100,110 +214,288 @@ export function LiveSiteAboutAndGallery({ isCymraeg = false }: AboutAndGalleryPr
         </div>
       </section>
 
-      {/* 2. Gallery Carousel Section */}
-      <section className="py-12 bg-stone-50/70 border-y border-stone-200">
+      {/* ========================================================= */}
+      {/* 2. IMAGES OF PLAS HAFOD SCROLLING CAROUSEL                */}
+      {/* Matches WordPress Elementor .elementor-element-17492189   */}
+      {/* & media-carousel widget with all 44 photos                */}
+      {/* Slide style: border: 3px solid #99A0C1; border-radius: 15px */}
+      {/* ========================================================= */}
+      <section className="py-12 bg-[#f4f5f8] border-y border-stone-200/80">
         <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl sm:text-4xl font-architects text-center tracking-wide uppercase text-stone-900 mb-8">
-            {isCymraeg ? 'DELWEDDAU O' : 'IMAGES OF'}{' '}
-            <span className="text-[#99a0c1]">PLAS HAFOD</span>
-          </h2>
+          <div className="text-center mb-8">
+            <h2 className="text-3xl sm:text-4xl font-architects tracking-wide uppercase text-[#323149]">
+              {isCymraeg ? 'DELWEDDAU O' : 'IMAGES OF'}{' '}
+              <span className="text-[#99A0C1]">PLAS HAFOD</span>
+            </h2>
+            <div className="w-16 h-1 bg-[#EFDA07] mx-auto mt-2" />
+            <p className="text-xs sm:text-sm text-stone-500 font-sans mt-2">
+              {isCymraeg
+                ? `Archwiliwch ein horiel o ${total} llun - cliciwch ar unrhyw ddelwedd i&#39;w chwyddo`
+                : `Explore our complete gallery of ${total} authentic photos — click any image to enlarge`}
+            </p>
+          </div>
 
-          <div className="relative">
-            {/* Gallery Track */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {visibleImages.map((img) => (
-                <div
-                  key={img.id}
-                  className="relative h-64 sm:h-72 rounded-2xl overflow-hidden shadow-md border-2 border-white group"
-                >
-                  <Image
-                    src={img.src}
-                    alt={img.alt}
-                    fill
-                    className="object-cover group-hover:scale-105 transition duration-500"
-                  />
-                </div>
-              ))}
+          {/* Carousel Container with Smooth Sliding Track */}
+          <div
+            className="relative group"
+            onMouseEnter={() => setIsHovered(true)}
+            onMouseLeave={() => setIsHovered(false)}
+          >
+            {/* Overflow Hidden Window */}
+            <div className="overflow-hidden w-full py-1">
+              {/* Sliding Track */}
+              <div
+                ref={carouselTrackRef}
+                className="flex will-change-transform"
+                style={{
+                  transform: `translate3d(-${trackIndex * (100 / visibleCount)}%, 0, 0)`,
+                  transition: isAnimating
+                    ? 'transform 650ms cubic-bezier(0.25, 1, 0.5, 1)'
+                    : 'none',
+                }}
+                onTransitionEnd={handleTransitionEnd}
+              >
+                {extendedSlides.map((slide, slideIndex) => {
+                  const realIndex =
+                    ((slideIndex - CLONE_COUNT) % total + total) % total;
+                  return (
+                    <div
+                      key={`${slide.id}-${slideIndex}`}
+                      className="shrink-0 px-1.5 sm:px-2"
+                      style={{
+                        width: `${100 / visibleCount}%`,
+                        maxWidth: `${100 / visibleCount}%`,
+                      }}
+                    >
+                      <div
+                        onClick={() => setLightboxIndex(realIndex)}
+                        className="relative h-[250px] sm:h-[280px] md:h-[310px] lg:h-[330px] overflow-hidden cursor-pointer group/slide transition-transform duration-300 hover:-translate-y-1 bg-stone-200"
+                        style={{
+                          border: '3px solid #99A0C1',
+                          borderRadius: '15px',
+                          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.08)',
+                        }}
+                        title={isCymraeg ? 'Cliciwch i agor' : 'Click to enlarge'}
+                      >
+                        <Image
+                          src={slide.src}
+                          alt={slide.alt}
+                          fill
+                          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 25vw"
+                          className="object-cover rounded-[12px] group-hover/slide:scale-105 transition-transform duration-500"
+                        />
+
+                        {/* Subtle hover overlay with expand icon */}
+                        <div className="absolute inset-0 bg-[#323149]/30 opacity-0 group-hover/slide:opacity-100 transition-opacity duration-300 rounded-[12px] flex items-center justify-center">
+                          <div className="p-2.5 bg-white/90 text-[#323149] rounded-full shadow-lg transform scale-90 group-hover/slide:scale-100 transition-transform">
+                            <Maximize2 className="w-5 h-5" />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
 
-            {/* Carousel Navigation Arrows */}
+            {/* Navigation Arrows */}
             <button
               onClick={prevSlide}
               aria-label="Previous Slide"
-              className="absolute -left-3 sm:-left-5 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/90 hover:bg-white text-stone-800 shadow-md border border-stone-200 flex items-center justify-center transition"
+              className="absolute -left-3 sm:-left-5 top-1/2 -translate-y-1/2 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-white text-[#323149] hover:bg-[#99A0C1] hover:text-white shadow-xl border-2 border-[#99A0C1] flex items-center justify-center transition z-20"
             >
               <ChevronLeft className="w-6 h-6" />
             </button>
             <button
               onClick={nextSlide}
               aria-label="Next Slide"
-              className="absolute -right-3 sm:-right-5 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/90 hover:bg-white text-stone-800 shadow-md border border-stone-200 flex items-center justify-center transition"
+              className="absolute -right-3 sm:-right-5 top-1/2 -translate-y-1/2 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-white text-[#323149] hover:bg-[#99A0C1] hover:text-white shadow-xl border-2 border-[#99A0C1] flex items-center justify-center transition z-20"
             >
               <ChevronRight className="w-6 h-6" />
             </button>
           </div>
+
+          {/* Carousel Footer: Index indicator + Autoplay controls */}
+          <div className="flex items-center justify-between mt-6 px-2 text-xs text-stone-600 font-sans">
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setIsAutoPlaying((prev) => !prev)}
+                className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-white border border-stone-300 hover:border-[#99A0C1] text-stone-700 transition"
+                aria-label={isAutoPlaying ? 'Pause Slideshow' : 'Play Slideshow'}
+              >
+                {isAutoPlaying ? (
+                  <>
+                    <Pause className="w-3.5 h-3.5 text-[#99A0C1]" />
+                    <span>{isCymraeg ? 'Oedi' : 'Pause'}</span>
+                  </>
+                ) : (
+                  <>
+                    <Play className="w-3.5 h-3.5 text-[#99A0C1]" />
+                    <span>{isCymraeg ? 'Chwarae' : 'Play'}</span>
+                  </>
+                )}
+              </button>
+              <span className="hidden sm:inline text-stone-400">|</span>
+              <span className="hidden sm:inline font-mono">
+                {currentPhotoNumber} / {total}
+              </span>
+            </div>
+
+            {/* Slider progress bar indicator */}
+            <div className="w-36 sm:w-64 h-1.5 bg-stone-200 rounded-full overflow-hidden">
+              <div
+                className="h-full bg-[#99A0C1] transition-all duration-300"
+                style={{ width: `${(currentPhotoNumber / total) * 100}%` }}
+              />
+            </div>
+          </div>
         </div>
       </section>
 
-      {/* 3. Visit Wales 5-Star Rating Section */}
-      <section className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 py-20">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+      {/* ========================================================= */}
+      {/* 3. VISIT WALES 5* RATING SECTION                          */}
+      {/* Matches WordPress Elementor .elementor-element-5487bbb6   */}
+      {/* Image style: border: 4px solid #99A0C1;                   */}
+      {/* border-radius: 90px 30px 90px 30px; box-shadow: 4px 4px 10px rgba(0,0,0,0.5) */}
+      {/* Image: /images/wp/plas-hafod-visit-wales.jpg (7_12_crop)  */}
+      {/* ========================================================= */}
+      <section className="max-w-[1240px] mx-auto px-4 sm:px-6 lg:px-8 py-20">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
           {/* Left Details */}
           <div className="lg:col-span-7 space-y-6">
-            <h2 className="text-3xl sm:text-4xl font-architects tracking-wide uppercase text-stone-900">
+            <h2 className="text-3xl sm:text-5xl font-architects tracking-wide uppercase text-[#323149] leading-tight">
               {isCymraeg ? 'GRADDIO 5★' : 'VISIT WALES'}{' '}
-              <span className="text-[#99a0c1]">
-                {isCymraeg ? 'CROESO CYMRU' : '5★ RATING'}
+              <span className="text-[#99A0C1]">
+                {isCymraeg ? 'CROESO CYMRU' : '5* RATING'}
               </span>
             </h2>
 
-            <p className="text-sm sm:text-base text-stone-600 font-sans">
+            {/* Gold Accent Divider */}
+            <div className="w-20 h-1 bg-[#EFDA07]" />
+
+            <p className="text-base sm:text-lg text-stone-700 font-sans font-light">
               {isCymraeg
                 ? 'Mae Bwthyn Plas Hafod wedi&#39;i asesu gan Croeso Cymru ac mae wedi ennill Graddfa Ansawdd 5* ragorol yn y meysydd canlynol:'
                 : 'Plas Hafod Cottage has been assessed by Visit Wales and has acquired an excellent 5* Quality Grading in the following areas:'}
             </p>
 
-            <ul className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2 font-architects uppercase tracking-wider text-sm text-stone-800">
-              <li className="flex items-center gap-3 p-2 bg-white rounded-lg border border-stone-200/80 shadow-sm">
-                <Paintbrush className="w-5 h-5 text-[#99a0c1]" />
-                <span>{isCymraeg ? 'Glendid' : 'Cleanliness'}</span>
+            <ul className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 pt-2 font-architects uppercase tracking-wider text-sm sm:text-base text-stone-800">
+              <li className="flex items-center gap-3 p-3 bg-white rounded-xl border border-stone-200/90 shadow-sm">
+                <Paintbrush className="w-5 h-5 text-[#99A0C1]" />
+                <span>{isCymraeg ? 'Glendid' : 'CLEANLINESS'}</span>
               </li>
-              <li className="flex items-center gap-3 p-2 bg-white rounded-lg border border-stone-200/80 shadow-sm">
-                <Key className="w-5 h-5 text-[#99a0c1]" />
-                <span>{isCymraeg ? 'Effeithlonrwydd Rheolaeth' : 'Management Efficiency'}</span>
+              <li className="flex items-center gap-3 p-3 bg-white rounded-xl border border-stone-200/90 shadow-sm">
+                <Key className="w-5 h-5 text-[#99A0C1]" />
+                <span>{isCymraeg ? 'Effeithlonrwydd Rheolaeth' : 'MANAGEMENT EFFICIENCY'}</span>
               </li>
-              <li className="flex items-center gap-3 p-2 bg-white rounded-lg border border-stone-200/80 shadow-sm">
-                <Armchair className="w-5 h-5 text-[#99a0c1]" />
-                <span>{isCymraeg ? 'Mannau Byw' : 'Living Areas'}</span>
+              <li className="flex items-center gap-3 p-3 bg-white rounded-xl border border-stone-200/90 shadow-sm">
+                <Armchair className="w-5 h-5 text-[#99A0C1]" />
+                <span>{isCymraeg ? 'Mannau Byw' : 'LIVING AREAS'}</span>
               </li>
-              <li className="flex items-center gap-3 p-2 bg-white rounded-lg border border-stone-200/80 shadow-sm">
-                <Bed className="w-5 h-5 text-[#99a0c1]" />
-                <span>{isCymraeg ? 'Ystafelloedd Gwely' : 'Bedrooms'}</span>
+              <li className="flex items-center gap-3 p-3 bg-white rounded-xl border border-stone-200/90 shadow-sm">
+                <Bed className="w-5 h-5 text-[#99A0C1]" />
+                <span>{isCymraeg ? 'Ystafelloedd Gwely' : 'BEDROOMS'}</span>
               </li>
-              <li className="flex items-center gap-3 p-2 bg-white rounded-lg border border-stone-200/80 shadow-sm">
-                <Bath className="w-5 h-5 text-[#99a0c1]" />
-                <span>{isCymraeg ? 'Ystafell Ymolchi' : 'Bathroom'}</span>
+              <li className="flex items-center gap-3 p-3 bg-white rounded-xl border border-stone-200/90 shadow-sm">
+                <Bath className="w-5 h-5 text-[#99A0C1]" />
+                <span>{isCymraeg ? 'Ystafell Ymolchi' : 'BATHROOM'}</span>
               </li>
-              <li className="flex items-center gap-3 p-2 bg-white rounded-lg border border-stone-200/80 shadow-sm">
-                <Coffee className="w-5 h-5 text-[#99a0c1]" />
-                <span>{isCymraeg ? 'Cegin / Ardal Fwyta' : 'Kitchen / Dining Area'}</span>
+              <li className="flex items-center gap-3 p-3 bg-white rounded-xl border border-stone-200/90 shadow-sm">
+                <Coffee className="w-5 h-5 text-[#99A0C1]" />
+                <span>{isCymraeg ? 'Cegin / Ardal Fwyta' : 'KITCHEN / DINING AREA'}</span>
               </li>
             </ul>
           </div>
 
-          {/* Right: Visit Wales Sign Photo */}
+          {/* Right: Authentic Cottage Patio & Grounds Image */}
           <div className="lg:col-span-5 flex justify-center">
-            <div className="relative w-full max-w-[360px] aspect-[4/5] rounded-[32px] overflow-hidden shadow-xl border-4 border-white ring-1 ring-stone-200">
+            <div
+              className="relative w-full max-w-[420px] aspect-[4/3.8] overflow-hidden transition-transform duration-500 hover:scale-[1.01]"
+              style={{
+                borderRadius: '90px 30px 90px 30px',
+                border: '4px solid #99A0C1',
+                boxShadow: '4px 4px 10px 0px rgba(0, 0, 0, 0.5)',
+              }}
+            >
               <Image
-                src="/images/wp/visit-wales-sign.jpg"
-                alt="Visit Wales 5 Star Quality Grading Sign"
+                src="/images/wp/plas-hafod-visit-wales.jpg"
+                alt={
+                  isCymraeg
+                    ? 'Golygfeydd a gerddi Bwthyn Plas Hafod'
+                    : 'Plas Hafod Cottage grounds, patio and breathtaking mountain views'
+                }
                 fill
+                sizes="(max-width: 768px) 100vw, 420px"
                 className="object-cover"
               />
             </div>
           </div>
         </div>
       </section>
+
+      {/* ========================================================= */}
+      {/* 4. FULL-SCREEN LIGHTBOX MODAL                             */}
+      {/* ========================================================= */}
+      {lightboxIndex !== null && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          className="fixed inset-0 z-50 bg-black/90 backdrop-blur-md flex items-center justify-center p-4 sm:p-8 animate-in fade-in duration-200"
+          onClick={() => setLightboxIndex(null)}
+        >
+          {/* Close button */}
+          <button
+            onClick={() => setLightboxIndex(null)}
+            className="absolute top-4 right-4 sm:top-6 sm:right-6 text-white/80 hover:text-white p-2 rounded-full bg-white/10 hover:bg-white/20 transition z-50"
+            aria-label="Close Lightbox"
+          >
+            <X className="w-6 h-6 sm:w-8 sm:h-8" />
+          </button>
+
+          {/* Slide counter */}
+          <div className="absolute top-5 left-6 text-white/80 font-mono text-sm sm:text-base z-50">
+            {lightboxIndex + 1} / {total}
+          </div>
+
+          {/* Previous Arrow */}
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              setLightboxIndex((prev) => (prev !== null ? (prev - 1 + total) % total : 0));
+            }}
+            className="absolute left-3 sm:left-6 top-1/2 -translate-y-1/2 p-3 text-white/80 hover:text-white bg-white/10 hover:bg-white/25 rounded-full transition z-50"
+            aria-label="Previous Lightbox Image"
+          >
+            <ChevronLeft className="w-7 h-7 sm:w-9 sm:h-9" />
+          </button>
+
+          {/* Main Lightbox Image */}
+          <div
+            className="relative max-w-5xl max-h-[85vh] w-full h-[75vh] flex items-center justify-center"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <Image
+              src={liveCarouselImages[lightboxIndex].src}
+              alt={liveCarouselImages[lightboxIndex].alt}
+              fill
+              className="object-contain"
+              priority
+            />
+          </div>
+
+          {/* Next Arrow */}
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              setLightboxIndex((prev) => (prev !== null ? (prev + 1) % total : 0));
+            }}
+            className="absolute right-3 sm:right-6 top-1/2 -translate-y-1/2 p-3 text-white/80 hover:text-white bg-white/10 hover:bg-white/25 rounded-full transition z-50"
+            aria-label="Next Lightbox Image"
+          >
+            <ChevronRight className="w-7 h-7 sm:w-9 sm:h-9" />
+          </button>
+        </div>
+      )}
     </div>
   );
 }

@@ -1,72 +1,107 @@
 /**
- * Sanity / Headless CMS Schema: Guestbook & Reviews
+ * Sanity Schema: Handwritten Guestbook Comment / Note (Llyfr Gwesteion)
+ * Enables viewing, uploading, cropping, and editing the handwritten guestbook
+ * clipping images and their transcripts in Sanity Studio.
  */
 export const guestbookSchema = {
   name: 'guestbookEntry',
-  title: 'Guestbook & Reviews',
+  title: 'Handwritten Guestbook Archive (Llyfr Gwesteion)',
   type: 'document',
   fields: [
     {
-      name: 'author',
-      title: 'Guest Name',
-      type: 'string',
+      name: 'photo',
+      title: 'Guestbook Clipping Image / Llun y Sylw Llawysgrif',
+      type: 'image',
+      description:
+        'Upload or view the photograph/scan of the handwritten guestbook page from Plas Hafod or Bryn Bugeiliaid Bach.',
+      options: {
+        hotspot: true,
+      },
       validation: (Rule: any) => Rule.required(),
     },
     {
-      name: 'location',
-      title: 'Guest Origin / Location',
+      name: 'property',
+      title: 'Property / Eiddo',
       type: 'string',
-      description: 'e.g. "Cardiff", "London", "Bristol", "Edinburgh"',
+      options: {
+        list: [
+          { title: 'Plas Hafod Cottage (Bwthyn Plas Hafod)', value: 'plas-hafod' },
+          { title: 'Bryn Bugeiliaid Bach (Annexe)', value: 'bryn-bugeiliaid-bach' },
+        ],
+        layout: 'radio',
+      },
+      initialValue: 'plas-hafod',
+      validation: (Rule: any) => Rule.required(),
+    },
+    {
+      name: 'author',
+      title: 'Guest Name(s) / Enw(au) y Gwesteion (Optional)',
+      type: 'string',
+      description: 'Optional. Leave blank to let the handwritten note speak for itself.',
+      validation: (Rule: any) => Rule.optional(),
     },
     {
       name: 'stayDate',
-      title: 'Month / Year of Stay',
+      title: 'Stay Date / Month & Year (Dyddiad Arhosiad)',
       type: 'string',
-      description: 'e.g. "September 2025"',
+      description: 'e.g. "August 2026", "October 2026", "Autumn 2026"',
+    },
+    {
+      name: 'location',
+      title: 'Guest Origin / Location (Tarddiad y Gwestai)',
+      type: 'string',
+      description: 'e.g. "Cardiff", "Bristol", "London", "Aberystwyth"',
     },
     {
       name: 'rating',
       title: 'Star Rating (1-5)',
       type: 'number',
       initialValue: 5,
-      validation: (Rule: any) => Rule.required().min(1).max(5),
+      validation: (Rule: any) => Rule.min(1).max(5),
     },
     {
       name: 'reviewTextEn',
-      title: 'Review / Comment (English)',
+      title: 'Transcription / Handwritten Note Content (English)',
       type: 'text',
       rows: 4,
-      validation: (Rule: any) => Rule.required(),
+      description: 'Optional text transcription of the handwritten note for accessibility and search.',
     },
     {
       name: 'reviewTextCy',
-      title: 'Adolygiad (Cymraeg - Optional)',
+      title: 'Trawsgrifiad / Cynnwys y Sylw Llawysgrif (Cymraeg)',
       type: 'text',
       rows: 4,
     },
     {
-      name: 'photo',
-      title: 'Guest Photo / Guestbook Handwritten Note Image',
-      type: 'image',
-      options: { hotspot: true },
+      name: 'order',
+      title: 'Display Order / Trefn',
+      type: 'number',
+      description: 'Controls the display order on the website (1, 2, 3...)',
+      initialValue: 1,
     },
     {
       name: 'isFeatured',
-      title: 'Feature on Homepage',
+      title: 'Feature on Homepage (Dangos ar yr Hafan)',
       type: 'boolean',
       initialValue: false,
     },
   ],
   preview: {
     select: {
-      author: 'author',
-      stayDate: 'stayDate',
-      rating: 'rating',
+      title: 'author',
+      property: 'property',
+      order: 'order',
+      subtitle: 'stayDate',
+      media: 'photo',
     },
-    prepare({ author, stayDate, rating }: any) {
+    prepare({ title, property, order, subtitle, media }: any) {
+      const propLabel =
+        property === 'bryn-bugeiliaid-bach' ? '🌿 Bryn Bugeiliaid Bach' : '🏡 Plas Hafod';
+      const numLabel = order ? `Note #${order}` : 'Note';
       return {
-        title: `${author} (${'★'.repeat(rating || 5)})`,
-        subtitle: stayDate || 'Guest Review',
+        title: title ? `${propLabel} - ${title}` : `${propLabel} ${numLabel}`,
+        subtitle: subtitle || 'Authentic handwritten note',
+        media,
       };
     },
   },

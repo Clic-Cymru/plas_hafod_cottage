@@ -1,94 +1,203 @@
-import React from 'react';
+'use client';
+
+import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { Award, Star, CheckCircle2 } from 'lucide-react';
+import { LiveSiteFooter } from '@/components/navigation/LiveSiteFooter';
+import { Accreditation } from '@/cms/types';
+import { defaultAccreditations } from '@/data/defaultAccreditations';
 
 interface SisterProps {
   isCymraeg?: boolean;
   isBBBPage?: boolean;
+  accreditations?: Accreditation[];
 }
 
-const accreditationImages = [
-  { id: 1, src: '/images/wp/award-plastic-free.jpg', alt: 'Plastic Free Business Copa Gold' },
-  { id: 2, src: '/images/wp/award-eryri-ambassador.jpg', alt: 'Llysgennad Eryri Ambassador 2026' },
-  { id: 3, src: '/images/wp/award-welsh-hospitality.jpeg', alt: 'Best of Welsh Hospitality Awards 2026 Finalist' },
-  { id: 4, src: '/images/wp/award-superhost.jpg', alt: 'Airbnb Superhost Award' },
-  { id: 5, src: '/images/wp/award-best-north-wales.jpg', alt: 'Best of North Wales Business Awards' },
-  { id: 6, src: '/images/wp/award-ph-5star.jpg', alt: 'Visit Wales 5-star Grading Certificate' },
+const bbbSliderImages = [
+  { id: 1, src: '/images/wp/bbb-slide-4.jpg', alt: 'Bryn Bugeiliaid Bach Bedroom Comfort' },
+  { id: 2, src: '/images/wp/bbb-slide-1.jpg', alt: 'Bryn Bugeiliaid Bach Conservatory and Grounds' },
+  { id: 3, src: '/images/wp/bbb-slide-2.jpg', alt: 'Bryn Bugeiliaid Bach Cozy Living Area with Log Fire' },
+  { id: 4, src: '/images/wp/bbb-slide-3.jpg', alt: 'Bryn Bugeiliaid Bach Farmhouse Kitchen and Dining' },
 ];
 
-const croesoBadges = [
-  { id: 7, src: '/images/wp/croeso-cyclists.jpg', alt: 'Croeso Beicwyr Cyclists Welcome' },
-  { id: 8, src: '/images/wp/croeso-pets.jpg', alt: 'Croeso Anifeiliaid Pets Welcome' },
-  { id: 9, src: '/images/wp/croeso-tv.jpg', alt: 'Croeso Criwiau TV/Film Crew Welcome' },
-  { id: 10, src: '/images/wp/croeso-walkers.jpg', alt: 'Croeso Cerddwyr Walkers Welcome' },
+const plasHafodSliderImages = [
+  { id: 1, src: '/images/wp/plas-hafod-welcome.jpg', alt: 'Plas Hafod Cottage Exterior' },
+  { id: 2, src: '/images/wp/carousel/slide-01.jpg', alt: 'Plas Hafod Grounds' },
+  { id: 3, src: '/images/wp/carousel/slide-06.jpg', alt: 'Plas Hafod Living Room' },
+  { id: 4, src: '/images/wp/carousel/slide-11.jpg', alt: 'Plas Hafod Valley Views' },
 ];
 
 export function LiveSiteSisterPropertyAndAccreditations({
   isCymraeg = false,
   isBBBPage = false,
+  accreditations,
 }: SisterProps) {
+  const [activeSlide, setActiveSlide] = useState(0);
+  const slides = isBBBPage ? plasHafodSliderImages : bbbSliderImages;
+
+  const fallbackAwards = defaultAccreditations
+    .filter((a) => a.featured !== false && (a.property === 'both' || a.property === 'plas-hafod'))
+    .map((a) => ({
+      ...a,
+      title: isCymraeg ? (a.titleCy || a.title) : a.title,
+      score: isCymraeg ? (a.scoreCy || a.score) : a.score,
+      description: isCymraeg ? (a.descriptionCy || a.description) : a.description,
+    }));
+
+  const displayAwards =
+    accreditations && accreditations.length > 0 ? accreditations : fallbackAwards;
+
+  // Auto rotate the sister property slider every 5 seconds
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setActiveSlide((prev) => (prev + 1) % slides.length);
+    }, 5000);
+    return () => clearInterval(timer);
+  }, [slides.length]);
+
   return (
     <div className="bg-[#fbfbfd] text-[#333333]">
-      {/* Wave Separator */}
-      <div className="w-full overflow-hidden leading-none py-6">
+      {/* Thicker, Wavier Section Separator (Matches original site) */}
+      <div className="w-full overflow-hidden leading-none pt-8 pb-3 sm:pb-4 flex justify-center">
         <svg
-          className="w-full h-8 sm:h-12 text-[#99a0c1]/40"
-          viewBox="0 0 1200 60"
-          preserveAspectRatio="none"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="3"
+          className="w-full max-w-[1240px] h-7 sm:h-8 text-[#99A0C1]"
+          height="32"
         >
-          <path d="M0,30 Q30,10 60,30 T120,30 T180,30 T240,30 T300,30 T360,30 T420,30 T480,30 T540,30 T600,30 T660,30 T720,30 T780,30 T840,30 T900,30 T960,30 T1020,30 T1080,30 T1140,30 T1200,30" />
+          <defs>
+            <pattern
+              id="thick-wavy-ribbon"
+              width="22"
+              height="32"
+              patternUnits="userSpaceOnUse"
+            >
+              <path
+                d="M 0,16 Q 5.5,2 11,16 T 22,16"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="4"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </pattern>
+          </defs>
+          <rect width="100%" height="32" fill="url(#thick-wavy-ribbon)" />
         </svg>
       </div>
 
-      {/* 1. Sister Property Section */}
-      <section className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <h2 className="text-2xl sm:text-4xl font-architects text-center uppercase tracking-wide text-stone-900 mb-12">
+      {/* ========================================================= */}
+      {/* 1. SISTER PROPERTY SECTION                                */}
+      {/* Matches WordPress Elementor .elementor-element-43104334   */}
+      {/* Slider container: border: 3px solid #99A0C1;              */}
+      {/* border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.5)*/}
+      {/* ========================================================= */}
+      <section className="max-w-[1240px] mx-auto px-4 sm:px-6 lg:px-8 pt-3 sm:pt-4 pb-12 sm:pb-16">
+        <h2 className="text-2xl sm:text-4xl font-architects text-center uppercase tracking-wide text-[#323149] mb-10">
           {isBBBPage ? (
             <>
-              {isCymraeg ? 'A YDYCH WEDI YSTYRIED EIN PRIF FWTHYN - ' : 'HAVE YOU CONSIDERED OUR MAIN COTTAGE - '}{' '}
-              <span className="text-[#99a0c1]">PLAS HAFOD COTTAGE</span>
+              {isCymraeg
+                ? 'A YDYCH WEDI YSTYRIED EIN PRIF FWTHYN - '
+                : 'HAVE YOU CONSIDERED OUR MAIN COTTAGE - '}{' '}
+              <span className="text-[#99A0C1]">PLAS HAFOD COTTAGE</span>
             </>
           ) : (
             <>
               {isCymraeg
                 ? 'A YDYCH WEDI YSTYRIED EIN HEIDDO ARALL - '
                 : 'HAVE YOU CONSIDERED OUR OTHER PROPERTY - '}{' '}
-              <span className="text-[#99a0c1]">BRYN BUGEILIAID BACH</span>
+              <span className="text-[#99A0C1]">BRYN BUGEILIAID BACH</span>
             </>
           )}
         </h2>
 
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-center bg-white border border-stone-200 rounded-3xl p-6 sm:p-10 shadow-sm">
-          {/* Left Photo with Click here to book button */}
-          <div className="md:col-span-6 relative aspect-[16/11] rounded-2xl overflow-hidden shadow-md group">
-            <Image
-              src={isBBBPage ? '/images/wp/gallery-1.jpg' : '/images/wp/bbb-living.jpg'}
-              alt={isBBBPage ? 'Plas Hafod Cottage Exterior' : 'Bryn Bugeiliaid Bach sister accommodation'}
-              fill
-              className="object-cover group-hover:scale-105 transition duration-500"
-            />
-            <Link
-              href={isBBBPage ? (isCymraeg ? '/cy#book' : '/#book') : '/bryn-bugeiliaid-bach#book'}
-              className="absolute bottom-5 left-1/2 -translate-x-1/2 px-6 py-2.5 rounded-full text-xs font-semibold uppercase tracking-wider text-white bg-[#99a0c1] hover:bg-[#323149] transition shadow-lg"
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-8 lg:gap-12 items-center">
+          {/* Left: 4-Slide Interactive BBB Image Slider */}
+          <div className="md:col-span-6 flex justify-center">
+            <div
+              className="relative w-full max-w-[540px] aspect-[16/11] overflow-hidden group rounded-xl shadow-xl border-[3px] border-[#99A0C1]"
+              style={{
+                boxShadow: '0px 4px 20px 0px rgba(0, 0, 0, 0.35)',
+              }}
             >
-              {isCymraeg ? 'CLICIWCH YMA I ARCHEBU' : 'CLICK HERE TO BOOK'}
-            </Link>
+              {slides.map((s, idx) => (
+                <div
+                  key={s.id}
+                  className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
+                    idx === activeSlide ? 'opacity-100 z-10' : 'opacity-0 z-0 pointer-events-none'
+                  }`}
+                >
+                  <Image
+                    src={s.src}
+                    alt={s.alt}
+                    fill
+                    priority={idx === 0}
+                    sizes="(max-width: 768px) 100vw, 540px"
+                    className="object-cover"
+                  />
+                  {/* Subtle dark overlay matching original Elementor background-overlay #00000042 */}
+                  <div className="absolute inset-0 bg-black/20" />
+                </div>
+              ))}
+
+              {/* "CHECK AVAILABILITY" Button centered on bottom of slide */}
+              <div className="absolute bottom-6 inset-x-0 z-20 flex justify-center">
+                <Link
+                  href={
+                    isBBBPage
+                      ? isCymraeg
+                        ? '/cy#book'
+                        : '/#book'
+                      : isCymraeg
+                      ? '/cy/bryn-bugeiliaid-bach#book'
+                      : '/bryn-bugeiliaid-bach#book'
+                  }
+                  className="px-6 sm:px-8 py-2.5 sm:py-3 rounded-xl text-xs sm:text-sm font-architects uppercase tracking-wider text-white bg-[#99A0C1]/90 hover:bg-[#323149] transition shadow-lg border-2 border-white backdrop-blur-xs"
+                >
+                  {isCymraeg ? 'GWIRIO ARGAELEDD' : 'CHECK AVAILABILITY'}
+                </Link>
+              </div>
+
+              {/* Slider Dots */}
+              <div className="absolute bottom-2 inset-x-0 z-20 flex justify-center gap-2 pb-0.5">
+                {slides.map((_, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => setActiveSlide(idx)}
+                    aria-label={`Slide ${idx + 1}`}
+                    className={`w-2.5 h-2.5 rounded-full transition-all ${
+                      idx === activeSlide ? 'bg-white scale-110 shadow' : 'bg-white/60 hover:bg-white/80'
+                    }`}
+                  />
+                ))}
+              </div>
+            </div>
           </div>
 
-          {/* Right Logo & Description */}
+          {/* Right: BBB Logo & Narrative */}
           <div className="md:col-span-6 flex flex-col items-center text-center px-4">
-            <div className="relative w-72 sm:w-80 h-24 mb-6">
+            <Link
+              href={
+                isBBBPage
+                  ? isCymraeg
+                    ? '/cy'
+                    : '/'
+                  : isCymraeg
+                  ? '/cy/bryn-bugeiliaid-bach'
+                  : '/bryn-bugeiliaid-bach'
+              }
+              className="relative w-full max-w-[380px] sm:max-w-[440px] md:max-w-[460px] aspect-[1301/552] mb-6 hover:opacity-90 transition block"
+            >
               <Image
-                src={isBBBPage ? '/images/wp/logo-color.png' : '/images/wp/bbb-logo.jpg'}
+                src={isBBBPage ? '/images/wp/logo-color.png' : '/images/wp/bbb-logo-transparent.png'}
                 alt={isBBBPage ? 'Plas Hafod Cottage Logo' : 'Bryn Bugeiliaid Bach Logo'}
                 fill
+                priority
+                sizes="(max-width: 768px) 380px, 460px"
                 className="object-contain"
               />
-            </div>
-            <p className="text-stone-700 text-sm sm:text-base leading-relaxed font-sans max-w-md">
+            </Link>
+
+            <p className="text-stone-700 text-base sm:text-lg leading-relaxed font-sans font-light max-w-lg mx-auto">
               {isBBBPage ? (
                 isCymraeg
                   ? 'Bwthyn traddodiadol moethus 5 seren yn Nyffryn Nantlle gyda lle tân agored, golygfeydd panoramig ac yn croesawu cŵn.'
@@ -103,117 +212,161 @@ export function LiveSiteSisterPropertyAndAccreditations({
         </div>
       </section>
 
-      {/* 2. Accreditations & Partnerships */}
-      <section className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <h2 className="text-3xl sm:text-5xl font-architects text-center uppercase tracking-wide text-stone-900 mb-6">
-          {isCymraeg ? 'EIN' : 'OUR'}{' '}
-          <span className="text-[#99a0c1]">
-            {isCymraeg ? 'ACHREDIADAU A PHARTNERIAETHAU' : 'ACCREDITATIONS & PARTNERSHIPS'}
-          </span>
-        </h2>
+      {/* Thicker, Wavier Section Separator before Accreditations */}
+      <div className="w-full overflow-hidden leading-none pt-6 pb-2 flex justify-center">
+        <svg
+          className="w-full max-w-[1240px] h-7 sm:h-8 text-[#99A0C1]"
+          height="32"
+        >
+          <rect width="100%" height="32" fill="url(#thick-wavy-ribbon)" />
+        </svg>
+      </div>
 
-        {/* Bulleted Points */}
-        <div className="text-center max-w-2xl mx-auto space-y-2 text-xs sm:text-sm text-stone-700 font-sans mb-12">
-          <p className="font-semibold text-stone-900">
-            {isCymraeg ? 'Mae&#39;r ddwy eiddo yn:' : 'Both properties are :'}
+      {/* ========================================================= */}
+      {/* 2. ACCREDITATIONS & PARTNERSHIPS SECTION                  */}
+      {/* Styled to match the modern card aesthetic on Bryn Bugeiliaid Bach */}
+      {/* ========================================================= */}
+      <section className="max-w-[1300px] mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24">
+        {/* Section Heading matching BBB */}
+        <div className="text-center mb-14">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#99A0C1]/15 border border-[#99A0C1]/40 text-[#494c68] text-xs font-bold tracking-wider uppercase mb-3 font-sans">
+            <Award className="w-3.5 h-3.5 text-[#99A0C1]" />
+            {isCymraeg ? 'Cydnabyddiaeth o Ragoriaeth' : 'Recognised For Excellence'}
+          </div>
+          <h2
+            className="text-3xl sm:text-4xl md:text-5xl font-architects uppercase tracking-wider text-stone-900"
+            style={{ fontFamily: "'Architects Daughter', cursive, sans-serif" }}
+          >
+            {isCymraeg ? (
+              <>EIN <span className="text-[#99A0C1]">ACHREDIADAU A PHARTNERIAETHAU</span></>
+            ) : (
+              <>OUR <span className="text-[#99A0C1]">ACCREDITATIONS &amp; PARTNERSHIPS</span></>
+            )}
+          </h2>
+          <div className="w-20 sm:w-28 h-1.5 bg-[#efda07] mx-auto mt-3 mb-4" />
+          <p className="max-w-2xl mx-auto text-sm sm:text-base text-stone-600 font-sans leading-relaxed mb-6">
+            {isCymraeg
+              ? 'Rydym yn hynod falch o’r cydnabyddiaethau swyddogol a dderbyniwyd ar gyfer Bwthyn Plas Hafod gan Croeso Cymru, Awdurdod Parc Cenedlaethol Eryri, a phrif lwyfannau lletygarwch.'
+              : 'We take great pride in maintaining the highest standards of luxury, sustainability, and authentic guest care, officially certified by Visit Wales, Snowdonia National Park, and premier global hospitality platforms.'}
           </p>
-          <p>★ 5 star Accredited by the Visit Wales grading scheme</p>
-          <p>🏅 Copa (Gold) Award by Snowdonia National Park as a Plastic Free Business</p>
-          <p className="pt-2 text-stone-600">
-            In addition, Plas Hafod Cottage has been further accredited by Visit Wales with successful
-            &ldquo;Welcome Awards&rdquo; in the following:
-          </p>
-          <div className="flex flex-wrap items-center justify-center gap-4 pt-1 font-medium">
-            <span>🐾 Pet Welcome</span>
-            <span>🚲 Cyclists Welcome</span>
-            <span>🥾 Walkers Welcome</span>
-            <span>🎥 TV/Film Crew Welcome</span>
+
+          {/* Quick Highlights Bar */}
+          <div className="inline-flex flex-wrap items-center justify-center gap-2 sm:gap-3 py-2 px-4 rounded-2xl bg-[#99A0C1]/10 border border-[#99A0C1]/20 text-xs sm:text-sm font-medium text-stone-700">
+            <span className="font-bold text-stone-900">
+              {isCymraeg ? 'Safonau Allweddol:' : 'Official Standards:'}
+            </span>
+            <span className="inline-flex items-center gap-1 bg-white px-2.5 py-1 rounded-lg border border-stone-200/80 shadow-2xs font-semibold text-stone-800">
+              ⭐ 5-Star Visit Wales
+            </span>
+            <span className="inline-flex items-center gap-1 bg-white px-2.5 py-1 rounded-lg border border-stone-200/80 shadow-2xs font-semibold text-stone-800">
+              🥇 Copa Gold Plastic Free
+            </span>
+            <span className="inline-flex items-center gap-1 bg-white px-2.5 py-1 rounded-lg border border-stone-200/80 shadow-2xs font-semibold text-stone-800">
+              🏆 9.6/10 Booking.com
+            </span>
+            <span className="inline-flex items-center gap-1 bg-white px-2.5 py-1 rounded-lg border border-stone-200/80 shadow-2xs font-semibold text-stone-800">
+              🎖️ Airbnb Superhost
+            </span>
           </div>
         </div>
 
-        {/* Awards Gallery Grid */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-6 sm:gap-8 max-w-4xl mx-auto mb-8">
-          {accreditationImages.map((award) => (
+        {/* 3-Column Grid of Prominent Cards matching BBB */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {displayAwards.map((award, index) => (
             <div
               key={award.id}
-              className="relative aspect-[3/4] bg-white rounded-2xl overflow-hidden shadow-sm border border-stone-200 p-2 hover:shadow-md transition"
+              className="bg-[#fbfbfd] rounded-3xl p-6 sm:p-8 border border-stone-200/90 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col items-center text-center group hover:-translate-y-1 relative"
             >
-              <Image src={award.src} alt={award.alt} fill className="object-contain p-2" />
-            </div>
-          ))}
-        </div>
+              {/* Badge Pill */}
+              <div
+                className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold tracking-wider uppercase mb-5 font-sans ${award.badgeColor || 'bg-[#efda07] text-stone-900'} shadow-xs`}
+              >
+                <Star className="w-3 h-3 fill-current" />
+                <span>{award.badge}</span>
+              </div>
 
-        {/* 4 Croeso Welcome Badges */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 max-w-3xl mx-auto">
-          {croesoBadges.map((badge) => (
-            <div
-              key={badge.id}
-              className="relative aspect-[1/2] rounded-xl overflow-hidden shadow-sm border border-stone-200"
-            >
-              <Image src={badge.src} alt={badge.alt} fill className="object-contain" />
+              {/* Award Image Container - Generous & Prominent */}
+              <div className="relative w-full h-56 sm:h-64 mb-6 rounded-2xl overflow-hidden p-3 bg-white border border-stone-200/80 shadow-xs flex items-center justify-center">
+                {award.id === 'ph-welcome-charters' ? (
+                  <div className="grid grid-cols-2 gap-2 w-full h-full p-1">
+                    <div className="relative w-full h-full rounded-lg overflow-hidden bg-stone-50 border border-stone-200/60">
+                      <Image
+                        src="/images/wp/croeso-pets.jpg"
+                        alt="Pet Welcome / Croeso Anifeiliaid Anwes"
+                        fill
+                        className="object-contain p-1"
+                      />
+                    </div>
+                    <div className="relative w-full h-full rounded-lg overflow-hidden bg-stone-50 border border-stone-200/60">
+                      <Image
+                        src="/images/wp/croeso-cyclists.jpg"
+                        alt="Cyclists Welcome / Croeso Beicwyr"
+                        fill
+                        className="object-contain p-1"
+                      />
+                    </div>
+                    <div className="relative w-full h-full rounded-lg overflow-hidden bg-stone-50 border border-stone-200/60">
+                      <Image
+                        src="/images/wp/croeso-walkers.jpg"
+                        alt="Walkers Welcome / Croeso Cerddwyr"
+                        fill
+                        className="object-contain p-1"
+                      />
+                    </div>
+                    <div className="relative w-full h-full rounded-lg overflow-hidden bg-stone-50 border border-stone-200/60">
+                      <Image
+                        src="/images/wp/croeso-tv.jpg"
+                        alt="TV & Film Crew Welcome"
+                        fill
+                        className="object-contain p-1"
+                      />
+                    </div>
+                  </div>
+                ) : (
+                  <Image
+                    src={award.imageUrl}
+                    alt={award.title}
+                    fill
+                    loading={index < 6 ? 'eager' : 'lazy'}
+                    className="object-contain p-2 group-hover:scale-105 transition-transform duration-300"
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                  />
+                )}
+              </div>
+
+              {/* Title & Organization */}
+              <h3
+                className="text-xl sm:text-2xl font-architects uppercase text-stone-900 mb-1"
+                style={{ fontFamily: "'Architects Daughter', cursive, sans-serif" }}
+              >
+                {award.title}
+              </h3>
+              <p className="text-xs font-semibold uppercase tracking-wider text-stone-400 mb-3 font-sans">
+                {award.source}
+              </p>
+
+              {/* Rating / Score Highlight */}
+              {award.score && (
+                <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-amber-50 text-amber-900 border border-[#efda07]/40 text-xs font-bold mb-4 font-sans">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-amber-700 shrink-0" />
+                  <span>{award.score}</span>
+                </div>
+              )}
+
+              {/* Description */}
+              <p className="text-sm text-stone-600 leading-relaxed font-sans mt-auto">
+                {award.description}
+              </p>
             </div>
           ))}
         </div>
       </section>
 
-      {/* 3. Live Site Footer */}
-      <footer className="border-t border-stone-200 bg-white py-12">
-        <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Dual Logos in Footer */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-12 sm:gap-24 mb-8">
-            <Link href="/" className="relative w-52 h-20">
-              <Image
-                src="/images/wp/logo-color.png"
-                alt="Plas Hafod Cottage"
-                fill
-                className="object-contain"
-              />
-            </Link>
-            <Link href="/bryn-bugeiliaid-bach" className="relative w-52 h-20">
-              <Image
-                src="/images/wp/bbb-logo.jpg"
-                alt="Bryn Bugeiliaid Bach"
-                fill
-                className="object-contain"
-              />
-            </Link>
-          </div>
 
-          <div className="flex flex-wrap justify-center gap-6 text-xs text-stone-600 mb-6 font-medium">
-            <Link href="/" className="hover:text-stone-900 transition">
-              {isCymraeg ? 'Hafan' : 'Home'}
-            </Link>
-            <Link href="/bwthyn-plas-hafod-cymraeg" className="hover:text-stone-900 transition">
-              {isCymraeg ? 'English' : 'Cymraeg'}
-            </Link>
-            <Link href="/local-area" className="hover:text-stone-900 transition">
-              {isCymraeg ? 'Ardal Leol' : 'Local Area'}
-            </Link>
-            <Link href="/reviews" className="hover:text-stone-900 transition">
-              {isCymraeg ? 'Adolygiadau' : 'Reviews'}
-            </Link>
-            <Link href="/bryn-bugeiliaid-bach" className="hover:text-stone-900 transition">
-              Bryn Bugeiliaid Bach
-            </Link>
-            <Link href="/contact" className="hover:text-stone-900 transition font-semibold text-[#99a0c1]">
-              {isCymraeg ? 'Cysylltu' : 'Contact Us'}
-            </Link>
-            <Link href="/terms" className="hover:text-stone-900 transition underline underline-offset-2">
-              {isCymraeg ? 'Telerau ac Amodau' : 'Terms & Conditions'}
-            </Link>
-
-          </div>
-
-          <div className="text-center text-xs text-stone-500 font-sans space-y-1">
-            <p>
-              © 2026 Plas Hafod Cottage & Bryn Bugeiliaid Bach. All rights reserved.
-            </p>
-            <p className="text-[11px] text-stone-400">
-              Snowdonia / Eryri National Park, North Wales, UK
-            </p>
-          </div>
-        </div>
-      </footer>
+      {/* ========================================================= */}
+      {/* 3. SITE FOOTER                                            */}
+      {/* ========================================================= */}
+      <LiveSiteFooter isCymraeg={isCymraeg} />
     </div>
   );
 }

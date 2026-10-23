@@ -46,11 +46,13 @@ export function GuestbookGallery({ currentLocale, entries }: GuestbookGalleryPro
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {entries.map((entry) => {
             const commentText =
-              typeof entry.comment === 'string'
+              !entry.comment
+                ? ''
+                : typeof entry.comment === 'string'
                 ? entry.comment
                 : currentLocale === 'cy'
-                ? entry.comment.cy
-                : entry.comment.en;
+                ? entry.comment.cy || entry.comment.en
+                : entry.comment.en || entry.comment.cy;
 
             return (
               <div

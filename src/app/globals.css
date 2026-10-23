@@ -2,9 +2,10 @@
 @import "tailwindcss";
 
 @theme {
-  --font-architects: "Architects Daughter", cursive, sans-serif;
-  --font-montserrat: "Montserrat", sans-serif;
-  --font-roboto: "Roboto", sans-serif;
+  --font-sans: var(--font-montserrat), 'Montserrat', sans-serif;
+  --font-montserrat: var(--font-montserrat), 'Montserrat', sans-serif;
+  --font-architects: var(--font-architects), 'Architects Daughter', cursive, sans-serif;
+  --font-roboto: var(--font-roboto), 'Roboto', sans-serif;
 }
 
 :root {
@@ -15,23 +16,41 @@
   --brand-yellow: #efda07;
 }
 
-body {
+html, body {
   background-color: var(--background);
   color: var(--foreground);
-  font-family: 'Montserrat', 'Roboto', sans-serif;
+  font-family: var(--font-montserrat), 'Montserrat', sans-serif;
   overflow-x: hidden;
 }
 
-/* Force Architects Daughter font onto all headings, navbar items, and .font-architects classes */
+body,
+p,
+li,
+input,
+textarea,
+select,
+.font-sans {
+  font-family: var(--font-montserrat), 'Montserrat', sans-serif !important;
+}
+
+/* Force Architects Daughter font onto all headings and ALL child elements (spans, links, etc.), navbar items, and .font-architects classes */
 .font-architects,
+.font-architects *,
 header nav,
-header nav a,
-header nav span,
+header nav *,
 header a.font-architects,
 h1,
+h1 *,
 h2,
+h2 *,
 h3,
-h4 {
+h3 *,
+h4,
+h4 *,
+h5,
+h5 *,
+h6,
+h6 * {
   font-family: 'Architects Daughter', cursive, sans-serif !important;
 }
 

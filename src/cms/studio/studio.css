@@ -1,0 +1,82 @@
+/* Clic Cymru Editorial Design System for Sanity Studio */
+@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=DM+Sans:wght@400;500;600;700&display=swap');
+
+:root {
+  --clic-purple: #552077;
+  --clic-yellow: #eed44e;
+  --clic-yellowink: #241929;
+  --clic-paper: #f8f5ed;
+  --clic-ink: #201526;
+  --clic-dim: #695c71;
+  --clic-lilac: #cbbaff;
+  --clic-mint: #daefbe;
+  --clic-pink: #ffc0da;
+  --clic-line: #d8cedb;
+  --clic-darkslate: #241331;
+}
+
+/* Sanity Studio Header Navbar */
+header[data-ui="Navbar"] {
+  background: var(--clic-darkslate) !important;
+  border-bottom: 2px solid var(--clic-purple) !important;
+}
+
+header[data-ui="Navbar"] * {
+  font-family: 'DM Sans', -apple-system, sans-serif !important;
+}
+
+/* Studio Desk Pane Headers */
+[data-ui="PaneHeader"] {
+  background: #ffffff !important;
+  border-bottom: 1px solid var(--clic-line) !important;
+}
+
+[data-ui="PaneHeader"] h2,
+[data-ui="PaneHeader"] h1 {
+  font-family: 'Barlow Condensed', sans-serif !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.5px !important;
+  text-transform: uppercase !important;
+  color: var(--clic-ink) !important;
+}
+
+/* Document List Items in Desk */
+[data-ui="PaneItem"] {
+  border-radius: 8px !important;
+  margin: 2px 4px !important;
+  transition: all 0.15s ease !important;
+}
+
+[data-ui="PaneItem"]:hover {
+  background: rgba(85, 32, 119, 0.05) !important;
+}
+
+[data-ui="PaneItem"][data-selected="true"] {
+  background: rgba(85, 32, 119, 0.1) !important;
+  border-left: 3px solid var(--clic-purple) !important;
+}
+
+/* Sanity Primary Action / Publish Buttons */
+button[data-ui="Button"][data-tone="primary"] {
+  background: var(--clic-yellow) !important;
+  color: var(--clic-yellowink) !important;
+  font-family: 'DM Sans', sans-serif !important;
+  font-weight: 700 !important;
+  border-radius: 24px !important;
+  border: none !important;
+  box-shadow: 0 2px 8px rgba(36, 25, 41, 0.15) !important;
+  transition: transform 0.15s ease, background 0.15s ease !important;
+}
+
+button[data-ui="Button"][data-tone="primary"]:hover {
+  background: #ffe359 !important;
+  transform: translateY(-1px) !important;
+}
+
+/* Focus outlines and borders */
+input:focus,
+textarea:focus,
+select:focus {
+  border-color: var(--clic-purple) !important;
+  box-shadow: 0 0 0 2px rgba(85, 32, 119, 0.2) !important;
+}

@@ -4,80 +4,139 @@ import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { X } from 'lucide-react';
 
+import { HeroSlide, SiteSettings } from '@/cms/types';
+import { defaultHeroSlides, defaultSiteSettings } from '@/cms/client';
+
 interface HeroProps {
   isCymraeg?: boolean;
+  slides?: HeroSlide[];
+  siteSettings?: SiteSettings;
 }
 
-const slides = [
-  {
-    id: 1,
-    src: '/images/wp/hero-slide-1.jpg',
-    alt: 'Plas Hafod Cottage panoramic views over Snowdonia and Irish Sea',
-  },
-  {
-    id: 2,
-    src: '/images/wp/hero-slide-2.jpg',
-    alt: 'Plas Hafod mountain valley and Snowdonia National Park setting',
-  },
-  {
-    id: 3,
-    src: '/images/wp/hero-slide-3.jpg',
-    alt: 'Plas Hafod cottage grounds and Nantlle Ridge walkway views',
-  },
-];
+export function LiveSiteHero({
+  isCymraeg = false,
+  slides: initialSlides,
+  siteSettings = defaultSiteSettings,
+}: HeroProps) {
+  const activeSlides = (initialSlides && initialSlides.length > 0)
+    ? initialSlides.map((s, idx) => ({
+        id: s.id || idx + 1,
+        src: s.imageUrl || '/images/wp/hero-slide-1.jpg',
+        alt: isCymraeg && s.altCy ? s.altCy : (s.altEn || 'Plas Hafod Cottage Snowdonia'),
+      }))
+    : defaultHeroSlides.map((s, idx) => ({
+        id: s.id || idx + 1,
+        src: s.imageUrl,
+        alt: isCymraeg && s.altCy ? s.altCy : s.altEn,
+      }));
 
-export function LiveSiteHero({ isCymraeg = false }: HeroProps) {
   const [currentSlide, setCurrentSlide] = useState(0);
-  const [promoVisible, setPromoVisible] = useState(true);
+  const [prevSlide, setPrevSlide] = useState<number | null>(null);
+  const [promoVisible, setPromoVisible] = useState(siteSettings.bannerEnabled !== false);
 
-  // Rotate hero slides every 9 seconds
+  // Rotate hero slides every 8.5 seconds with seamless dissolved cross-fade
   useEffect(() => {
+    if (activeSlides.length <= 1) return;
     const timer = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % slides.length);
-    }, 9000);
+      setCurrentSlide((curr) => {
+        setPrevSlide(curr);
+        return (curr + 1) % activeSlides.length;
+      });
+    }, 8500);
     return () => clearInterval(timer);
-  }, []);
+  }, [activeSlides.length]);
+
+  // Clear prevSlide after cross-fade duration completes (2200ms)
+  useEffect(() => {
+    if (prevSlide === null) return;
+    const timeout = setTimeout(() => {
+      setPrevSlide(null);
+    }, 2200);
+    return () => clearTimeout(timeout);
+  }, [prevSlide, currentSlide]);
 
   return (
     <>
       <div className="relative h-[540px] sm:h-[575px] md:h-[595px] lg:h-[600px] max-h-[610px] flex flex-col justify-between overflow-hidden bg-stone-950">
-        {/* Slow, gentle, cinematic Ken Burns keyframes */}
+        {/* Cinematic, prominent Ken Burns keyframes for each slide */}
         <style
           dangerouslySetInnerHTML={{
             __html: `
-              @keyframes heroKenBurnsSlow {
+              @keyframes heroKenBurns0 {
                 0% {
-                  transform: scale(1.0);
+                  transform: scale(1.0) translate3d(0, 0, 0);
                 }
                 100% {
-                  transform: scale(1.06);
+                  transform: scale(1.15) translate3d(-1.5%, -1%, 0);
                 }
               }
-              .ken-burns-slide {
-                animation: heroKenBurnsSlow 28000ms linear forwards;
-                transform-origin: center center;
+              @keyframes heroKenBurns1 {
+                0% {
+                  transform: scale(1.15) translate3d(1%, 0.5%, 0);
+                }
+                100% {
+                  transform: scale(1.02) translate3d(-1%, -0.5%, 0);
+                }
+              }
+              @keyframes heroKenBurns2 {
+                0% {
+                  transform: scale(1.03) translate3d(0, 1%, 0);
+                }
+                100% {
+                  transform: scale(1.16) translate3d(1.5%, -1%, 0);
+                }
+              }
+              .ken-burns-anim-0 {
+                animation: heroKenBurns0 10000ms cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+                transform-origin: 50% 60%;
+                will-change: transform;
+              }
+              .ken-burns-anim-1 {
+                animation: heroKenBurns1 10000ms cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+                transform-origin: 40% 50%;
+                will-change: transform;
+              }
+              .ken-burns-anim-2 {
+                animation: heroKenBurns2 10000ms cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+                transform-origin: 50% 50%;
                 will-change: transform;
               }
             `,
           }}
         />
 
-        {/* 3-Image Background Slider with Slow Ken Burns Effect */}
+        {/* 3-Image Background Slider with Seamless Dissolve Cross-Fade */}
         <div className="absolute inset-0 z-0 overflow-hidden">
-          {slides.map((slide, index) => {
-            const isActive = index === currentSlide;
+          {activeSlides.map((slide, index) => {
+            const isCurrent = index === currentSlide;
+            const isPrevious = index === prevSlide;
+            const animClass =
+              index === 0
+                ? 'ken-burns-anim-0'
+                : index === 1
+                ? 'ken-burns-anim-1'
+                : 'ken-burns-anim-2';
+
             return (
               <div
                 key={slide.id}
-                className={`absolute inset-0 transition-opacity duration-[1500ms] ease-in-out ${
-                  isActive ? 'opacity-100 z-10' : 'opacity-0 z-0 pointer-events-none'
+                className={`absolute inset-0 transition-opacity duration-[2000ms] ease-in-out ${
+                  isCurrent
+                    ? 'opacity-100 z-10'
+                    : isPrevious
+                    ? 'opacity-100 z-0'
+                    : 'opacity-0 z-0 pointer-events-none'
                 }`}
               >
-                {/* Inner wrapper with dynamic key to restart gentle Ken Burns drift on each activation */}
+                {/* Ken Burns drift wrapper */}
                 <div
-                  key={`${slide.id}-${isActive ? currentSlide : 'idle'}`}
+                  key={isCurrent ? `anim-${currentSlide}` : undefined}
                   className={`relative w-full h-full ${
-                    isActive ? 'ken-burns-slide' : 'scale-100'
+                    isCurrent
+                      ? animClass
+                      : isPrevious
+                      ? `${animClass} [animation-play-state:paused]`
+                      : 'scale-100'
                   }`}
                 >
                   <Image
@@ -85,6 +144,7 @@ export function LiveSiteHero({ isCymraeg = false }: HeroProps) {
                     alt={slide.alt}
                     fill
                     priority={index === 0}
+                    sizes="100vw"
                     className="object-cover object-center"
                   />
                 </div>

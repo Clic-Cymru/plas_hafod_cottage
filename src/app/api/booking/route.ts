@@ -19,6 +19,14 @@ export async function POST(request: Request) {
       notes = '',
     } = body;
 
+    // Guardrail: Honeypot bot protection (prevents spam bots from consuming Sanity mutation quota)
+    if (body.website_url || body.honeypot || body.bot_field) {
+      return NextResponse.json({
+        success: true,
+        message: 'Booking inquiry received.',
+      });
+    }
+
     const validatedPropertyId: 'plas-hafod' | 'bryn-bugeiliaid-bach' =
       propertyId === 'bryn-bugeiliaid-bach' ? 'bryn-bugeiliaid-bach' : 'plas-hafod';
 

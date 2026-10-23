@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { NextStudio } from 'next-sanity/studio';
 import config from '../../../../sanity.config';
+import '@/cms/studio/studio.css';
 
 const projectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID;
 const isConfigured = Boolean(projectId && projectId !== 'demo-project');
@@ -12,41 +13,60 @@ export default function StudioPage() {
 
   if (!isConfigured && !dismissGuide) {
     return (
-      <div className="min-h-screen bg-slate-900 text-white flex items-center justify-center p-6">
-        <div className="max-w-xl w-full bg-slate-800 border border-slate-700 rounded-2xl p-8 shadow-2xl">
-          <div className="flex items-center space-x-3 mb-6">
-            <div className="w-10 h-10 rounded-xl bg-[#efda07] text-slate-950 flex items-center justify-center font-bold text-xl select-none">
-              PH
+      <div className="min-h-screen bg-[#201526] text-[#f7f2e9] flex items-center justify-center p-6 font-sans">
+        <div className="max-w-xl w-full bg-[#292033] border-2 border-[#552077] rounded-3xl p-8 shadow-2xl relative overflow-hidden">
+          {/* Subtle Clic Cymru background glow */}
+          <div className="absolute -top-24 -right-24 w-60 h-60 bg-[#eed44e]/10 rounded-full blur-3xl pointer-events-none" />
+
+          {/* Clic Cymru Brand Header */}
+          <div className="flex items-center justify-between pb-6 mb-6 border-b border-[#552077]/50">
+            <div className="flex items-center gap-3">
+              <div className="flex flex-col leading-none">
+                <span className="font-extrabold text-2xl tracking-tight text-[#eed44e] font-sans uppercase">
+                  CLIC
+                </span>
+                <span className="text-[8px] font-bold tracking-[3px] text-[#cbbaff] uppercase mt-0.5">
+                  CYMRU
+                </span>
+              </div>
+              <div className="h-7 w-[1px] bg-white/20" />
+              <div>
+                <h1 className="text-lg font-bold text-white tracking-wide">
+                  Plas Hafod Cottage Management
+                </h1>
+                <p className="text-xs text-[#cbbaff]">
+                  Stiwdio Ddwyieithog · Bilingual Content Engine
+                </p>
+              </div>
             </div>
-            <div>
-              <h1 className="text-xl font-bold">Plas Hafod Cottage Management Studio</h1>
-              <p className="text-sm text-slate-400">Headless CMS Setup & Client Dashboard</p>
-            </div>
+            <span className="text-[11px] font-semibold px-2.5 py-1 rounded-full bg-[#552077] text-[#cbbaff]">
+              Sanity v3
+            </span>
           </div>
 
-          <div className="bg-slate-900/60 border border-slate-700/60 rounded-xl p-4 mb-6 space-y-3">
-            <h2 className="text-sm font-semibold uppercase tracking-wider text-[#efda07]">
-              Quick 2-Minute Setup:
+          <div className="bg-[#1a1120] border border-[#552077]/60 rounded-2xl p-5 mb-6 space-y-3">
+            <h2 className="text-xs font-bold uppercase tracking-wider text-[#eed44e]">
+              Connect Your Sanity Project:
             </h2>
-            <ol className="list-decimal list-inside text-sm text-slate-300 space-y-2">
+            <ol className="list-decimal list-inside text-xs text-stone-300 space-y-2 leading-relaxed">
               <li>
                 Log into or create a free account at{' '}
                 <a
                   href="https://www.sanity.io/manage"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-amber-300 underline font-semibold hover:text-amber-200"
+                  className="text-[#eed44e] underline font-semibold hover:text-white"
                 >
                   sanity.io/manage
                 </a>
                 .
               </li>
               <li>
-                Create a project (e.g. <strong>Plas Hafod Cottage</strong>) with dataset <strong>production</strong>.
+                Create a project named <strong>Plas Hafod Cottage</strong> with dataset <strong>production</strong>.
               </li>
               <li>
-                Add your Project ID to your <code className="bg-slate-800 px-1.5 py-0.5 rounded text-amber-300 font-mono text-xs">.env.local</code> file:
-                <pre className="mt-2 p-3 bg-slate-950 rounded-lg text-xs font-mono text-emerald-400 overflow-x-auto">
+                Paste your Project ID into your <code className="bg-[#292033] px-1.5 py-0.5 rounded text-[#eed44e] font-mono text-xs">.env.local</code> file:
+                <pre className="mt-2 p-3 bg-[#0f0914] rounded-xl text-xs font-mono text-[#daefbe] overflow-x-auto border border-white/5">
 NEXT_PUBLIC_SANITY_PROJECT_ID=your_project_id_here
 NEXT_PUBLIC_SANITY_DATASET=production
 SANITY_API_WRITE_TOKEN=your_write_token_here
@@ -55,28 +75,48 @@ SANITY_API_WRITE_TOKEN=your_write_token_here
             </ol>
           </div>
 
-          <div className="text-xs text-slate-400 mb-6">
-            <p className="font-semibold text-slate-300 mb-1">Once connected, your client can manage:</p>
-            <ul className="list-disc list-inside space-y-1">
-              <li>Seasonal nightly rates & stay discounts for both cottages</li>
-              <li>Calendar blocked dates (maintenance, owner stays, phone bookings)</li>
-              <li>Incoming booking inquiries with real-time status updates</li>
-              <li>Guestbook reviews & bilingual text content</li>
-            </ul>
+          <div className="text-xs text-[#c1b4ca] mb-6">
+            <p className="font-bold text-white mb-2">100% Editable via Clic Cymru Studio:</p>
+            <div className="grid grid-cols-2 gap-2 text-[11px]">
+              <span className="flex items-center gap-1.5">
+                <span className="text-[#eed44e]">✓</span> English &amp; Cymraeg Copy
+              </span>
+              <span className="flex items-center gap-1.5">
+                <span className="text-[#eed44e]">✓</span> Hero Slides &amp; Banner
+              </span>
+              <span className="flex items-center gap-1.5">
+                <span className="text-[#eed44e]">✓</span> Seasonal Pricing &amp; Rates
+              </span>
+              <span className="flex items-center gap-1.5">
+                <span className="text-[#eed44e]">✓</span> Live Blocked Dates
+              </span>
+              <span className="flex items-center gap-1.5">
+                <span className="text-[#eed44e]">✓</span> Snowdonia Walking Trails
+              </span>
+              <span className="flex items-center gap-1.5">
+                <span className="text-[#eed44e]">✓</span> Booking Inquiries Inbox
+              </span>
+              <span className="flex items-center gap-1.5">
+                <span className="text-[#eed44e]">✓</span> Reviews (Airbnb, Vrbo)
+              </span>
+              <span className="flex items-center gap-1.5">
+                <span className="text-[#eed44e]">✓</span> Terms &amp; Pet Policies
+              </span>
+            </div>
           </div>
 
-          <div className="flex items-center justify-between pt-4 border-t border-slate-700/60">
+          <div className="flex items-center justify-between pt-4 border-t border-[#552077]/50">
             <a
               href="/"
-              className="text-sm text-slate-400 hover:text-white transition"
+              className="text-xs text-stone-400 hover:text-white transition"
             >
               ← Back to Main Website
             </a>
             <button
               onClick={() => setDismissGuide(true)}
-              className="px-5 py-2.5 rounded-lg bg-[#efda07] text-slate-950 font-bold text-sm hover:bg-[#ffe600] transition"
+              className="px-5 py-2.5 rounded-full bg-[#eed44e] text-[#241929] font-bold text-xs hover:bg-[#ffe359] transition shadow-lg flex items-center gap-2"
             >
-              Continue to Studio UI →
+              Open Studio Interface →
             </button>
           </div>
         </div>

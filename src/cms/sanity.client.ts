@@ -1,5 +1,5 @@
 import { createClient } from 'next-sanity';
-import imageUrlBuilder from '@sanity/image-url';
+import { createImageUrlBuilder } from '@sanity/image-url';
 
 export const projectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID || '';
 export const dataset = process.env.NEXT_PUBLIC_SANITY_DATASET || 'production';
@@ -12,11 +12,13 @@ export const sanityClient = isSanityLive
       projectId,
       dataset,
       apiVersion,
-      useCdn: false,
+      // Guardrail: Use Sanity edge CDN in production (1,000,000 free requests/mo)
+      // and fresh data in local development.
+      useCdn: process.env.NODE_ENV === 'production',
     })
   : null;
 
-const builder = isSanityLive && sanityClient ? imageUrlBuilder(sanityClient) : null;
+const builder = isSanityLive && sanityClient ? createImageUrlBuilder(sanityClient) : null;
 
 export function urlForImage(source: any) {
   if (!builder || !source) return '';

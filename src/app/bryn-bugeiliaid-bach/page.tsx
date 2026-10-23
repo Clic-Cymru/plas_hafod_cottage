@@ -2,88 +2,66 @@ import { Metadata } from 'next';
 import Image from 'next/image';
 import { LiveSiteNavbar } from '@/components/navigation/LiveSiteNavbar';
 import { LiveSiteBooking } from '@/components/booking/LiveSiteBooking';
-import { LiveSiteSisterPropertyAndAccreditations } from '@/components/cottage/LiveSiteSisterPropertyAndAccreditations';
+import { LiveSiteFooter } from '@/components/navigation/LiveSiteFooter';
+import { SubpageHero } from '@/components/navigation/SubpageHero';
+import { BrynBugeiliaidBachAccreditations } from '@/components/cottage/BrynBugeiliaidBachAccreditations';
+import { BrynBugeiliaidBachGallery } from '@/components/cottage/BrynBugeiliaidBachGallery';
 import { cmsClient } from '@/cms/client';
 import { Sparkles, Flame, Bed, Bath, Coffee, Ban } from 'lucide-react';
 
-export const instant = false;
 
 export const metadata: Metadata = {
   title: 'Bryn Bugeiliaid Bach - Luxury Annexe in Snowdonia',
   description:
     'A beautifully restored 2-bed self-contained annexe overlooking Dyffryn Nantlle with cozy log burner, conservatory, underfloor heating, and 5-star comfort.',
+  alternates: {
+    canonical: 'https://plashafodcottage.co.uk/bryn-bugeiliaid-bach',
+    languages: {
+      'en-GB': 'https://plashafodcottage.co.uk/bryn-bugeiliaid-bach',
+      'cy-GB': 'https://plashafodcottage.co.uk/cy/bryn-bugeiliaid-bach',
+    },
+  },
 };
 
-
-const bbbGallery = [
-  { id: 1, src: '/images/wp/bbb-gallery-1.jpg', alt: 'Bryn Bugeiliaid Bach Living Room' },
-  { id: 2, src: '/images/wp/bbb-gallery-2.jpg', alt: 'Bryn Bugeiliaid Bach Conservatory' },
-  { id: 3, src: '/images/wp/bbb-gallery-3.jpg', alt: 'Bryn Bugeiliaid Bach Fireplace' },
-  { id: 4, src: '/images/wp/bbb-gallery-4.jpg', alt: 'Bryn Bugeiliaid Bach Master Bedroom' },
-  { id: 5, src: '/images/wp/bbb-gallery-5.jpg', alt: 'Bryn Bugeiliaid Bach Double Bedroom' },
-  { id: 6, src: '/images/wp/bbb-gallery-6.jpg', alt: 'Bryn Bugeiliaid Bach Bathroom' },
-  { id: 7, src: '/images/wp/bbb-gallery-7.jpg', alt: 'Bryn Bugeiliaid Bach Kitchen' },
-  { id: 8, src: '/images/wp/bbb-gallery-8.jpg', alt: 'Bryn Bugeiliaid Bach Garden & Firepit' },
-];
-
-const bbbAwards = [
-  { id: 1, src: '/images/wp/bbb-award-tra.png', alt: 'Traveller Review Awards 2026' },
-  { id: 2, src: '/images/wp/bbb-5seren.jpg', alt: 'Croeso Cymru 5 Seren Grading' },
-  { id: 3, src: '/images/wp/bbb-award-superhost.jpeg', alt: 'Airbnb Superhost Annexe' },
-];
-
 export default async function BrynBugeiliaidBachPage() {
-  const [pricingConfig, blockedDates] = await Promise.all([
+  const [pricingConfig, blockedDates, accreditations] = await Promise.all([
     cmsClient.getPricingConfig('bryn-bugeiliaid-bach'),
     cmsClient.getBlockedDates('bryn-bugeiliaid-bach'),
+    cmsClient.getAccreditations('bryn-bugeiliaid-bach', false),
   ]);
 
   return (
     <div className="min-h-screen bg-[#fbfbfd] text-[#333333] flex flex-col font-sans selection:bg-[#efda07]/30 selection:text-stone-900">
       <LiveSiteNavbar currentPath="/bryn-bugeiliaid-bach" isCymraeg={false} />
 
-      <main className="flex-1 pt-24 sm:pt-28">
-        {/* BBB Hero Banner */}
-        <section className="relative py-20 sm:py-28 bg-stone-900 text-white overflow-hidden text-center">
-          <div className="absolute inset-0 opacity-40">
-            <Image
-              src="/images/wp/bbb-living.jpg"
-              alt="Bryn Bugeiliaid Bach Living Space"
-              fill
-              className="object-cover"
-              priority
-            />
-            <div className="absolute inset-0 bg-stone-950/60" />
-          </div>
+      <main className="flex-1">
+        {/* Floating Subpage Hero with Official BBB Header Background & Large Centered White Logo */}
+        <SubpageHero
+          imageSrc="/images/wp/bbb-hero-bg.jpg"
+          imageAlt="Bryn Bugeiliaid Bach"
+          logoSrc="/images/wp/bbb-logo-white-official.png"
+          logoAlt="Bryn Bugeiliaid Bach Official Logo"
+          logoSize="large"
+        />
 
-          <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="relative w-64 sm:w-80 h-28 mx-auto mb-6">
-              <Image
-                src="/images/wp/bbb-logo-white.png"
-                alt="Bryn Bugeiliaid Bach Logo"
-                fill
-                className="object-contain"
-              />
-            </div>
-            <h1 className="text-3xl sm:text-5xl font-architects uppercase tracking-wider text-white mb-4">
-              BRYN BUGEILIAID <span className="text-[#99a0c1]">BACH</span>
-            </h1>
-            <div className="w-20 h-1 bg-[#efda07] mx-auto mb-6" />
-            <p className="text-base sm:text-xl font-architects text-stone-200 leading-relaxed max-w-2xl mx-auto">
-              A cozy self-contained annexe to the main property offering the same stunning views
-            </p>
-          </div>
-        </section>
-
-        {/* BBB Overview & Features */}
+        {/* BBB Overview & Narrative */}
         <section className="max-w-[1300px] mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
             {/* Left Narrative */}
             <div className="lg:col-span-7 space-y-6 text-stone-700 text-base leading-relaxed">
-              <h2 className="text-3xl sm:text-4xl font-architects uppercase text-stone-900">
-                A LUXURIOUS ESCAPE IN <span className="text-[#99a0c1]">DYFFRYN NANTLLE</span>
-              </h2>
+              <h1
+                className="text-3xl sm:text-4xl md:text-5xl font-architects uppercase tracking-wider text-stone-900"
+                style={{ fontFamily: "'Architects Daughter', cursive, sans-serif" }}
+              >
+                BRYN <span className="text-[#99A0C1]">BUGEILIAID BACH</span>
+              </h1>
               <div className="w-16 h-1 bg-[#efda07]" />
+              <p
+                className="text-lg sm:text-xl font-architects text-stone-700 tracking-wide"
+                style={{ fontFamily: "'Architects Daughter', cursive, sans-serif" }}
+              >
+                A cozy self-contained annexe to the main property offering the same stunning views
+              </p>
 
               <p>
                 A beautifully restored 2 bed accommodation overlooking Dyffryn Nantlle and nestled just
@@ -113,86 +91,54 @@ export default async function BrynBugeiliaidBachPage() {
 
               {/* Key Features Icons */}
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 pt-4">
-                <div className="flex items-center gap-3 bg-white p-3 rounded-xl border border-stone-200">
+                <div className="flex items-center gap-3 bg-white p-3.5 rounded-xl border border-stone-200/80 shadow-xs">
                   <Flame className="w-5 h-5 text-[#efda07]" />
-                  <span className="text-xs font-semibold text-stone-800">Log Fire & Heating</span>
+                  <span className="text-xs font-semibold text-stone-800">Log Fire &amp; Heating</span>
                 </div>
-                <div className="flex items-center gap-3 bg-white p-3 rounded-xl border border-stone-200">
+                <div className="flex items-center gap-3 bg-white p-3.5 rounded-xl border border-stone-200/80 shadow-xs">
                   <Bed className="w-5 h-5 text-[#99a0c1]" />
                   <span className="text-xs font-semibold text-stone-800">2 Double Bedrooms</span>
                 </div>
-                <div className="flex items-center gap-3 bg-white p-3 rounded-xl border border-stone-200">
+                <div className="flex items-center gap-3 bg-white p-3.5 rounded-xl border border-stone-200/80 shadow-xs">
                   <Bath className="w-5 h-5 text-[#99a0c1]" />
                   <span className="text-xs font-semibold text-stone-800">Spacious Shower</span>
                 </div>
-                <div className="flex items-center gap-3 bg-white p-3 rounded-xl border border-stone-200">
+                <div className="flex items-center gap-3 bg-white p-3.5 rounded-xl border border-stone-200/80 shadow-xs">
                   <Coffee className="w-5 h-5 text-[#99a0c1]" />
-                  <span className="text-xs font-semibold text-stone-800">Full Farmhouse Kitchen</span>
+                  <span className="text-xs font-semibold text-stone-800">Farmhouse Kitchen</span>
                 </div>
-                <div className="flex items-center gap-3 bg-white p-3 rounded-xl border border-stone-200">
+                <div className="flex items-center gap-3 bg-white p-3.5 rounded-xl border border-stone-200/80 shadow-xs">
                   <Sparkles className="w-5 h-5 text-[#efda07]" />
                   <span className="text-xs font-semibold text-stone-800">Glass Conservatory</span>
                 </div>
-                <div className="flex items-center gap-3 bg-white p-3 rounded-xl border border-stone-200">
+                <div className="flex items-center gap-3 bg-white p-3.5 rounded-xl border border-stone-200/80 shadow-xs">
                   <Sparkles className="w-5 h-5 text-[#efda07]" />
-                  <span className="text-xs font-semibold text-stone-800">Fire Pit & Garden</span>
+                  <span className="text-xs font-semibold text-stone-800">Fire Pit &amp; Garden</span>
                 </div>
               </div>
             </div>
 
-            {/* Right: BBB Awards & Signage */}
+            {/* Right: Featured Photo Showcase */}
             <div className="lg:col-span-5 flex flex-col gap-6 items-center">
-              <div className="w-full bg-white rounded-3xl p-6 border border-stone-200 shadow-sm text-center">
-                <h3 className="font-architects text-lg uppercase tracking-wider text-stone-900 mb-4">
-                  RECOGNITION & AWARDS
-                </h3>
-                <div className="grid grid-cols-3 gap-4">
-                  {bbbAwards.map((award) => (
-                    <div
-                      key={award.id}
-                      className="relative aspect-square rounded-xl overflow-hidden border border-stone-200 p-2"
-                    >
-                      <Image
-                        src={award.src}
-                        alt={award.alt}
-                        fill
-                        className="object-contain p-1"
-                      />
-                    </div>
-                  ))}
-                </div>
+              <div className="relative w-full aspect-[4/3] rounded-3xl overflow-hidden shadow-lg border-4 border-white bg-stone-200">
+                <Image
+                  src="/images/wp/bbb/bbb-01.jpg"
+                  alt="Bryn Bugeiliaid Bach"
+                  fill
+                  sizes="(max-width: 1024px) 100vw, 40vw"
+                  className="object-cover"
+                  priority
+                />
               </div>
             </div>
           </div>
         </section>
 
-        {/* BBB Gallery */}
-        <section className="bg-stone-100/70 border-y border-stone-200 py-16 sm:py-20">
-          <div className="max-w-[1300px] mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center mb-12">
-              <h2 className="text-2xl sm:text-4xl font-architects uppercase tracking-wide text-stone-900">
-                IMAGES OF <span className="text-[#99a0c1]">BRYN BUGEILIAID BACH</span>
-              </h2>
-              <div className="w-16 h-1 bg-[#efda07] mx-auto mt-3" />
-            </div>
+        {/* Dedicated Prominent Accreditations & Awards Section */}
+        <BrynBugeiliaidBachAccreditations isCymraeg={false} accreditations={accreditations} />
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
-              {bbbGallery.map((img) => (
-                <div
-                  key={img.id}
-                  className="relative aspect-[4/3] rounded-2xl overflow-hidden shadow-md border-2 border-white group hover:scale-[1.02] transition duration-300"
-                >
-                  <Image
-                    src={img.src}
-                    alt={img.alt}
-                    fill
-                    className="object-cover group-hover:scale-105 transition duration-500"
-                  />
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
+        {/* Interactive 30-Photo Gallery with Lightbox Modal */}
+        <BrynBugeiliaidBachGallery isCymraeg={false} />
 
         {/* BBB Booking Widget */}
         <LiveSiteBooking
@@ -202,8 +148,8 @@ export default async function BrynBugeiliaidBachPage() {
           blockedDates={blockedDates}
         />
 
-        {/* Accreditations & Footer (promotes main Plas Hafod cottage) */}
-        <LiveSiteSisterPropertyAndAccreditations isCymraeg={false} isBBBPage={true} />
+        {/* Footer */}
+        <LiveSiteFooter isCymraeg={false} />
       </main>
     </div>
   );

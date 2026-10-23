@@ -7,7 +7,6 @@ import { LiveSiteBooking } from '@/components/booking/LiveSiteBooking';
 import { LiveSiteSisterPropertyAndAccreditations } from '@/components/cottage/LiveSiteSisterPropertyAndAccreditations';
 import { generateCottageJsonLd } from '@/lib/seo/jsonld';
 
-export const instant = false;
 
 export const metadata: Metadata = {
   title: 'Bwthyn Plas Hafod Cottage - Cozy Cottage with Amazing Views in Snowdonia',
@@ -41,9 +40,12 @@ export const metadata: Metadata = {
 };
 
 export default async function HomePage() {
-  const [pricingConfig, blockedDates] = await Promise.all([
+  const [pricingConfig, blockedDates, accreditations, heroSlides, siteSettings] = await Promise.all([
     cmsClient.getPricingConfig(),
     cmsClient.getBlockedDates(),
+    cmsClient.getAccreditations('plas-hafod', false),
+    cmsClient.getHeroSlides(false),
+    cmsClient.getSiteSettings(false),
   ]);
 
   const { lodgingBusiness, breadcrumbs } = generateCottageJsonLd({ locale: 'en' });
@@ -63,7 +65,11 @@ export default async function HomePage() {
       <div className="min-h-screen bg-[#fbfbfd] text-[#333333] flex flex-col font-sans selection:bg-[#efda07]/30 selection:text-stone-900">
         <LiveSiteNavbar currentPath="/" isCymraeg={false} />
         <main className="flex-1">
-          <LiveSiteHero isCymraeg={false} />
+          <LiveSiteHero
+            isCymraeg={false}
+            slides={heroSlides}
+            siteSettings={siteSettings}
+          />
           <LiveSiteAboutAndGallery isCymraeg={false} />
           <LiveSiteBooking
             propertyId="plas-hafod"
@@ -71,7 +77,7 @@ export default async function HomePage() {
             pricingConfig={pricingConfig}
             blockedDates={blockedDates}
           />
-          <LiveSiteSisterPropertyAndAccreditations isCymraeg={false} />
+          <LiveSiteSisterPropertyAndAccreditations isCymraeg={false} accreditations={accreditations} />
         </main>
       </div>
     </>

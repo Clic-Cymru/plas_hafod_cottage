@@ -7,6 +7,14 @@ export async function POST(request: Request) {
     const body = await request.json();
     const { name, email, phone = '', subject = 'General Inquiry', message } = body;
 
+    // Guardrail: Honeypot bot protection (prevents spam bots from consuming Sanity mutation quota)
+    if (body.website_url || body.honeypot || body.bot_field) {
+      return NextResponse.json({
+        success: true,
+        message: 'Thank you! Your message has been sent.',
+      });
+    }
+
     if (!name || !email || !message) {
       return NextResponse.json(
         { error: 'Please provide your name, email address, and message.' },
