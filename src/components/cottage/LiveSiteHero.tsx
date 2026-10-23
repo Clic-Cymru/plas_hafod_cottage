@@ -32,9 +32,17 @@ export function LiveSiteHero({
 
   const [currentSlide, setCurrentSlide] = useState(0);
   const [prevSlide, setPrevSlide] = useState<number | null>(null);
-  const isOfferEnabled = siteSettings.offerPopupEnabled !== false;
-  const [promoVisible, setPromoVisible] = useState(isOfferEnabled);
+
+  // Offer Display Mode: 'banner' | 'popup' | 'both' | 'none'
+  const mode = siteSettings.offerDisplayMode || (siteSettings.bannerEnabled !== false ? 'banner' : 'none');
+  const showBanner = (mode === 'banner' || mode === 'both') && Boolean(siteSettings.bannerAnnouncementEn || siteSettings.bannerAnnouncementCy);
+  const showPopup = (mode === 'popup' || mode === 'both') && (siteSettings.offerPopupEnabled !== false);
+  const [promoVisible, setPromoVisible] = useState(showPopup);
   const position = siteSettings.offerPosition || 'center';
+
+  const bannerText = isCymraeg
+    ? (siteSettings.bannerAnnouncementCy || siteSettings.bannerAnnouncementEn)
+    : (siteSettings.bannerAnnouncementEn || siteSettings.bannerAnnouncementCy);
 
   // Allow Escape key to dismiss centered offer modal
   useEffect(() => {
@@ -69,6 +77,30 @@ export function LiveSiteHero({
 
   return (
     <>
+      {/* Top Golden Highlight Announcement Banner */}
+      {showBanner && bannerText && (
+        <aside
+          role="region"
+          aria-label={isCymraeg ? 'Cynnig Arbennig' : 'Special Offer Announcement'}
+          className="relative z-30 w-full bg-[#efda07] text-[#1c1c1c] border-b border-[#d8c504] shadow-sm py-2 px-4 text-center select-none animate-in fade-in slide-in-from-top-1 duration-300"
+        >
+          <div className="max-w-7xl mx-auto flex items-center justify-center gap-2 sm:gap-3 flex-wrap font-architects text-xs sm:text-sm font-bold tracking-wide uppercase">
+            <span className="inline-block text-stone-900" aria-hidden="true">
+              ✨
+            </span>
+            <a
+              href={siteSettings.bannerLink || '#book'}
+              className="hover:underline flex items-center gap-2 transition"
+            >
+              <span>{bannerText}</span>
+              <span className="text-[11px] underline font-sans font-semibold tracking-normal normal-case text-stone-900/80 hover:text-stone-950">
+                {isCymraeg ? '(archebwch nawr →)' : '(book direct →)'}
+              </span>
+            </a>
+          </div>
+        </aside>
+      )}
+
       <div className="relative h-[540px] sm:h-[575px] md:h-[595px] lg:h-[600px] max-h-[610px] flex flex-col justify-between overflow-hidden bg-stone-950">
         {/* Cinematic, prominent Ken Burns keyframes for each slide */}
         <style

@@ -146,12 +146,14 @@ export interface SiteSettings {
   bannerAnnouncementEn: string;
   bannerAnnouncementCy?: string;
   bannerEnabled: boolean;
+  bannerLink?: string;
   facebookUrl?: string;
   instagramUrl?: string;
   trustindexEnabled?: boolean;
   trustindexScriptUrl?: string;
   trustindexEmbedCode?: string;
-  // Special Offer Popup / Modal Controls
+  // Special Offer & Promo Display Mode (Banner vs Popup vs Both)
+  offerDisplayMode?: 'banner' | 'popup' | 'both' | 'none';
   offerPopupEnabled?: boolean;
   offerPosition?: 'center' | 'bottom-right';
   offerBadgeEn?: string;

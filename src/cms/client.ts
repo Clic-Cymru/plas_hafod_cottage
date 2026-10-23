@@ -567,6 +567,8 @@ export const cmsClient = {
               rev?.trustindexScriptUrl || site.trustindexScriptUrl || defaultSiteSettings.trustindexScriptUrl,
             trustindexEmbedCode:
               rev?.trustindexEmbedCode || site.trustindexEmbedCode || defaultSiteSettings.trustindexEmbedCode,
+            bannerLink: site.bannerLink || defaultSiteSettings.bannerLink,
+            offerDisplayMode: site.offerDisplayMode || (site.bannerEnabled !== false ? 'banner' : 'none'),
             offerPopupEnabled:
               site.offerPopupEnabled !== undefined ? site.offerPopupEnabled : defaultSiteSettings.offerPopupEnabled,
             offerPosition: site.offerPosition || defaultSiteSettings.offerPosition,
@@ -825,6 +827,8 @@ export const defaultSiteSettings: SiteSettings = {
   offerButtonTextEn: 'Book Now',
   offerButtonTextCy: 'Archebwch Nawr',
   offerButtonLink: '#book',
+  bannerLink: '#book',
+  offerDisplayMode: 'banner',
 };
 
 export const defaultHeroSlides: HeroSlide[] = [
