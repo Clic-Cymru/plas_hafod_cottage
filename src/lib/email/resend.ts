@@ -14,8 +14,11 @@ export const resend = apiKey ? new Resend(apiKey) : null;
 // Before domain verification, Resend free accounts send from 'onboarding@resend.dev'
 // Once custom domain is added in Resend, set RESEND_FROM_EMAIL='Plas Hafod <info@plashafodcottage.co.uk>'
 const FROM_EMAIL =
-  process.env.RESEND_FROM_EMAIL || 'Plas Hafod Cottage <onboarding@resend.dev>';
+  process.env.RESEND_FROM_EMAIL || 'Plas Hafod Cottage <info@plashafodcottage.co.uk>';
+// Destination where owner notifications are delivered (e.g. testing email, or plashafodcottage@gmail.com in prod)
 const OWNER_EMAIL = process.env.NOTIFICATION_EMAIL || 'info@plashafodcottage.co.uk';
+// Public business address customer sees when clicking reply (forwarded via Cloudflare/cPanel to Gmail)
+const PUBLIC_REPLY_EMAIL = process.env.PUBLIC_REPLY_EMAIL || 'info@plashafodcottage.co.uk';
 
 export async function sendBookingEmails(data: BookingEmailData) {
   if (!resend) {
@@ -30,7 +33,7 @@ export async function sendBookingEmails(data: BookingEmailData) {
   }
 
   try {
-    // 1. Send Alert to Cottage Owner
+    // 1. Send Alert to Cottage Owner (replying to this email goes straight to the guest)
     const ownerRes = await resend.emails.send({
       from: FROM_EMAIL,
       to: OWNER_EMAIL,
@@ -39,11 +42,11 @@ export async function sendBookingEmails(data: BookingEmailData) {
       html: generateOwnerBookingAlertHtml(data),
     });
 
-    // 2. Send Confirmation to Guest
+    // 2. Send Confirmation to Guest (replying to this goes to the business email, e.g. info@plashafodcottage.co.uk)
     const guestRes = await resend.emails.send({
       from: FROM_EMAIL,
       to: data.guestEmail,
-      replyTo: OWNER_EMAIL,
+      replyTo: PUBLIC_REPLY_EMAIL,
       subject: `Booking Request Received – ${data.propertyTitle}`,
       html: generateGuestConfirmationHtml(data),
     });
@@ -67,7 +70,7 @@ export async function sendContactEmails(data: ContactEmailData) {
   }
 
   try {
-    // 1. Send Alert to Cottage Owner
+    // 1. Send Alert to Cottage Owner (replying to this email goes straight to the sender)
     const ownerRes = await resend.emails.send({
       from: FROM_EMAIL,
       to: OWNER_EMAIL,
@@ -76,11 +79,11 @@ export async function sendContactEmails(data: ContactEmailData) {
       html: generateOwnerContactAlertHtml(data),
     });
 
-    // 2. Send Auto-reply to Visitor
+    // 2. Send Auto-reply to Visitor (replying to this goes to business email)
     const visitorRes = await resend.emails.send({
       from: FROM_EMAIL,
       to: data.email,
-      replyTo: OWNER_EMAIL,
+      replyTo: PUBLIC_REPLY_EMAIL,
       subject: `Thank You for Contacting Plas Hafod Cottage`,
       html: generateVisitorContactAutoReplyHtml(data),
     });
