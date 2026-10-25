@@ -66,11 +66,14 @@ const snowdonPathsCy = [
 ];
 
 export default async function WelshLocalAreaPage() {
-  const attractions = await cmsClient.getLocalAttractions(true);
+  const [attractions, siteSettings] = await Promise.all([
+    cmsClient.getLocalAttractions(true),
+    cmsClient.getSiteSettings(false),
+  ]);
 
   return (
     <div className="min-h-screen bg-[#fbfbfd] text-[#333333] flex flex-col font-sans selection:bg-[#efda07]/30 selection:text-stone-900">
-      <LiveSiteNavbar currentPath="/cy/local-area" isCymraeg={true} />
+      <LiveSiteNavbar currentPath="/cy/local-area" isCymraeg={true} siteSettings={siteSettings} />
 
       <main className="flex-1">
         {/* Floating Subpage Hero with Snowdon Landscape Background & Wave Divider */}

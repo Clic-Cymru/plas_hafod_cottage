@@ -2,6 +2,7 @@ import { Metadata } from 'next';
 import { LiveSiteNavbar } from '@/components/navigation/LiveSiteNavbar';
 import { LiveSiteFooter } from '@/components/navigation/LiveSiteFooter';
 import { SubpageHero } from '@/components/navigation/SubpageHero';
+import { cmsClient } from '@/cms/client';
 import { CheckCircle2, AlertTriangle, ShieldCheck, Dog, Sparkles } from 'lucide-react';
 
 export const metadata: Metadata = {
@@ -17,10 +18,12 @@ export const metadata: Metadata = {
   },
 };
 
-export default function WelshTermsPage() {
+export default async function WelshTermsPage() {
+  const siteSettings = await cmsClient.getSiteSettings(false);
+
   return (
     <div className="min-h-screen bg-[#fbfbfd] text-[#333333] flex flex-col font-sans selection:bg-[#efda07]/30 selection:text-stone-900">
-      <LiveSiteNavbar currentPath="/cy/terms" isCymraeg={true} />
+      <LiveSiteNavbar currentPath="/cy/terms" isCymraeg={true} siteSettings={siteSettings} />
 
       <main className="flex-1">
         {/* Floating Subpage Hero with Landscape Background & Wave Divider */}

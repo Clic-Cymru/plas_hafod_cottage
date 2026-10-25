@@ -828,7 +828,7 @@ export const defaultSiteSettings: SiteSettings = {
   offerButtonTextCy: 'Archebwch Nawr',
   offerButtonLink: '#book',
   bannerLink: '#book',
-  offerDisplayMode: 'banner',
+  offerDisplayMode: 'popup',
 };
 
 export const defaultHeroSlides: HeroSlide[] = [

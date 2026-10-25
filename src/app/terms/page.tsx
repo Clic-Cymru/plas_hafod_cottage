@@ -31,11 +31,14 @@ function renderIcon(iconType?: string) {
 }
 
 export default async function TermsPage() {
-  const policySections = await cmsClient.getPolicySections(false);
+  const [policySections, siteSettings] = await Promise.all([
+    cmsClient.getPolicySections(false),
+    cmsClient.getSiteSettings(false),
+  ]);
 
   return (
     <div className="min-h-screen bg-[#fbfbfd] text-[#333333] flex flex-col font-sans selection:bg-[#efda07]/30 selection:text-stone-900">
-      <LiveSiteNavbar currentPath="/terms" isCymraeg={false} />
+      <LiveSiteNavbar currentPath="/terms" isCymraeg={false} siteSettings={siteSettings} />
 
       <main className="flex-1">
         {/* Floating Subpage Hero with Landscape Background & Wave Divider */}

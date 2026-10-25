@@ -21,9 +21,10 @@ export const metadata: Metadata = {
 };
 
 export default async function WelshReviewsPage() {
-  const [reviewSettings, guestbookEntries] = await Promise.all([
+  const [reviewSettings, guestbookEntries, siteSettings] = await Promise.all([
     cmsClient.getReviewSettings(true),
     cmsClient.getGuestbookEntries('both', true),
+    cmsClient.getSiteSettings(false),
   ]);
 
   const hasTrustindex =
@@ -32,7 +33,7 @@ export default async function WelshReviewsPage() {
 
   return (
     <div className="min-h-screen bg-[#fbfbfd] text-[#333333] flex flex-col font-sans selection:bg-[#efda07]/30 selection:text-stone-900">
-      <LiveSiteNavbar currentPath="/cy/reviews" isCymraeg={true} />
+      <LiveSiteNavbar currentPath="/cy/reviews" isCymraeg={true} siteSettings={siteSettings} />
 
       <main className="flex-1">
         {/* Floating Subpage Hero with Landscape Background & Wave Divider */}

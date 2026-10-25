@@ -24,15 +24,16 @@ export const metadata: Metadata = {
 };
 
 export default async function WelshBrynBugeiliaidBachPage() {
-  const [pricingConfig, blockedDates, accreditations] = await Promise.all([
+  const [pricingConfig, blockedDates, accreditations, siteSettings] = await Promise.all([
     cmsClient.getPricingConfig('bryn-bugeiliaid-bach'),
     cmsClient.getBlockedDates('bryn-bugeiliaid-bach'),
     cmsClient.getAccreditations('bryn-bugeiliaid-bach', true),
+    cmsClient.getSiteSettings(false),
   ]);
 
   return (
     <div className="min-h-screen bg-[#fbfbfd] text-[#333333] flex flex-col font-sans selection:bg-[#efda07]/30 selection:text-stone-900">
-      <LiveSiteNavbar currentPath="/cy/bryn-bugeiliaid-bach" isCymraeg={true} />
+      <LiveSiteNavbar currentPath="/cy/bryn-bugeiliaid-bach" isCymraeg={true} siteSettings={siteSettings} />
 
       <main className="flex-1">
         {/* Floating Subpage Hero with Official BBB Header Background & Large Centered White Logo */}

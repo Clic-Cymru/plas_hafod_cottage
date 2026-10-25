@@ -15,14 +15,15 @@ export const metadata: Metadata = {
 };
 
 export default async function LocalAreaPage() {
-  const [attractions, snowdonPaths] = await Promise.all([
+  const [attractions, snowdonPaths, siteSettings] = await Promise.all([
     cmsClient.getLocalAttractions(false),
     cmsClient.getSnowdonPaths(false),
+    cmsClient.getSiteSettings(false),
   ]);
 
   return (
     <div className="min-h-screen bg-[#fbfbfd] text-[#333333] flex flex-col font-sans selection:bg-[#efda07]/30 selection:text-stone-900">
-      <LiveSiteNavbar currentPath="/local-area" isCymraeg={false} />
+      <LiveSiteNavbar currentPath="/local-area" isCymraeg={false} siteSettings={siteSettings} />
 
       <main className="flex-1">
         {/* Floating Subpage Hero with Snowdon Landscape Background & Wave Divider */}
