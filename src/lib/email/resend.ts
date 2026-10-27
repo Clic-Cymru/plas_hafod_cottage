@@ -146,14 +146,9 @@ export async function sendDepositRequestEmail(data: DepositRequestEmailData) {
   const { fromEmail, ownerEmail, publicReplyEmail } = getEmailConfig();
 
   if (!client) {
-    console.warn('[Resend Simulation] RESEND_API_KEY not configured. Deposit request simulated:', {
-      guest: data.guestEmail,
-      property: data.propertyTitle,
-      depositAmount: data.depositAmount,
-      reference: data.paymentReference,
-      bank: `${data.bankName} - Sort: ${data.bankSortCode} - Acc: ${data.bankAccountNumber}`,
-    });
-    return { success: true, simulated: true };
+    const errMsg = 'RESEND_API_KEY environment variable is missing or invalid on the server.';
+    console.error('[Resend Error]', errMsg);
+    return { success: false, simulated: true, error: new Error(errMsg) };
   }
 
   try {
