@@ -17,6 +17,7 @@ export async function POST(request: Request) {
       children = 0,
       pets = 0,
       notes = '',
+      isCymraeg = false,
     } = body;
 
     // Guardrail: Honeypot bot protection (prevents spam bots from consuming Sanity mutation quota)
@@ -87,23 +88,26 @@ export async function POST(request: Request) {
         : 'Plas Hafod Cottage';
 
     // Action 2: Trigger Resend Email API (Owner Alert + Guest Auto-Confirmation)
-    const emailResult = await sendBookingEmails({
-      propertyTitle,
-      guestName,
-      guestEmail,
-      guestPhone,
-      checkIn,
-      checkOut,
-      totalNights: calculation.totalNights,
-      adults: Number(adults),
-      children: Number(children),
-      pets: Number(pets),
-      totalPrice: calculation.totalPrice,
-      depositAmount: calculation.depositAmount,
-      balanceDue: calculation.balanceDue,
-      notes,
-      inquiryId: inquiryRecord.id,
-    });
+    const emailResult = await sendBookingEmails(
+      {
+        propertyTitle,
+        guestName,
+        guestEmail,
+        guestPhone,
+        checkIn,
+        checkOut,
+        totalNights: calculation.totalNights,
+        adults: Number(adults),
+        children: Number(children),
+        pets: Number(pets),
+        totalPrice: calculation.totalPrice,
+        depositAmount: calculation.depositAmount,
+        balanceDue: calculation.balanceDue,
+        notes,
+        inquiryId: inquiryRecord.id,
+      },
+      Boolean(isCymraeg)
+    );
 
 
     return NextResponse.json({

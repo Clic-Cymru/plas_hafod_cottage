@@ -626,6 +626,16 @@ export const cmsClient = {
             bankBic: site.bankBic || defaultSiteSettings.bankBic,
             depositHoldHours: site.depositHoldHours ?? defaultSiteSettings.depositHoldHours,
             depositInstructions: site.depositInstructions || defaultSiteSettings.depositInstructions,
+            depositInstructionsCy: site.depositInstructionsCy || defaultSiteSettings.depositInstructionsCy,
+            depositPercentage: site.depositPercentage ?? defaultSiteSettings.depositPercentage,
+            emergencyHostPhone: site.emergencyHostPhone || defaultSiteSettings.emergencyHostPhone,
+            notificationRecipients: site.notificationRecipients || defaultSiteSettings.notificationRecipients,
+            guestBookingEmailWelcomeEn: site.guestBookingEmailWelcomeEn || defaultSiteSettings.guestBookingEmailWelcomeEn,
+            guestBookingEmailWelcomeCy: site.guestBookingEmailWelcomeCy || defaultSiteSettings.guestBookingEmailWelcomeCy,
+            guestBookingEmailNextStepsEn: site.guestBookingEmailNextStepsEn || defaultSiteSettings.guestBookingEmailNextStepsEn,
+            guestBookingEmailNextStepsCy: site.guestBookingEmailNextStepsCy || defaultSiteSettings.guestBookingEmailNextStepsCy,
+            guestContactEmailReplyEn: site.guestContactEmailReplyEn || defaultSiteSettings.guestContactEmailReplyEn,
+            guestContactEmailReplyCy: site.guestContactEmailReplyCy || defaultSiteSettings.guestContactEmailReplyCy,
           };
         }
       } catch (err) {
@@ -881,6 +891,23 @@ export const defaultSiteSettings: SiteSettings = {
   depositHoldHours: 48,
   depositInstructions:
     'Please quote your unique payment reference on your bank transfer so we can instantly identify your payment and confirm your reservation.',
+  depositInstructionsCy:
+    'Nodwch eich cyfeirnod talu unigryw wrth drosglwyddo arian fel y gallwn nodi eich taliad ar unwaith a chadarnhau eich archeb.',
+  depositPercentage: 25,
+  emergencyHostPhone: '+44 (0) 7900 123 456',
+  notificationRecipients: 'info@plashafodcottage.co.uk',
+  guestBookingEmailWelcomeEn:
+    'Thank you for your inquiry to stay with us at {property}. We have received your booking request and our team is reviewing availability for your selected dates.',
+  guestBookingEmailWelcomeCy:
+    'Diolch am eich ymholiad i aros gyda ni yn {property}. Rydym wedi derbyn eich cais archebu ac mae ein tîm yn adolygu argaeledd ar gyfer eich dyddiadau dewisol.',
+  guestBookingEmailNextStepsEn:
+    'We will review your requested dates and contact you shortly with confirmation and secure deposit payment details to lock in your stay.',
+  guestBookingEmailNextStepsCy:
+    'Byddwn yn adolygu eich dyddiadau gofynnol ac yn cysylltu â chi’n fuan gyda chadarnhad a manylion talu blaendal diogel i gadarnhau eich arhosiad.',
+  guestContactEmailReplyEn:
+    'Thank you for getting in touch with us. We have received your inquiry and will respond to you within 24 hours.',
+  guestContactEmailReplyCy:
+    'Diolch am gysylltu â ni. Rydym wedi derbyn eich neges a byddwn yn ymateb cyn pen 24 awr.',
 };
 
 export const defaultHeroSlides: HeroSlide[] = [

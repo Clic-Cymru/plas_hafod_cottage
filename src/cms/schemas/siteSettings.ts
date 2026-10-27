@@ -1,12 +1,19 @@
+import { EmailTemplatePreviewAndTest } from '../studio/EmailTemplatePreviewAndTest';
+
 /**
  * Sanity Schema: Site Settings & Global Branding
- * Allows editing site-wide contact info, announcement banner, and host details.
+ * Allows editing site-wide contact info, announcement banner, email copy, and host details.
  */
 export const siteSettingsSchema = {
   name: 'siteSettings',
   title: 'Site Settings & Branding (Gosodiadau Gwefan)',
   type: 'document',
   fieldsets: [
+    {
+      name: 'emailCopy',
+      title: '📧 Email Copy & Notifications (Golygu Negeseuon E-bost)',
+      options: { collapsible: true, collapsed: false },
+    },
     {
       name: 'banking',
       title: '🏦 Bank Transfer & Deposit Details (Manylion Talu a Blaendal)',
@@ -282,12 +289,111 @@ export const siteSettingsSchema = {
     },
     {
       name: 'depositInstructions',
-      title: 'Deposit Payment Instructions / Notes',
+      title: 'Deposit Payment Instructions / Notes (English)',
       type: 'text',
       rows: 3,
       fieldset: 'banking',
       initialValue: 'Please quote your unique payment reference when making the transfer so we can instantly identify your payment and confirm your reservation.',
       description: 'Included in deposit request emails sent to guests',
+    },
+    {
+      name: 'depositInstructionsCy',
+      title: 'Cyfarwyddiadau Talu Blaendal (Cymraeg)',
+      type: 'text',
+      rows: 3,
+      fieldset: 'banking',
+      initialValue: 'Nodwch eich cyfeirnod talu unigryw wrth drosglwyddo arian fel y gallwn nodi eich taliad ar unwaith a chadarnhau eich archeb.',
+      description: 'Cyfarwyddiadau trosglwyddo banc ar gyfer gwesteion Cymraeg',
+    },
+    // Email Template Live Preview & Testing Tool
+    {
+      name: 'emailPreviewTool',
+      title: 'Live Email Preview & Test Dispatcher',
+      type: 'string',
+      fieldset: 'emailCopy',
+      components: {
+        input: EmailTemplatePreviewAndTest,
+      },
+    },
+    // Email Copy & Notification Settings
+    {
+      name: 'notificationRecipients',
+      title: 'Notification Alert Recipients / E-byst Rhybudd',
+      type: 'string',
+      fieldset: 'emailCopy',
+      initialValue: 'info@plashafodcottage.co.uk',
+      description: 'Comma-separated email addresses to receive new booking alerts and website inquiries (e.g. "info@plashafodcottage.co.uk, host@example.com")',
+    },
+    {
+      name: 'depositPercentage',
+      title: 'Standard Deposit Percentage (%)',
+      type: 'number',
+      fieldset: 'emailCopy',
+      initialValue: 25,
+      description: 'Percentage of total stay required as initial booking deposit (default: 25%)',
+      validation: (Rule: any) => Rule.min(10).max(100),
+    },
+    {
+      name: 'emergencyHostPhone',
+      title: 'Host Direct / Emergency Phone (Rhif Ffôn Brys)',
+      type: 'string',
+      fieldset: 'emailCopy',
+      initialValue: '+44 (0) 7900 123 456',
+      description: 'Direct mobile or emergency number included on booking confirmations and deposit requests',
+    },
+    {
+      name: 'guestBookingEmailWelcomeEn',
+      title: 'Guest Booking Welcome Message (English)',
+      type: 'text',
+      rows: 3,
+      fieldset: 'emailCopy',
+      initialValue: 'Thank you for your inquiry to stay with us at {property}. We have received your booking request and our team is reviewing availability for your selected dates.',
+      description: 'Opening paragraph in guest booking request receipt email. Use {property} as placeholder.',
+    },
+    {
+      name: 'guestBookingEmailWelcomeCy',
+      title: 'Croeso Archebu Gwesteion (Cymraeg)',
+      type: 'text',
+      rows: 3,
+      fieldset: 'emailCopy',
+      initialValue: 'Diolch am eich ymholiad i aros gyda ni yn {property}. Rydym wedi derbyn eich cais archebu ac mae ein tîm yn adolygu argaeledd ar gyfer eich dyddiadau dewisol.',
+      description: 'Paragraff croeso mewn e-bost cadarnhau cais archebu',
+    },
+    {
+      name: 'guestBookingEmailNextStepsEn',
+      title: 'Guest Next Steps Information (English)',
+      type: 'text',
+      rows: 3,
+      fieldset: 'emailCopy',
+      initialValue: 'We will review your requested dates and contact you shortly with confirmation and secure deposit payment details to lock in your stay.',
+      description: 'Explanation in highlight box of what happens next after submitting a booking inquiry',
+    },
+    {
+      name: 'guestBookingEmailNextStepsCy',
+      title: 'Gwybodaeth Camau Nesaf (Cymraeg)',
+      type: 'text',
+      rows: 3,
+      fieldset: 'emailCopy',
+      initialValue: 'Byddwn yn adolygu eich dyddiadau gofynnol ac yn cysylltu â chi’n fuan gyda chadarnhad a manylion talu blaendal diogel i gadarnhau eich arhosiad.',
+      description: 'Eglurhad o beth sy’n digwydd nesaf ar ôl anfon cais archebu',
+    },
+    {
+      name: 'guestContactEmailReplyEn',
+      title: 'Contact Form Auto-Reply Message (English)',
+      type: 'text',
+      rows: 3,
+      fieldset: 'emailCopy',
+      initialValue: 'Thank you for getting in touch with us. We have received your inquiry and will respond to you within 24 hours.',
+      description: 'Automated receipt sent to visitors submitting website contact form',
+    },
+    {
+      name: 'guestContactEmailReplyCy',
+      title: 'Neges Ateb Awtomatig Cyswllt (Cymraeg)',
+      type: 'text',
+      rows: 3,
+      fieldset: 'emailCopy',
+      initialValue: 'Diolch am gysylltu â ni. Rydym wedi derbyn eich neges a byddwn yn ymateb cyn pen 24 awr.',
+      description: 'Neges awtomatig a anfonir at ymwelwyr sy’n cysylltu trwy’r wefan',
     },
   ],
   preview: {

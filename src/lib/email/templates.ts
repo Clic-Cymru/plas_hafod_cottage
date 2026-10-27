@@ -1,4 +1,5 @@
-import { formatDateUK } from '@/lib/date-utils';
+import { formatDateUK } from '../date-utils.ts';
+import type { SiteSettings } from '../../cms/types.ts';
 
 export interface BookingEmailData {
   propertyTitle: string;
@@ -54,7 +55,12 @@ export const LOGO_WHITE_URL =
 /**
  * 1. Owner Alert: Dark Theme / Dashboard Style with White Logo
  */
-export function generateOwnerBookingAlertHtml(data: BookingEmailData): string {
+export function generateOwnerBookingAlertHtml(data: BookingEmailData, settings?: Partial<SiteSettings>): string {
+  const depositPct = settings?.depositPercentage || 25;
+  const studioUrl = data.inquiryId
+    ? `https://plashafodcottage.co.uk/studio/structure/archebion-phrisiau-booking-engine;bookingInquiry;${data.inquiryId}`
+    : 'https://plashafodcottage.co.uk/studio';
+
   return `
 <!DOCTYPE html>
 <html>
@@ -95,17 +101,18 @@ export function generateOwnerBookingAlertHtml(data: BookingEmailData): string {
         <tr><th>Party</th><td>${data.adults} Adults, ${data.children} Children, ${data.pets} Pets</td></tr>
         ${data.appliedDiscountName ? `<tr><th>Discount Applied</th><td><span style="color: #15803d; font-weight: 600;">${data.appliedDiscountName} (-£${data.discountAmount})</span></td></tr>` : ''}
         <tr class="total-row"><th>Total Quote</th><td>£${data.totalPrice}</td></tr>
-        <tr><th>Deposit to Collect (25%)</th><td><strong style="color: #0f172a;">£${data.depositAmount}</strong></td></tr>
+        <tr><th>Deposit to Collect (${depositPct}%)</th><td><strong style="color: #0f172a;">£${data.depositAmount}</strong></td></tr>
         <tr><th>Remaining Balance</th><td>£${data.balanceDue}</td></tr>
         ${data.notes ? `<tr><th>Guest Notes</th><td><em style="color: #475569;">"${data.notes}"</em></td></tr>` : ''}
+        ${data.inquiryId ? `<tr><th>Reference ID</th><td><code>${data.inquiryId}</code></td></tr>` : ''}
       </table>
 
       <div style="text-align: center; margin-top: 24px;">
-        <a href="https://plashafodcottage.co.uk/studio" class="btn">Open in Sanity Studio Dashboard →</a>
+        <a href="${studioUrl}" class="btn">Open in Sanity Studio Dashboard →</a>
       </div>
     </div>
     <div class="footer">
-      Plas Hafod Cottage Management System • Snowdonia / Eryri
+      ${settings?.siteTitle || 'Plas Hafod Cottage Management System'} • Snowdonia / Eryri
     </div>
   </div>
 </body>
@@ -116,7 +123,38 @@ export function generateOwnerBookingAlertHtml(data: BookingEmailData): string {
 /**
  * 2. Guest Confirmation: Light, Welcoming Holiday Template with Colour Logo (+ Dark Mode swap)
  */
-export function generateGuestConfirmationHtml(data: BookingEmailData): string {
+export function generateGuestConfirmationHtml(
+  data: BookingEmailData,
+  settings?: Partial<SiteSettings>,
+  isCymraeg: boolean = false
+): string {
+  const hosts = settings?.hostNames || 'Siwsan & Neil';
+  const siteTitle = settings?.siteTitle || 'Plas Hafod Cottage & Bryn Bugeiliaid Bach';
+  const phone = settings?.emergencyHostPhone || settings?.phone || '+44 (0) 1286 880 000';
+  const checkInTime = settings?.checkInTime || '4:00 PM';
+  const checkOutTime = settings?.checkOutTime || '10:00 AM';
+  const depositPct = settings?.depositPercentage || 25;
+  const address =
+    (isCymraeg && settings?.addressCy ? settings.addressCy : settings?.address) ||
+    'Plas Hafod Cottage, Nebo, Caernarfon, Gwynedd, LL54 6EE';
+
+  const rawWelcome = isCymraeg
+    ? (settings?.guestBookingEmailWelcomeCy ||
+       'Diolch am eich ymholiad i aros gyda ni yn {property}. Rydym wedi derbyn eich cais archebu ac mae ein tîm yn adolygu argaeledd ar gyfer eich dyddiadau dewisol.')
+    : (settings?.guestBookingEmailWelcomeEn ||
+       'Thank you for your inquiry to stay with us at {property}. We have received your booking request and our team is reviewing availability for your selected dates.');
+  const resolvedWelcome = rawWelcome.replace('{property}', `<strong>${data.propertyTitle}</strong>`);
+
+  const resolvedNextSteps = isCymraeg
+    ? (settings?.guestBookingEmailNextStepsCy ||
+       'Byddwn yn adolygu eich dyddiadau gofynnol ac yn cysylltu â chi’n fuan gyda chadarnhad a manylion talu blaendal diogel i gadarnhau eich arhosiad.')
+    : (settings?.guestBookingEmailNextStepsEn ||
+       'We will review your requested dates and contact you shortly with confirmation and secure deposit payment details to lock in your stay.');
+
+  const dearText = isCymraeg ? 'Annwyl' : 'Dear';
+  const whatNextHeading = isCymraeg ? 'Beth sy’n digwydd nesaf?' : 'What happens next?';
+  const summaryHeading = isCymraeg ? 'Crynodeb o’ch Archeb' : 'Your Booking Summary';
+
   return `
 <!DOCTYPE html>
 <html>
@@ -161,44 +199,45 @@ export function generateGuestConfirmationHtml(data: BookingEmailData): string {
       <p style="margin: 4px 0 0; font-size: 15px; color: #64748b; font-weight: 500;">${data.propertyTitle}</p>
     </div>
     <div class="content">
-      <p style="font-size: 16px; margin-top: 0; color: #1e293b;">Dear <strong>${data.guestName}</strong>,</p>
+      <p style="font-size: 16px; margin-top: 0; color: #1e293b;">${dearText} <strong>${data.guestName}</strong>,</p>
       
       <p style="font-size: 14px; line-height: 1.6; color: #475569;">
-        Thank you for your inquiry to stay with us at <strong>${data.propertyTitle}</strong>. We have received your booking request and our team is reviewing availability for your selected dates.
+        ${resolvedWelcome}
       </p>
 
       <div class="highlight-box">
-        <strong style="color: #0f172a;">What happens next?</strong><br>
-        We will review your requested dates and contact you shortly with confirmation and secure deposit payment details to lock in your stay.
+        <strong style="color: #0f172a;">${whatNextHeading}</strong><br>
+        ${resolvedNextSteps}
       </div>
 
-      <h3 style="font-size: 16px; margin: 26px 0 10px; color: #0f172a;">Your Booking Summary</h3>
+      <h3 style="font-size: 16px; margin: 26px 0 10px; color: #0f172a;">${summaryHeading}</h3>
       <table class="table">
         <tr><th>Property</th><td><strong>${data.propertyTitle}</strong></td></tr>
-        <tr><th>Check-in</th><td>${formatDateUK(data.checkIn)}</td></tr>
-        <tr><th>Check-out</th><td>${formatDateUK(data.checkOut)}</td></tr>
+        <tr><th>Check-in</th><td>${formatDateUK(data.checkIn)} (from ${checkInTime})</td></tr>
+        <tr><th>Check-out</th><td>${formatDateUK(data.checkOut)} (by ${checkOutTime})</td></tr>
         <tr><th>Duration</th><td>${data.totalNights} Nights</td></tr>
         <tr><th>Guests</th><td>${data.adults} Adults, ${data.children} Children, ${data.pets} Pets</td></tr>
         ${data.appliedDiscountName ? `<tr><th>Special Offer</th><td><span style="color: #15803d; font-weight: 600;">${data.appliedDiscountName} (-£${data.discountAmount})</span></td></tr>` : ''}
         <tr><th>Total Stay Price</th><td><strong>£${data.totalPrice}</strong></td></tr>
-        <tr><th>Deposit to Secure</th><td><strong>£${data.depositAmount}</strong> (25%)</td></tr>
+        <tr><th>Deposit to Secure (${depositPct}%)</th><td><strong>£${data.depositAmount}</strong></td></tr>
         <tr><th>Balance Due Prior to Arrival</th><td>£${data.balanceDue}</td></tr>
       </table>
 
       <p style="font-size: 13px; color: #64748b; line-height: 1.6;">
-        If you have any questions in the meantime or wish to modify your dates, simply reply directly to this email or call us.
+        If you have any questions in the meantime or wish to modify your dates, simply reply directly to this email or call us on <strong>${phone}</strong>.
       </p>
 
       <div style="margin-top: 28px; padding-top: 20px; border-top: 1px solid #edf2f7;">
         <p style="font-size: 14px; margin: 0 0 4px; color: #1e293b;">
           Warmest regards,<br>
-          <strong>Plas Hafod Cottage Team</strong>
+          <strong>${hosts}</strong><br>
+          <span style="color: #64748b; font-size: 13px;">${siteTitle}</span>
         </p>
-        <span style="font-size: 12px; color: #64748b;">Nebo, Caernarfon, Gwynedd, LL54 6EE • Eryri / Snowdonia National Park</span>
+        <span style="font-size: 12px; color: #64748b;">${address} • Eryri / Snowdonia National Park</span>
       </div>
     </div>
     <div class="footer">
-      Plas Hafod Cottage &amp; Bryn Bugeiliaid Bach<br>
+      ${siteTitle}<br>
       Website: <a href="https://plashafodcottage.co.uk" style="color: #4f46e5; text-decoration: none;">plashafodcottage.co.uk</a> • Email: <a href="mailto:info@plashafodcottage.co.uk" style="color: #4f46e5; text-decoration: none;">info@plashafodcottage.co.uk</a>
     </div>
   </div>
@@ -210,7 +249,12 @@ export function generateGuestConfirmationHtml(data: BookingEmailData): string {
 /**
  * 3. Owner Contact Message: Dark Theme with White Logo
  */
-export function generateOwnerContactAlertHtml(data: ContactEmailData): string {
+export function generateOwnerContactAlertHtml(
+  data: ContactEmailData,
+  settings?: Partial<SiteSettings>
+): string {
+  const siteTitle = settings?.siteTitle || 'Plas Hafod Cottage Management System';
+
   return `
 <!DOCTYPE html>
 <html>
@@ -223,6 +267,7 @@ export function generateOwnerContactAlertHtml(data: ContactEmailData): string {
     .header { background: #323149; color: #ffffff; padding: 30px 24px; text-align: center; }
     .content { padding: 28px 24px; }
     .message-box { background: #f8fafc; border: 1px solid #e2e8f0; border-left: 4px solid #efda07; border-radius: 6px; padding: 18px; margin: 18px 0; font-size: 14px; line-height: 1.6; white-space: pre-wrap; color: #1e293b; }
+    .btn { display: inline-block; background: #323149; color: #ffffff !important; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 13px; text-align: center; margin-top: 14px; }
     .footer { padding: 18px; text-align: center; font-size: 12px; color: #94a3b8; background: #f8fafc; border-top: 1px solid #e2e8f0; }
   </style>
 </head>
@@ -246,9 +291,13 @@ export function generateOwnerContactAlertHtml(data: ContactEmailData): string {
       <p style="font-size: 13px; color: #64748b; margin-bottom: 0;">
         💡 You can reply directly to this email to respond to <strong>${data.name}</strong>.
       </p>
+
+      <div style="text-align: center; margin-top: 20px;">
+        <a href="https://plashafodcottage.co.uk/studio/structure/negeseuon-messages-inbox;contactMessage" class="btn">View in Studio Messages Inbox →</a>
+      </div>
     </div>
     <div class="footer">
-      Plas Hafod Cottage Website Message System
+      ${siteTitle} • Website Message System
     </div>
   </div>
 </body>
@@ -259,7 +308,27 @@ export function generateOwnerContactAlertHtml(data: ContactEmailData): string {
 /**
  * 4. Visitor Auto-Reply: Light Template with Colour Logo (+ Dark Mode swap)
  */
-export function generateVisitorContactAutoReplyHtml(data: ContactEmailData): string {
+export function generateVisitorContactAutoReplyHtml(
+  data: ContactEmailData,
+  settings?: Partial<SiteSettings>,
+  isCymraeg: boolean = false
+): string {
+  const hosts = settings?.hostNames || 'Siwsan & Neil';
+  const siteTitle = settings?.siteTitle || 'Plas Hafod Cottage & Bryn Bugeiliaid Bach';
+  const phone = settings?.emergencyHostPhone || settings?.phone || '+44 (0) 1286 880 000';
+  const address =
+    (isCymraeg && settings?.addressCy ? settings.addressCy : settings?.address) ||
+    'Plas Hafod Cottage, Nebo, Caernarfon, Gwynedd, LL54 6EE';
+
+  const rawReply = isCymraeg
+    ? (settings?.guestContactEmailReplyCy ||
+       'Diolch am gysylltu â ni. Rydym wedi derbyn eich neges a byddwn yn ymateb cyn pen 24 awr.')
+    : (settings?.guestContactEmailReplyEn ||
+       'Thank you for getting in touch with us. We have received your inquiry and will respond to you within 24 hours.');
+
+  const dearText = isCymraeg ? 'Annwyl' : 'Dear';
+  const yourMsgHeading = isCymraeg ? 'Eich Neges:' : 'Your Message:';
+
   return `
 <!DOCTYPE html>
 <html>
@@ -293,29 +362,30 @@ export function generateVisitorContactAutoReplyHtml(data: ContactEmailData): str
         <img class="logo-color" src="${LOGO_COLOR_URL}" alt="Plas Hafod Cottage" width="160" style="display: inline-block; max-width: 160px; height: auto;" border="0" />
       </div>
       <h2 style="margin: 0; font-size: 20px; font-weight: 700; color: #1e1b2e;">Thank You for Contacting Us</h2>
-      <p style="margin: 4px 0 0; font-size: 14px; color: #64748b;">Bwthyn Plas Hafod Cottage &amp; Bryn Bugeiliaid Bach</p>
+      <p style="margin: 4px 0 0; font-size: 14px; color: #64748b;">${siteTitle}</p>
     </div>
     <div class="content">
-      <p style="font-size: 15px; margin-top: 0; color: #1e293b;">Dear <strong>${data.name}</strong>,</p>
+      <p style="font-size: 15px; margin-top: 0; color: #1e293b;">${dearText} <strong>${data.name}</strong>,</p>
       <p style="font-size: 14px; line-height: 1.6; color: #475569;">
-        Thank you for getting in touch with us. We have received your inquiry and will respond to you within 24 hours.
+        ${rawReply}
       </p>
       
       <div style="background: #fafaf9; border-left: 3px solid #323149; padding: 14px 18px; margin: 18px 0; font-size: 13px; color: #475569; border-radius: 0 6px 6px 0;">
-        <strong style="color: #0f172a;">Your Message:</strong><br>
+        <strong style="color: #0f172a;">${yourMsgHeading}</strong><br>
         <span style="font-style: italic;">"${data.message}"</span>
       </div>
 
       <div style="margin-top: 24px;">
         <p style="font-size: 14px; margin: 0 0 4px; color: #1e293b;">
           Warm regards,<br>
-          <strong>Plas Hafod Cottage Team</strong>
+          <strong>${hosts}</strong><br>
+          <span style="color: #64748b; font-size: 13px;">${siteTitle}</span>
         </p>
-        <span style="font-size: 12px; color: #64748b;">Nebo, Caernarfon • Eryri / Snowdonia National Park</span>
+        <span style="font-size: 12px; color: #64748b;">${address} • Tel: ${phone}</span>
       </div>
     </div>
     <div class="footer">
-      Plas Hafod Cottage • <a href="https://plashafodcottage.co.uk" style="color: #4f46e5; text-decoration: none;">plashafodcottage.co.uk</a>
+      ${siteTitle} • <a href="https://plashafodcottage.co.uk" style="color: #4f46e5; text-decoration: none;">plashafodcottage.co.uk</a>
     </div>
   </div>
 </body>
@@ -326,31 +396,63 @@ export function generateVisitorContactAutoReplyHtml(data: ContactEmailData): str
 /**
  * Plain Text Alternative: Guest Booking Confirmation
  */
-export function generateGuestConfirmationText(data: BookingEmailData): string {
+export function generateGuestConfirmationText(
+  data: BookingEmailData,
+  settings?: Partial<SiteSettings>,
+  isCymraeg: boolean = false
+): string {
+  const hosts = settings?.hostNames || 'Siwsan & Neil';
+  const siteTitle = settings?.siteTitle || 'Plas Hafod Cottage & Bryn Bugeiliaid Bach';
+  const phone = settings?.emergencyHostPhone || settings?.phone || '+44 (0) 1286 880 000';
+  const checkInTime = settings?.checkInTime || '4:00 PM';
+  const checkOutTime = settings?.checkOutTime || '10:00 AM';
+  const depositPct = settings?.depositPercentage || 25;
+  const address =
+    (isCymraeg && settings?.addressCy ? settings.addressCy : settings?.address) ||
+    'Plas Hafod Cottage, Nebo, Caernarfon, Gwynedd, LL54 6EE';
+
+  const rawWelcome = isCymraeg
+    ? (settings?.guestBookingEmailWelcomeCy ||
+       'Diolch am eich ymholiad i aros gyda ni yn {property}. Rydym wedi derbyn eich cais archebu ac mae ein tîm yn adolygu argaeledd ar gyfer eich dyddiadau dewisol.')
+    : (settings?.guestBookingEmailWelcomeEn ||
+       'Thank you for your inquiry to stay with us at {property}. We have received your booking request and our team is reviewing availability for your selected dates.');
+  const resolvedWelcome = rawWelcome.replace('{property}', data.propertyTitle);
+
+  const rawNextSteps = isCymraeg
+    ? (settings?.guestBookingEmailNextStepsCy ||
+       'Byddwn yn adolygu eich dyddiadau gofynnol ac yn cysylltu â chi’n fuan gyda chadarnhad a manylion talu blaendal diogel i gadarnhau eich arhosiad.')
+    : (settings?.guestBookingEmailNextStepsEn ||
+       'We will review your requested dates and contact you shortly with confirmation and secure deposit payment details to lock in your stay.');
+
+  const dearText = isCymraeg ? 'Annwyl' : 'Dear';
+  const whatNextHeading = isCymraeg ? 'BETH SY’N DIGWYDD NESAF:' : 'WHAT HAPPENS NEXT:';
+  const summaryHeading = isCymraeg ? 'CRYNODEB O’CH ARCHEB:' : 'YOUR BOOKING SUMMARY:';
+
   return `Croeso / Welcome to ${data.propertyTitle}
 
-Dear ${data.guestName},
+${dearText} ${data.guestName},
 
-Thank you for your inquiry to stay with us at ${data.propertyTitle}. We have received your booking request and our team is reviewing availability for your selected dates.
+${resolvedWelcome}
 
-WHAT HAPPENS NEXT:
-We will review your requested dates and contact you shortly with confirmation and secure deposit payment details to lock in your stay.
+${whatNextHeading}
+${rawNextSteps}
 
-YOUR BOOKING SUMMARY:
+${summaryHeading}
 - Property: ${data.propertyTitle}
-- Check-in: ${formatDateUK(data.checkIn)}
-- Check-out: ${formatDateUK(data.checkOut)}
+- Check-in: ${formatDateUK(data.checkIn)} (from ${checkInTime})
+- Check-out: ${formatDateUK(data.checkOut)} (by ${checkOutTime})
 - Duration: ${data.totalNights} Nights
 - Guests: ${data.adults} Adults, ${data.children} Children, ${data.pets} Pets
 ${data.appliedDiscountName ? `- Special Offer: ${data.appliedDiscountName} (-£${data.discountAmount || 0})\n` : ''}- Total Stay Price: £${data.totalPrice}
-- Deposit to Secure (25%): £${data.depositAmount}
+- Deposit to Secure (${depositPct}%): £${data.depositAmount}
 - Remaining Balance: £${data.balanceDue}
 ${data.notes ? `- Notes: "${data.notes}"\n` : ''}
-If you have any questions in the meantime or wish to modify your dates, simply reply directly to this email or call us.
+If you have any questions in the meantime or wish to modify your dates, simply reply directly to this email or call us on ${phone}.
 
 Warmest regards,
-Plas Hafod Cottage Team
-Nebo, Caernarfon, Gwynedd, LL54 6EE • Eryri / Snowdonia National Park
+${hosts}
+${siteTitle}
+${address} • Eryri / Snowdonia National Park
 Website: https://plashafodcottage.co.uk
 Email: info@plashafodcottage.co.uk`;
 }
@@ -358,7 +460,13 @@ Email: info@plashafodcottage.co.uk`;
 /**
  * Plain Text Alternative: Owner Booking Alert
  */
-export function generateOwnerBookingAlertText(data: BookingEmailData): string {
+export function generateOwnerBookingAlertText(
+  data: BookingEmailData,
+  settings?: Partial<SiteSettings>
+): string {
+  const depositPct = settings?.depositPercentage || 25;
+  const siteTitle = settings?.siteTitle || 'Plas Hafod Cottage Management System';
+
   return `NEW BOOKING INQUIRY: ${data.propertyTitle}
 
 Guest Details:
@@ -373,17 +481,24 @@ Stay Details:
 - Duration: ${data.totalNights} Nights
 - Guests: ${data.adults} Adults, ${data.children} Children, ${data.pets} Pets
 ${data.appliedDiscountName ? `- Special Offer: ${data.appliedDiscountName} (-£${data.discountAmount || 0})\n` : ''}- Total Price: £${data.totalPrice}
-- Deposit to Collect: £${data.depositAmount}
+- Deposit to Collect (${depositPct}%): £${data.depositAmount}
 - Remaining Balance: £${data.balanceDue}
 ${data.notes ? `- Guest Notes: "${data.notes}"\n` : ''}
 Reference ID: ${data.inquiryId || 'N/A'}
-Dashboard: https://plashafodcottage.co.uk/studio`;
+Dashboard: https://plashafodcottage.co.uk/studio
+
+${siteTitle}`;
 }
 
 /**
  * Plain Text Alternative: Owner Contact Alert
  */
-export function generateOwnerContactAlertText(data: ContactEmailData): string {
+export function generateOwnerContactAlertText(
+  data: ContactEmailData,
+  settings?: Partial<SiteSettings>
+): string {
+  const siteTitle = settings?.siteTitle || 'Plas Hafod Cottage Management System';
+
   return `NEW WEBSITE CONTACT MESSAGE
 
 From: ${data.name} (${data.email})
@@ -391,23 +506,46 @@ ${data.phone ? `Phone: ${data.phone}\n` : ''}${data.subject ? `Subject: ${data.s
 Message:
 ${data.message}
 
-Reply directly to this email to respond to ${data.name}.`;
+Reply directly to this email to respond to ${data.name}.
+Inbox: https://plashafodcottage.co.uk/studio/structure/negeseuon-messages-inbox;contactMessage
+
+${siteTitle}`;
 }
 
 /**
  * Plain Text Alternative: Visitor Contact Auto-Reply
  */
-export function generateVisitorContactAutoReplyText(data: ContactEmailData): string {
-  return `Dear ${data.name},
+export function generateVisitorContactAutoReplyText(
+  data: ContactEmailData,
+  settings?: Partial<SiteSettings>,
+  isCymraeg: boolean = false
+): string {
+  const hosts = settings?.hostNames || 'Siwsan & Neil';
+  const siteTitle = settings?.siteTitle || 'Plas Hafod Cottage & Bryn Bugeiliaid Bach';
+  const phone = settings?.phone || '+44 (0) 1286 880 000';
+  const address =
+    (isCymraeg && settings?.addressCy ? settings.addressCy : settings?.address) ||
+    'Plas Hafod Cottage, Nebo, Caernarfon, Gwynedd, LL54 6EE';
 
-Thank you for getting in touch with Plas Hafod Cottage. We have received your message regarding "${data.subject || 'your inquiry'}" and will respond to you within 24 hours.
+  const rawReply = isCymraeg
+    ? (settings?.guestContactEmailReplyCy ||
+       'Diolch am gysylltu â ni. Rydym wedi derbyn eich neges a byddwn yn ymateb cyn pen 24 awr.')
+    : (settings?.guestContactEmailReplyEn ||
+       'Thank you for getting in touch with us. We have received your inquiry and will respond to you within 24 hours.');
 
-Your Message:
+  const dearText = isCymraeg ? 'Annwyl' : 'Dear';
+
+  return `${dearText} ${data.name},
+
+${rawReply}
+
+${isCymraeg ? 'Eich Neges:' : 'Your Message:'}
 "${data.message}"
 
 Warm regards,
-Plas Hafod Cottage Team
-Nebo, Caernarfon • Eryri / Snowdonia National Park
+${hosts}
+${siteTitle}
+${address} • Tel: ${phone}
 Website: https://plashafodcottage.co.uk
 Email: info@plashafodcottage.co.uk`;
 }
@@ -415,10 +553,18 @@ Email: info@plashafodcottage.co.uk`;
 /**
  * 5. Guest Deposit Request: Premium BACS Payment Invitation
  */
-export function generateDepositRequestHtml(data: DepositRequestEmailData): string {
-  const holdHours = data.holdHours || 48;
-  const hosts = data.hostNames || 'Siwsan & Neil';
-  const phone = data.contactPhone || '+44 (0) 1286 880 000';
+export function generateDepositRequestHtml(
+  data: DepositRequestEmailData,
+  settings?: Partial<SiteSettings>
+): string {
+  const holdHours = data.holdHours || settings?.depositHoldHours || 48;
+  const hosts = data.hostNames || settings?.hostNames || 'Siwsan & Neil';
+  const phone = data.contactPhone || settings?.emergencyHostPhone || settings?.phone || '+44 (0) 1286 880 000';
+  const siteTitle = settings?.siteTitle || 'Plas Hafod Cottage & Bryn Bugeiliaid Bach';
+  const checkInTime = settings?.checkInTime || '4:00 PM';
+  const checkOutTime = settings?.checkOutTime || '10:00 AM';
+  const depositPct = settings?.depositPercentage || 25;
+  const address = settings?.address || 'Plas Hafod Cottage, Nebo, Caernarfon, Gwynedd, LL54 6EE';
 
   return `
 <!DOCTYPE html>
@@ -551,13 +697,13 @@ export function generateDepositRequestHtml(data: DepositRequestEmailData): strin
       <h3 style="font-size: 16px; margin: 26px 0 10px; color: #0f172a;">Stay &amp; Pricing Breakdown</h3>
       <table class="table">
         <tr><th>Property</th><td><strong>${data.propertyTitle}</strong></td></tr>
-        <tr><th>Check-in</th><td>${formatDateUK(data.checkIn)} (from 4:00 PM)</td></tr>
-        <tr><th>Check-out</th><td>${formatDateUK(data.checkOut)} (by 10:00 AM)</td></tr>
+        <tr><th>Check-in</th><td>${formatDateUK(data.checkIn)} (from ${checkInTime})</td></tr>
+        <tr><th>Check-out</th><td>${formatDateUK(data.checkOut)} (by ${checkOutTime})</td></tr>
         <tr><th>Duration</th><td>${data.totalNights} Nights</td></tr>
         <tr><th>Guests</th><td>${data.adults} Adults, ${data.children} Children, ${data.pets} Pets</td></tr>
         ${data.appliedDiscountName ? `<tr><th>Applied Discount</th><td><span style="color: #15803d; font-weight: 600;">${data.appliedDiscountName} (-£${data.discountAmount})</span></td></tr>` : ''}
         <tr><th>Total Stay Price</th><td><strong>£${data.totalPrice}</strong></td></tr>
-        <tr style="background: #fefce8;"><th>Deposit Required Now (25%)</th><td><strong style="color: #854d0e; font-size: 15px;">£${data.depositAmount}</strong></td></tr>
+        <tr style="background: #fefce8;"><th>Deposit Required Now (${depositPct}%)</th><td><strong style="color: #854d0e; font-size: 15px;">£${data.depositAmount}</strong></td></tr>
         <tr><th>Remaining Balance</th><td>£${data.balanceDue} (due prior to arrival)</td></tr>
       </table>
 
@@ -577,14 +723,14 @@ export function generateDepositRequestHtml(data: DepositRequestEmailData): strin
         <p style="font-size: 14px; margin: 0 0 4px; color: #1e293b;">
           Warmest regards,<br>
           <strong>${hosts}</strong><br>
-          <span style="color: #64748b; font-size: 13px;">Plas Hafod Cottage &amp; Bryn Bugeiliaid Bach</span>
+          <span style="color: #64748b; font-size: 13px;">${siteTitle}</span>
         </p>
-        <span style="font-size: 12px; color: #64748b;">Nebo, Caernarfon, Gwynedd, LL54 6EE • Eryri / Snowdonia National Park</span>
+        <span style="font-size: 12px; color: #64748b;">${address} • Eryri / Snowdonia National Park</span>
       </div>
     </div>
 
     <div class="footer">
-      Plas Hafod Cottage &amp; Bryn Bugeiliaid Bach<br>
+      ${siteTitle}<br>
       Website: <a href="https://plashafodcottage.co.uk" style="color: #4f46e5; text-decoration: none;">plashafodcottage.co.uk</a> • Email: <a href="mailto:info@plashafodcottage.co.uk" style="color: #4f46e5; text-decoration: none;">info@plashafodcottage.co.uk</a>
     </div>
   </div>
@@ -596,9 +742,18 @@ export function generateDepositRequestHtml(data: DepositRequestEmailData): strin
 /**
  * Plain Text Alternative: Guest Deposit Request
  */
-export function generateDepositRequestText(data: DepositRequestEmailData): string {
-  const holdHours = data.holdHours || 48;
-  const hosts = data.hostNames || 'Siwsan & Neil';
+export function generateDepositRequestText(
+  data: DepositRequestEmailData,
+  settings?: Partial<SiteSettings>
+): string {
+  const holdHours = data.holdHours || settings?.depositHoldHours || 48;
+  const hosts = data.hostNames || settings?.hostNames || 'Siwsan & Neil';
+  const phone = data.contactPhone || settings?.emergencyHostPhone || settings?.phone || '+44 (0) 1286 880 000';
+  const checkInTime = settings?.checkInTime || '4:00 PM';
+  const checkOutTime = settings?.checkOutTime || '10:00 AM';
+  const depositPct = settings?.depositPercentage || 25;
+  const siteTitle = settings?.siteTitle || 'Plas Hafod Cottage & Bryn Bugeiliaid Bach';
+  const address = settings?.address || 'Plas Hafod Cottage, Nebo, Caernarfon, Gwynedd, LL54 6EE';
 
   return `PROVISIONAL RESERVATION ACCEPTED: ${data.propertyTitle}
 
@@ -607,7 +762,7 @@ Dear ${data.guestName},
 Great news! We have reviewed your reservation inquiry for ${data.propertyTitle} and are delighted to provisionally hold your dates: ${formatDateUK(data.checkIn)} to ${formatDateUK(data.checkOut)} (${data.totalNights} nights).
 
 ${data.customHostNote ? `NOTE FROM YOUR HOSTS:\n"${data.customHostNote}"\n\n` : ''}DEPOSIT REQUIRED TO SECURE RESERVATION:
-Amount: £${data.depositAmount} (25% of total stay £${data.totalPrice})
+Amount: £${data.depositAmount} (${depositPct}% of total stay £${data.totalPrice})
 Payment Deadline: Within ${holdHours} hours${data.depositDeadline ? ` (${data.depositDeadline})` : ''}
 
 BANK TRANSFER (BACS) DETAILS:
@@ -621,8 +776,8 @@ IMPORTANT: Please quote reference "${data.paymentReference}" on your bank transf
 
 BOOKING SUMMARY:
 - Property: ${data.propertyTitle}
-- Check-in: ${formatDateUK(data.checkIn)} (from 4:00 PM)
-- Check-out: ${formatDateUK(data.checkOut)} (by 10:00 AM)
+- Check-in: ${formatDateUK(data.checkIn)} (from ${checkInTime})
+- Check-out: ${formatDateUK(data.checkOut)} (by ${checkOutTime})
 - Duration: ${data.totalNights} Nights
 - Party: ${data.adults} Adults, ${data.children} Children, ${data.pets} Pets
 ${data.appliedDiscountName ? `- Discount: ${data.appliedDiscountName} (-£${data.discountAmount})\n` : ''}- Total Stay: £${data.totalPrice}
@@ -632,13 +787,14 @@ ${data.appliedDiscountName ? `- Discount: ${data.appliedDiscountName} (-£${data
 WHAT HAPPENS NEXT:
 1. Once your deposit transfer clears, we will send your official Booking Confirmation.
 2. Four weeks prior to arrival, you will receive full arrival directions and key collection info.
-3. If you have questions, reply directly to this email or call ${data.contactPhone || '+44 (0) 1286 880 000'}.
+3. If you have questions, reply directly to this email or call ${phone}.
 
 Warmest regards,
 ${hosts}
-Plas Hafod Cottage & Bryn Bugeiliaid Bach
-Nebo, Caernarfon, Gwynedd, LL54 6EE • Eryri / Snowdonia National Park
+${siteTitle}
+${address} • Eryri / Snowdonia National Park
 Website: https://plashafodcottage.co.uk
 Email: info@plashafodcottage.co.uk`;
 }
+
 

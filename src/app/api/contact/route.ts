@@ -5,7 +5,7 @@ import { sendContactEmails } from '@/lib/email/resend';
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { name, email, phone = '', subject = 'General Inquiry', message } = body;
+    const { name, email, phone = '', subject = 'General Inquiry', message, isCymraeg = false } = body;
 
     // Guardrail: Honeypot bot protection (prevents spam bots from consuming Sanity mutation quota)
     if (body.website_url || body.honeypot || body.bot_field) {
@@ -40,14 +40,17 @@ export async function POST(request: Request) {
     });
 
     // 2. Dispatch Automated Emails via Resend (Owner Alert + Guest Auto-Reply)
-    await sendContactEmails({
-      name: name.trim(),
-      email: email.trim(),
-      phone: phone.trim(),
-      subject: subject.trim(),
-      message: message.trim(),
-      submittedAt: contactRecord.createdAt,
-    });
+    await sendContactEmails(
+      {
+        name: name.trim(),
+        email: email.trim(),
+        phone: phone.trim(),
+        subject: subject.trim(),
+        message: message.trim(),
+        submittedAt: contactRecord.createdAt,
+      },
+      Boolean(isCymraeg)
+    );
 
     return NextResponse.json({
       success: true,

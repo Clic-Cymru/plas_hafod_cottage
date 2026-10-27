@@ -1,5 +1,6 @@
 import { Resend } from 'resend';
 import { formatDateUK } from '@/lib/date-utils';
+import { cmsClient } from '@/cms/client';
 import {
   BookingEmailData,
   ContactEmailData,
@@ -32,13 +33,20 @@ export function getEmailConfig() {
 // Retain export for backward compatibility
 export const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 
-export async function sendBookingEmails(data: BookingEmailData) {
+export async function sendBookingEmails(data: BookingEmailData, isCymraeg: boolean = false) {
   const client = getResendClient();
   const { fromEmail, ownerEmail, publicReplyEmail } = getEmailConfig();
 
+  // Load live site settings for customized copy, check-in times & recipients
+  const siteSettings = await cmsClient.getSiteSettings(isCymraeg);
+  const customRecipients = siteSettings.notificationRecipients
+    ? siteSettings.notificationRecipients.split(',').map((s) => s.trim()).filter(Boolean)
+    : [];
+  const targetOwnerRecipients = customRecipients.length > 0 ? customRecipients : ownerEmail;
+
   if (!client) {
     console.warn('[Resend Simulation] RESEND_API_KEY not configured. Emails simulated:', {
-      owner: ownerEmail,
+      owner: targetOwnerRecipients,
       guest: data.guestEmail,
       property: data.propertyTitle,
       dates: `${formatDateUK(data.checkIn)} to ${formatDateUK(data.checkOut)}`,
@@ -50,14 +58,14 @@ export async function sendBookingEmails(data: BookingEmailData) {
   try {
     const refHeader = data.inquiryId || `ph-${Date.now()}`;
 
-    // 1. Send Alert to Cottage Owner (replying to this email goes straight to the guest)
+    // 1. Send Alert to Cottage Owner(s) (replying goes straight to the guest)
     const ownerRes = await client.emails.send({
       from: fromEmail,
-      to: ownerEmail,
+      to: targetOwnerRecipients,
       replyTo: data.guestEmail,
       subject: `🔔 New Booking Inquiry: ${data.propertyTitle} from ${data.guestName} (${formatDateUK(data.checkIn)} to ${formatDateUK(data.checkOut)})`,
-      html: generateOwnerBookingAlertHtml(data),
-      text: generateOwnerBookingAlertText(data),
+      html: generateOwnerBookingAlertHtml(data, siteSettings),
+      text: generateOwnerBookingAlertText(data, siteSettings),
       headers: {
         'X-Entity-Ref-ID': refHeader,
       },
@@ -67,14 +75,18 @@ export async function sendBookingEmails(data: BookingEmailData) {
       console.error('Resend error sending owner alert:', ownerRes.error);
     }
 
-    // 2. Send Confirmation to Guest (replying to this goes to the business email)
+    // 2. Send Confirmation to Guest (replying goes to the public business email)
+    const guestSubject = isCymraeg
+      ? `Cais Archebu wedi’i Dderbyn – ${data.propertyTitle}`
+      : `Booking Request Received – ${data.propertyTitle}`;
+
     const guestRes = await client.emails.send({
       from: fromEmail,
       to: data.guestEmail,
       replyTo: publicReplyEmail,
-      subject: `Booking Request Received – ${data.propertyTitle}`,
-      html: generateGuestConfirmationHtml(data),
-      text: generateGuestConfirmationText(data),
+      subject: guestSubject,
+      html: generateGuestConfirmationHtml(data, siteSettings, isCymraeg),
+      text: generateGuestConfirmationText(data, siteSettings, isCymraeg),
       headers: {
         'X-Entity-Ref-ID': refHeader,
       },
@@ -91,13 +103,20 @@ export async function sendBookingEmails(data: BookingEmailData) {
   }
 }
 
-export async function sendContactEmails(data: ContactEmailData) {
+export async function sendContactEmails(data: ContactEmailData, isCymraeg: boolean = false) {
   const client = getResendClient();
   const { fromEmail, ownerEmail, publicReplyEmail } = getEmailConfig();
 
+  // Load live site settings for customized copy and recipients
+  const siteSettings = await cmsClient.getSiteSettings(isCymraeg);
+  const customRecipients = siteSettings.notificationRecipients
+    ? siteSettings.notificationRecipients.split(',').map((s) => s.trim()).filter(Boolean)
+    : [];
+  const targetOwnerRecipients = customRecipients.length > 0 ? customRecipients : ownerEmail;
+
   if (!client) {
     console.warn('[Resend Simulation] RESEND_API_KEY not configured. Contact message simulated:', {
-      owner: ownerEmail,
+      owner: targetOwnerRecipients,
       from: data.email,
       name: data.name,
       message: data.message,
@@ -106,28 +125,32 @@ export async function sendContactEmails(data: ContactEmailData) {
   }
 
   try {
-    // 1. Send Alert to Cottage Owner (replying to this email goes straight to the sender)
+    // 1. Send Alert to Cottage Owner(s) (replying goes straight to sender)
     const ownerRes = await client.emails.send({
       from: fromEmail,
-      to: ownerEmail,
+      to: targetOwnerRecipients,
       replyTo: data.email,
       subject: `📬 Website Message: ${data.subject || 'General Inquiry'} from ${data.name}`,
-      html: generateOwnerContactAlertHtml(data),
-      text: generateOwnerContactAlertText(data),
+      html: generateOwnerContactAlertHtml(data, siteSettings),
+      text: generateOwnerContactAlertText(data, siteSettings),
     });
 
     if (ownerRes.error) {
       console.error('Resend error sending owner contact alert:', ownerRes.error);
     }
 
-    // 2. Send Auto-reply to Visitor (replying to this goes to business email)
+    // 2. Send Auto-reply to Visitor (replying goes to business email)
+    const visitorSubject = isCymraeg
+      ? 'Diolch am Gysylltu â Bwthyn Plas Hafod'
+      : 'Thank You for Contacting Plas Hafod Cottage';
+
     const visitorRes = await client.emails.send({
       from: fromEmail,
       to: data.email,
       replyTo: publicReplyEmail,
-      subject: `Thank You for Contacting Plas Hafod Cottage`,
-      html: generateVisitorContactAutoReplyHtml(data),
-      text: generateVisitorContactAutoReplyText(data),
+      subject: visitorSubject,
+      html: generateVisitorContactAutoReplyHtml(data, siteSettings, isCymraeg),
+      text: generateVisitorContactAutoReplyText(data, siteSettings, isCymraeg),
     });
 
     if (visitorRes.error) {
@@ -151,18 +174,24 @@ export async function sendDepositRequestEmail(data: DepositRequestEmailData) {
     return { success: false, simulated: true, error: new Error(errMsg) };
   }
 
+  const siteSettings = await cmsClient.getSiteSettings(false);
+  const customRecipients = siteSettings.notificationRecipients
+    ? siteSettings.notificationRecipients.split(',').map((s) => s.trim()).filter(Boolean)
+    : [];
+  const targetBccRecipients = customRecipients.length > 0 ? customRecipients : ownerEmail;
+
   try {
     const refHeader = data.paymentReference || data.inquiryId || `ph-dep-${Date.now()}`;
 
-    // Send Deposit Request directly to Guest (cc owner so owner has immediate record)
+    // Send Deposit Request directly to Guest (bcc owner so owner has immediate record)
     const guestRes = await client.emails.send({
       from: fromEmail,
       to: data.guestEmail,
-      bcc: ownerEmail,
+      bcc: targetBccRecipients,
       replyTo: publicReplyEmail,
       subject: `Deposit Request – Secure Your Stay at ${data.propertyTitle} (${formatDateUK(data.checkIn)} to ${formatDateUK(data.checkOut)})`,
-      html: generateDepositRequestHtml(data),
-      text: generateDepositRequestText(data),
+      html: generateDepositRequestHtml(data, siteSettings),
+      text: generateDepositRequestText(data, siteSettings),
       headers: {
         'X-Entity-Ref-ID': refHeader,
       },
@@ -179,4 +208,5 @@ export async function sendDepositRequestEmail(data: DepositRequestEmailData) {
     return { success: false, error };
   }
 }
+
 

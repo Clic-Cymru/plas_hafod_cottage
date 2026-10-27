@@ -184,6 +184,17 @@ export interface SiteSettings {
   bankBic?: string;
   depositHoldHours?: number;
   depositInstructions?: string;
+  depositInstructionsCy?: string;
+  // Email Copy & Notification Settings (Studio Editable)
+  depositPercentage?: number;
+  emergencyHostPhone?: string;
+  notificationRecipients?: string;
+  guestBookingEmailWelcomeEn?: string;
+  guestBookingEmailWelcomeCy?: string;
+  guestBookingEmailNextStepsEn?: string;
+  guestBookingEmailNextStepsCy?: string;
+  guestContactEmailReplyEn?: string;
+  guestContactEmailReplyCy?: string;
 }
 
 export interface HeroSlide {
