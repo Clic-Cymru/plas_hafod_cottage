@@ -39,6 +39,9 @@ export const metadata: Metadata = {
   },
 };
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 export default async function HomePage() {
   const [pricingConfig, blockedDates, accreditations, heroSlides, siteSettings] = await Promise.all([
     cmsClient.getPricingConfig(),

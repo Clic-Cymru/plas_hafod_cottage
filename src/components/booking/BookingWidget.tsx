@@ -6,6 +6,7 @@ import { enDictionary } from '@/lib/i18n/dictionaries/en';
 import { cyDictionary } from '@/lib/i18n/dictionaries/cy';
 import { PricingConfig, BlockedDateRange } from '@/cms/types';
 import { calculateStayPrice, isDateBlocked } from '@/lib/pricing-engine';
+import { formatDateUK } from '@/lib/date-utils';
 import { format, addDays } from 'date-fns';
 import {
   Calendar as CalendarIcon,
@@ -28,8 +29,10 @@ interface BookingWidgetProps {
   blockedDates: BlockedDateRange[];
 }
 
-export function BookingWidget({ currentLocale, pricingConfig, blockedDates }: BookingWidgetProps) {
+export function BookingWidget({ currentLocale, pricingConfig, blockedDates: initialBlockedDates }: BookingWidgetProps) {
   const dict = currentLocale === 'cy' ? cyDictionary : enDictionary;
+
+  const [blockedDates, setBlockedDates] = useState<BlockedDateRange[]>(initialBlockedDates || []);
 
   // Default suggested dates initialized safely to prevent prerender hydration mismatches
   const [checkIn, setCheckIn] = useState<string>('2026-11-01');
@@ -42,6 +45,19 @@ export function BookingWidget({ currentLocale, pricingConfig, blockedDates }: Bo
     setTodayStr(formattedToday);
     setCheckIn(format(addDays(today, 14), 'yyyy-MM-dd'));
     setCheckOut(format(addDays(today, 21), 'yyyy-MM-dd'));
+
+    let isMounted = true;
+    fetch('/api/booking?propertyId=plas-hafod')
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (isMounted && data?.blockedDates && Array.isArray(data.blockedDates)) {
+          setBlockedDates(data.blockedDates);
+        }
+      })
+      .catch(() => {});
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   // Form states
@@ -127,7 +143,7 @@ export function BookingWidget({ currentLocale, pricingConfig, blockedDates }: Bo
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
             <div>
               <label className="block text-xs uppercase tracking-wider text-stone-300 font-semibold mb-2">
-                {dict.pricing.checkInLabel}
+                {dict.pricing.checkInLabel} (dd/mm/yyyy)
               </label>
               <input
                 type="date"
@@ -140,7 +156,7 @@ export function BookingWidget({ currentLocale, pricingConfig, blockedDates }: Bo
 
             <div>
               <label className="block text-xs uppercase tracking-wider text-stone-300 font-semibold mb-2">
-                {dict.pricing.checkOutLabel}
+                {dict.pricing.checkOutLabel} (dd/mm/yyyy)
               </label>
               <input
                 type="date"
@@ -248,7 +264,7 @@ export function BookingWidget({ currentLocale, pricingConfig, blockedDates }: Bo
                   key={b.id}
                   className="px-2.5 py-1 bg-stone-950 border border-stone-800 rounded-md text-[11px] text-stone-400 font-mono"
                 >
-                  {b.startDate} → {b.endDate}
+                  {formatDateUK(b.startDate)} → {formatDateUK(b.endDate)}
                 </span>
               ))}
             </div>

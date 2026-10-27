@@ -1,3 +1,5 @@
+import { DepositRequestComponent } from '../studio/DepositRequestComponent';
+
 /**
  * Sanity / Headless CMS Schema: Booking Inquiries (Booking Inbox)
  * Where form submissions from guests are saved directly into the client dashboard.
@@ -7,6 +9,14 @@ export const bookingInquirySchema = {
   title: 'Booking Inquiries (Inbox)',
   type: 'document',
   fields: [
+    {
+      name: 'depositWorkflow',
+      title: 'Deposit Request & BACS Payment Dispatcher',
+      type: 'string',
+      components: {
+        input: DepositRequestComponent,
+      },
+    },
     {
       name: 'propertyId',
       title: 'Property Booked',
@@ -27,9 +37,10 @@ export const bookingInquirySchema = {
       type: 'string',
       options: {
         list: [
-          { title: 'Pending Review', value: 'pending' },
-          { title: 'Confirmed / Deposit Paid', value: 'confirmed' },
-          { title: 'Declined / Cancelled', value: 'declined' },
+          { title: '⏳ Pending Review', value: 'pending' },
+          { title: '✉️ Deposit Requested / Provisional Hold', value: 'deposit_requested' },
+          { title: '✅ Confirmed / Deposit Paid', value: 'confirmed' },
+          { title: '❌ Declined / Cancelled', value: 'declined' },
         ],
         layout: 'radio',
       },
@@ -55,14 +66,20 @@ export const bookingInquirySchema = {
     },
     {
       name: 'checkIn',
-      title: 'Check-in Date',
+      title: 'Check-in Date (dd/mm/yyyy)',
       type: 'date',
+      options: {
+        dateFormat: 'DD/MM/YYYY',
+      },
       validation: (Rule: any) => Rule.required(),
     },
     {
       name: 'checkOut',
-      title: 'Check-out Date',
+      title: 'Check-out Date (dd/mm/yyyy)',
       type: 'date',
+      options: {
+        dateFormat: 'DD/MM/YYYY',
+      },
       validation: (Rule: any) => Rule.required(),
     },
     {
@@ -89,9 +106,30 @@ export const bookingInquirySchema = {
       initialValue: 0,
     },
     {
+      name: 'subtotal',
+      title: 'Subtotal (£)',
+      type: 'number',
+    },
+    {
+      name: 'discountAmount',
+      title: 'Discount Amount (£)',
+      type: 'number',
+    },
+    {
+      name: 'appliedDiscountName',
+      title: 'Applied Offer / Discount',
+      type: 'string',
+    },
+    {
       name: 'calculatedTotal',
       title: 'Calculated Total Amount (£)',
       type: 'number',
+    },
+    {
+      name: 'totalPrice',
+      title: 'Total Price (£)',
+      type: 'number',
+      hidden: true,
     },
     {
       name: 'depositAmount',
@@ -104,6 +142,78 @@ export const bookingInquirySchema = {
       type: 'number',
     },
     {
+      name: 'nightlyBreakdown',
+      title: 'Nightly Rate Breakdown',
+      type: 'array',
+      of: [
+        {
+          type: 'object',
+          name: 'nightRate',
+          fields: [
+            { name: 'date', title: 'Date', type: 'string' },
+            { name: 'rate', title: 'Nightly Rate (£)', type: 'number' },
+            { name: 'seasonName', title: 'Tariff / Season Name', type: 'string' },
+          ],
+          preview: {
+            select: { date: 'date', rate: 'rate', season: 'seasonName' },
+            prepare({ date, rate, season }: any) {
+              const formatUk = (d: string) => {
+                if (!d) return '';
+                const m = String(d).match(/^(\d{4})-(\d{2})-(\d{2})/);
+                return m ? `${m[3]}/${m[2]}/${m[1]}` : d;
+              };
+              return {
+                title: `${formatUk(date)}: £${rate || 0}`,
+                subtitle: season || 'Standard Rate',
+              };
+            },
+          },
+        },
+      ],
+    },
+    {
+      name: 'paymentReference',
+      title: 'BACS Payment Reference',
+      type: 'string',
+      description: 'Unique reference quote on bank transfer (e.g. PH-2611-JONES)',
+    },
+    {
+      name: 'depositSentAt',
+      title: 'Deposit Request Sent At',
+      type: 'datetime',
+      options: {
+        dateFormat: 'DD/MM/YYYY',
+        timeFormat: 'HH:mm',
+      },
+      readOnly: true,
+    },
+    {
+      name: 'depositEmailStatus',
+      title: 'Deposit Request Email Status',
+      type: 'string',
+      options: {
+        list: [
+          { title: 'Not Sent', value: 'not_sent' },
+          { title: 'Sent to Guest', value: 'sent' },
+          { title: 'Send Failed', value: 'failed' },
+        ],
+        layout: 'radio',
+      },
+      initialValue: 'not_sent',
+    },
+    {
+      name: 'customDepositNote',
+      title: 'Personal Host Note (Sent in Deposit Email)',
+      type: 'text',
+      rows: 2,
+    },
+    {
+      name: 'id',
+      title: 'Inquiry Reference ID',
+      type: 'string',
+      readOnly: true,
+    },
+    {
       name: 'notes',
       title: 'Guest Notes & Special Requests',
       type: 'text',
@@ -111,8 +221,12 @@ export const bookingInquirySchema = {
     },
     {
       name: 'createdAt',
-      title: 'Received At',
+      title: 'Received At (dd/mm/yyyy)',
       type: 'datetime',
+      options: {
+        dateFormat: 'DD/MM/YYYY',
+        timeFormat: 'HH:mm',
+      },
       readOnly: true,
     },
   ],
@@ -131,12 +245,27 @@ export const bookingInquirySchema = {
       total: 'calculatedTotal',
       status: 'status',
       propertyId: 'propertyId',
+      paymentReference: 'paymentReference',
     },
-    prepare({ guestName, checkIn, checkOut, total, status, propertyId }: any) {
+    prepare({ guestName, checkIn, checkOut, total, status, propertyId, paymentReference }: any) {
+      const formatUk = (d: string) => {
+        if (!d) return '';
+        const m = String(d).match(/^(\d{4})-(\d{2})-(\d{2})/);
+        return m ? `${m[3]}/${m[2]}/${m[1]}` : d;
+      };
       const propBadge = propertyId === 'bryn-bugeiliaid-bach' ? '[BBB]' : '[Plas Hafod]';
+      const statusLabel =
+        status === 'deposit_requested'
+          ? 'DEPOSIT SENT'
+          : status === 'confirmed'
+          ? 'PAID & CONFIRMED'
+          : status === 'declined'
+          ? 'DECLINED'
+          : 'NEW INQUIRY';
+      const refSuffix = paymentReference ? ` • Ref: ${paymentReference}` : '';
       return {
-        title: `${propBadge} ${guestName} (${status?.toUpperCase() || 'NEW'})`,
-        subtitle: `${checkIn} → ${checkOut} • Total: £${total || 0}`,
+        title: `${propBadge} ${guestName} (${statusLabel})`,
+        subtitle: `${formatUk(checkIn)} → ${formatUk(checkOut)} • Total: £${total || 0}${refSuffix}`,
       };
     },
   },

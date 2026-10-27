@@ -23,6 +23,9 @@ export const metadata: Metadata = {
   },
 };
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 export default async function BrynBugeiliaidBachPage() {
   const [pricingConfig, blockedDates, accreditations, siteSettings] = await Promise.all([
     cmsClient.getPricingConfig('bryn-bugeiliaid-bach'),

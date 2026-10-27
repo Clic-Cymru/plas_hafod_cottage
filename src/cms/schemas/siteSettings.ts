@@ -8,6 +8,11 @@ export const siteSettingsSchema = {
   type: 'document',
   fieldsets: [
     {
+      name: 'banking',
+      title: '🏦 Bank Transfer & Deposit Details (Manylion Talu a Blaendal)',
+      options: { collapsible: true, collapsed: false },
+    },
+    {
       name: 'promotions',
       title: '🎁 Special Offers & Announcements (Cynigion Arbennig a Baneri)',
       options: { collapsible: true, collapsed: false },
@@ -220,12 +225,76 @@ export const siteSettingsSchema = {
       fieldset: 'promotions',
       initialValue: '#book',
     },
+    // Banking & Deposit Configuration for BACS payments
+    {
+      name: 'bankAccountName',
+      title: 'Bank Account Name / Enw’r Cyfrif',
+      type: 'string',
+      fieldset: 'banking',
+      initialValue: 'Plas Hafod Cottage',
+      description: 'Account holder name appearing on guest bank transfers',
+    },
+    {
+      name: 'bankName',
+      title: 'Bank / Institution Name',
+      type: 'string',
+      fieldset: 'banking',
+      initialValue: 'Barclays Bank UK',
+      description: 'e.g. Barclays, HSBC, NatWest',
+    },
+    {
+      name: 'bankSortCode',
+      title: 'Sort Code (Cod Didoli)',
+      type: 'string',
+      fieldset: 'banking',
+      initialValue: '20-00-00',
+      description: '6-digit UK sort code (e.g. 20-00-00)',
+    },
+    {
+      name: 'bankAccountNumber',
+      title: 'Account Number (Rhif Cyfrif)',
+      type: 'string',
+      fieldset: 'banking',
+      initialValue: '12345678',
+      description: '8-digit UK bank account number',
+    },
+    {
+      name: 'bankIban',
+      title: 'IBAN (Optional, for International Guests)',
+      type: 'string',
+      fieldset: 'banking',
+      description: 'e.g. GB29 BUKB 2000 0012 3456 78',
+    },
+    {
+      name: 'bankBic',
+      title: 'BIC / SWIFT Code (Optional)',
+      type: 'string',
+      fieldset: 'banking',
+      description: 'e.g. BUKBGB22',
+    },
+    {
+      name: 'depositHoldHours',
+      title: 'Provisional Hold Window (Hours)',
+      type: 'number',
+      fieldset: 'banking',
+      initialValue: 48,
+      description: 'Hours to hold provisional booking before receiving deposit (default: 48 hours)',
+    },
+    {
+      name: 'depositInstructions',
+      title: 'Deposit Payment Instructions / Notes',
+      type: 'text',
+      rows: 3,
+      fieldset: 'banking',
+      initialValue: 'Please quote your unique payment reference when making the transfer so we can instantly identify your payment and confirm your reservation.',
+      description: 'Included in deposit request emails sent to guests',
+    },
   ],
   preview: {
     prepare() {
       return {
         title: 'Global Site Settings & Branding',
-        subtitle: 'Phone, Email, Address, Banner & Socials',
+        subtitle: 'Phone, Email, Address, Banking, Banner & Socials',
       };
     },
   },

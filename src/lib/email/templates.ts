@@ -1,3 +1,5 @@
+import { formatDateUK } from '@/lib/date-utils';
+
 export interface BookingEmailData {
   propertyTitle: string;
   guestName: string;
@@ -25,6 +27,22 @@ export interface ContactEmailData {
   subject?: string;
   message: string;
   submittedAt?: string;
+}
+
+export interface DepositRequestEmailData extends BookingEmailData {
+  paymentReference: string;
+  bankAccountName: string;
+  bankName: string;
+  bankSortCode: string;
+  bankAccountNumber: string;
+  bankIban?: string;
+  bankBic?: string;
+  holdHours?: number;
+  depositDeadline?: string;
+  depositInstructions?: string;
+  customHostNote?: string;
+  hostNames?: string;
+  contactPhone?: string;
 }
 
 // Hosted on global CDN for instant, reliable loading across all email clients (Gmail, Outlook, Apple Mail)
@@ -73,7 +91,7 @@ export function generateOwnerBookingAlertHtml(data: BookingEmailData): string {
         <tr><th>Guest Name</th><td><strong>${data.guestName}</strong></td></tr>
         <tr><th>Email</th><td><a href="mailto:${data.guestEmail}" style="color: #4338ca; text-decoration: none;">${data.guestEmail}</a></td></tr>
         <tr><th>Phone</th><td><a href="tel:${data.guestPhone}" style="color: #4338ca; text-decoration: none;">${data.guestPhone}</a></td></tr>
-        <tr><th>Dates</th><td><strong>${data.checkIn}</strong> to <strong>${data.checkOut}</strong> (${data.totalNights} nights)</td></tr>
+        <tr><th>Dates</th><td><strong>${formatDateUK(data.checkIn)}</strong> to <strong>${formatDateUK(data.checkOut)}</strong> (${data.totalNights} nights)</td></tr>
         <tr><th>Party</th><td>${data.adults} Adults, ${data.children} Children, ${data.pets} Pets</td></tr>
         ${data.appliedDiscountName ? `<tr><th>Discount Applied</th><td><span style="color: #15803d; font-weight: 600;">${data.appliedDiscountName} (-£${data.discountAmount})</span></td></tr>` : ''}
         <tr class="total-row"><th>Total Quote</th><td>£${data.totalPrice}</td></tr>
@@ -137,10 +155,7 @@ export function generateGuestConfirmationHtml(data: BookingEmailData): string {
   <div class="card">
     <div class="header">
       <div style="margin-bottom: 12px;">
-        <!-- Light Mode Colour Logo -->
         <img class="logo-color" src="${LOGO_COLOR_URL}" alt="Plas Hafod Cottage" width="165" style="display: inline-block; max-width: 165px; height: auto;" border="0" />
-        <!-- Dark Mode White Logo (hidden by default) -->
-        <img class="logo-white" src="${LOGO_WHITE_URL}" alt="Plas Hafod Cottage" width="165" style="display: none; max-width: 165px; height: auto;" border="0" />
       </div>
       <h1 style="margin: 0; font-size: 24px; font-weight: 700; color: #1e1b2e; letter-spacing: 0.3px;">Croeso / Welcome</h1>
       <p style="margin: 4px 0 0; font-size: 15px; color: #64748b; font-weight: 500;">${data.propertyTitle}</p>
@@ -160,8 +175,8 @@ export function generateGuestConfirmationHtml(data: BookingEmailData): string {
       <h3 style="font-size: 16px; margin: 26px 0 10px; color: #0f172a;">Your Booking Summary</h3>
       <table class="table">
         <tr><th>Property</th><td><strong>${data.propertyTitle}</strong></td></tr>
-        <tr><th>Check-in</th><td>${data.checkIn}</td></tr>
-        <tr><th>Check-out</th><td>${data.checkOut}</td></tr>
+        <tr><th>Check-in</th><td>${formatDateUK(data.checkIn)}</td></tr>
+        <tr><th>Check-out</th><td>${formatDateUK(data.checkOut)}</td></tr>
         <tr><th>Duration</th><td>${data.totalNights} Nights</td></tr>
         <tr><th>Guests</th><td>${data.adults} Adults, ${data.children} Children, ${data.pets} Pets</td></tr>
         ${data.appliedDiscountName ? `<tr><th>Special Offer</th><td><span style="color: #15803d; font-weight: 600;">${data.appliedDiscountName} (-£${data.discountAmount})</span></td></tr>` : ''}
@@ -276,7 +291,6 @@ export function generateVisitorContactAutoReplyHtml(data: ContactEmailData): str
     <div class="header">
       <div style="margin-bottom: 12px;">
         <img class="logo-color" src="${LOGO_COLOR_URL}" alt="Plas Hafod Cottage" width="160" style="display: inline-block; max-width: 160px; height: auto;" border="0" />
-        <img class="logo-white" src="${LOGO_WHITE_URL}" alt="Plas Hafod Cottage" width="160" style="display: none; max-width: 160px; height: auto;" border="0" />
       </div>
       <h2 style="margin: 0; font-size: 20px; font-weight: 700; color: #1e1b2e;">Thank You for Contacting Us</h2>
       <p style="margin: 4px 0 0; font-size: 14px; color: #64748b;">Bwthyn Plas Hafod Cottage &amp; Bryn Bugeiliaid Bach</p>
@@ -308,3 +322,323 @@ export function generateVisitorContactAutoReplyHtml(data: ContactEmailData): str
 </html>
 `;
 }
+
+/**
+ * Plain Text Alternative: Guest Booking Confirmation
+ */
+export function generateGuestConfirmationText(data: BookingEmailData): string {
+  return `Croeso / Welcome to ${data.propertyTitle}
+
+Dear ${data.guestName},
+
+Thank you for your inquiry to stay with us at ${data.propertyTitle}. We have received your booking request and our team is reviewing availability for your selected dates.
+
+WHAT HAPPENS NEXT:
+We will review your requested dates and contact you shortly with confirmation and secure deposit payment details to lock in your stay.
+
+YOUR BOOKING SUMMARY:
+- Property: ${data.propertyTitle}
+- Check-in: ${formatDateUK(data.checkIn)}
+- Check-out: ${formatDateUK(data.checkOut)}
+- Duration: ${data.totalNights} Nights
+- Guests: ${data.adults} Adults, ${data.children} Children, ${data.pets} Pets
+${data.appliedDiscountName ? `- Special Offer: ${data.appliedDiscountName} (-£${data.discountAmount || 0})\n` : ''}- Total Stay Price: £${data.totalPrice}
+- Deposit to Secure (25%): £${data.depositAmount}
+- Remaining Balance: £${data.balanceDue}
+${data.notes ? `- Notes: "${data.notes}"\n` : ''}
+If you have any questions in the meantime or wish to modify your dates, simply reply directly to this email or call us.
+
+Warmest regards,
+Plas Hafod Cottage Team
+Nebo, Caernarfon, Gwynedd, LL54 6EE • Eryri / Snowdonia National Park
+Website: https://plashafodcottage.co.uk
+Email: info@plashafodcottage.co.uk`;
+}
+
+/**
+ * Plain Text Alternative: Owner Booking Alert
+ */
+export function generateOwnerBookingAlertText(data: BookingEmailData): string {
+  return `NEW BOOKING INQUIRY: ${data.propertyTitle}
+
+Guest Details:
+- Name: ${data.guestName}
+- Email: ${data.guestEmail}
+- Phone: ${data.guestPhone}
+
+Stay Details:
+- Property: ${data.propertyTitle}
+- Check-in: ${formatDateUK(data.checkIn)}
+- Check-out: ${formatDateUK(data.checkOut)}
+- Duration: ${data.totalNights} Nights
+- Guests: ${data.adults} Adults, ${data.children} Children, ${data.pets} Pets
+${data.appliedDiscountName ? `- Special Offer: ${data.appliedDiscountName} (-£${data.discountAmount || 0})\n` : ''}- Total Price: £${data.totalPrice}
+- Deposit to Collect: £${data.depositAmount}
+- Remaining Balance: £${data.balanceDue}
+${data.notes ? `- Guest Notes: "${data.notes}"\n` : ''}
+Reference ID: ${data.inquiryId || 'N/A'}
+Dashboard: https://plashafodcottage.co.uk/studio`;
+}
+
+/**
+ * Plain Text Alternative: Owner Contact Alert
+ */
+export function generateOwnerContactAlertText(data: ContactEmailData): string {
+  return `NEW WEBSITE CONTACT MESSAGE
+
+From: ${data.name} (${data.email})
+${data.phone ? `Phone: ${data.phone}\n` : ''}${data.subject ? `Subject: ${data.subject}\n` : ''}
+Message:
+${data.message}
+
+Reply directly to this email to respond to ${data.name}.`;
+}
+
+/**
+ * Plain Text Alternative: Visitor Contact Auto-Reply
+ */
+export function generateVisitorContactAutoReplyText(data: ContactEmailData): string {
+  return `Dear ${data.name},
+
+Thank you for getting in touch with Plas Hafod Cottage. We have received your message regarding "${data.subject || 'your inquiry'}" and will respond to you within 24 hours.
+
+Your Message:
+"${data.message}"
+
+Warm regards,
+Plas Hafod Cottage Team
+Nebo, Caernarfon • Eryri / Snowdonia National Park
+Website: https://plashafodcottage.co.uk
+Email: info@plashafodcottage.co.uk`;
+}
+
+/**
+ * 5. Guest Deposit Request: Premium BACS Payment Invitation
+ */
+export function generateDepositRequestHtml(data: DepositRequestEmailData): string {
+  const holdHours = data.holdHours || 48;
+  const hosts = data.hostNames || 'Siwsan & Neil';
+  const phone = data.contactPhone || '+44 (0) 1286 880 000';
+
+  return `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="light dark">
+  <meta name="supported-color-schemes" content="light dark">
+  <title>Deposit Request – ${data.propertyTitle}</title>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #f7f6f4; color: #2d3748; margin: 0; padding: 24px 12px; }
+    .card { max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 16px; overflow: hidden; border: 1px solid #e2e8f0; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.06); }
+    .header { background: #323149; padding: 32px 24px 24px; text-align: center; }
+    .status-badge { display: inline-block; background: #efda07; color: #1e1b2e; font-weight: 800; font-size: 11px; padding: 6px 14px; border-radius: 9999px; text-transform: uppercase; letter-spacing: 1.2px; margin-bottom: 14px; }
+    .content { padding: 30px 24px; }
+    .hero-callout { background: #fefce8; border: 2px solid #facc15; border-radius: 12px; padding: 20px; margin: 20px 0; text-align: center; }
+    .bank-box { background: #f8fafc; border: 2px solid #cbd5e1; border-radius: 12px; padding: 20px; margin: 24px 0; }
+    .bank-table { width: 100%; border-collapse: collapse; margin-top: 12px; }
+    .bank-table td { padding: 8px 6px; font-size: 14px; border-bottom: 1px solid #e2e8f0; }
+    .bank-table td.label { width: 40%; color: #64748b; font-weight: 600; }
+    .bank-table td.value { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-weight: 700; color: #0f172a; font-size: 15px; }
+    .ref-badge { display: inline-block; background: #323149; color: #efda07; padding: 5px 12px; border-radius: 6px; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-size: 16px; font-weight: 800; letter-spacing: 1px; }
+    .table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+    .table th, .table td { padding: 11px 14px; text-align: left; border-bottom: 1px solid #edf2f7; font-size: 14px; }
+    .table th { background: #fbfbfd; color: #64748b; font-weight: 600; width: 42%; }
+    .footer { padding: 24px 20px; text-align: center; font-size: 12px; color: #94a3b8; background: #fafaf9; border-top: 1px solid #f1f5f9; line-height: 1.6; }
+
+    @media (prefers-color-scheme: dark) {
+      body { background-color: #121019 !important; color: #e2e8f0 !important; }
+      .card { background-color: #1c1829 !important; border-color: #2e2842 !important; color: #f1f5f9 !important; }
+      .header { background-color: #241f35 !important; }
+      .content { color: #e2e8f0 !important; }
+      .hero-callout { background-color: #262038 !important; border-color: #efda07 !important; color: #f1f5f9 !important; }
+      .bank-box { background-color: #201a30 !important; border-color: #3b3252 !important; color: #f1f5f9 !important; }
+      .bank-table td { border-color: #2e2842 !important; }
+      .bank-table td.label { color: #94a3b8 !important; }
+      .bank-table td.value { color: #f1f5f9 !important; }
+      .table th { background-color: #262038 !important; color: #cbd5e1 !important; border-color: #383152 !important; }
+      .table td { border-color: #2e2842 !important; color: #e2e8f0 !important; }
+      .footer { background-color: #151221 !important; border-color: #2e2842 !important; color: #64748b !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="header">
+      <div style="margin-bottom: 14px;">
+        <img src="${LOGO_WHITE_URL}" alt="Plas Hafod Cottage" width="165" style="display: inline-block; max-width: 165px; height: auto;" border="0" />
+      </div>
+      <span class="status-badge">Provisional Booking Accepted</span>
+      <h1 style="margin: 0; font-size: 22px; font-weight: 700; color: #ffffff;">Deposit Request – Secure Your Stay</h1>
+      <p style="margin: 6px 0 0; font-size: 14px; color: #cbbaff;">${data.propertyTitle}</p>
+    </div>
+
+    <div class="content">
+      <p style="font-size: 16px; margin-top: 0; color: #1e293b;">Dear <strong>${data.guestName}</strong>,</p>
+
+      <p style="font-size: 14px; line-height: 1.6; color: #475569;">
+        Great news! We have reviewed your reservation inquiry for <strong>${data.propertyTitle}</strong> and are delighted to provisionally hold your dates:
+        <strong>${formatDateUK(data.checkIn)} to ${formatDateUK(data.checkOut)}</strong> (${data.totalNights} nights).
+      </p>
+
+      ${data.customHostNote ? `
+      <div style="background: #f0fdf4; border-left: 4px solid #22c55e; border-radius: 6px; padding: 14px 16px; margin: 18px 0; font-size: 14px; color: #166534; line-height: 1.55;">
+        <strong>Note from your hosts (${hosts}):</strong><br>
+        "${data.customHostNote}"
+      </div>
+      ` : ''}
+
+      <!-- Deposit Callout -->
+      <div class="hero-callout">
+        <div style="font-size: 13px; text-transform: uppercase; letter-spacing: 1px; color: #854d0e; font-weight: 700;">Deposit Required to Lock in Reservation</div>
+        <div style="font-size: 32px; font-weight: 800; color: #1e1b2e; margin: 6px 0;">£${data.depositAmount}</div>
+        <div style="font-size: 13px; color: #713f12; line-height: 1.5;">
+          Please transfer within <strong>${holdHours} hours</strong>${data.depositDeadline ? ` (by <strong>${data.depositDeadline}</strong>)` : ''} to secure these dates.
+        </div>
+      </div>
+
+      <!-- Bank Details Box -->
+      <div class="bank-box">
+        <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px;">
+          <strong style="font-size: 15px; color: #0f172a;">🏦 Bank Transfer (BACS) Details</strong>
+          <span style="font-size: 11px; background: #e2e8f0; padding: 3px 8px; border-radius: 12px; font-weight: 600; color: #475569;">UK Bank Transfer</span>
+        </div>
+
+        <table class="bank-table">
+          <tr>
+            <td class="label">Bank Name</td>
+            <td class="value">${data.bankName}</td>
+          </tr>
+          <tr>
+            <td class="label">Account Name</td>
+            <td class="value">${data.bankAccountName}</td>
+          </tr>
+          <tr>
+            <td class="label">Sort Code</td>
+            <td class="value">${data.bankSortCode}</td>
+          </tr>
+          <tr>
+            <td class="label">Account Number</td>
+            <td class="value">${data.bankAccountNumber}</td>
+          </tr>
+          ${data.bankIban ? `
+          <tr>
+            <td class="label">IBAN (International)</td>
+            <td class="value">${data.bankIban}</td>
+          </tr>
+          ` : ''}
+          ${data.bankBic ? `
+          <tr>
+            <td class="label">BIC / SWIFT</td>
+            <td class="value">${data.bankBic}</td>
+          </tr>
+          ` : ''}
+          <tr>
+            <td class="label" style="vertical-align: middle;">Payment Reference</td>
+            <td class="value" style="padding-top: 10px; padding-bottom: 10px;">
+              <span class="ref-badge">${data.paymentReference}</span>
+            </td>
+          </tr>
+        </table>
+
+        <div style="margin-top: 14px; font-size: 12px; color: #64748b; line-height: 1.5;">
+          ⚠️ <strong>Crucial:</strong> Please quote reference <strong style="color: #0f172a;">${data.paymentReference}</strong> with your bank transfer so we can instantly identify your payment.
+        </div>
+      </div>
+
+      <!-- Booking Summary Table -->
+      <h3 style="font-size: 16px; margin: 26px 0 10px; color: #0f172a;">Stay &amp; Pricing Breakdown</h3>
+      <table class="table">
+        <tr><th>Property</th><td><strong>${data.propertyTitle}</strong></td></tr>
+        <tr><th>Check-in</th><td>${formatDateUK(data.checkIn)} (from 4:00 PM)</td></tr>
+        <tr><th>Check-out</th><td>${formatDateUK(data.checkOut)} (by 10:00 AM)</td></tr>
+        <tr><th>Duration</th><td>${data.totalNights} Nights</td></tr>
+        <tr><th>Guests</th><td>${data.adults} Adults, ${data.children} Children, ${data.pets} Pets</td></tr>
+        ${data.appliedDiscountName ? `<tr><th>Applied Discount</th><td><span style="color: #15803d; font-weight: 600;">${data.appliedDiscountName} (-£${data.discountAmount})</span></td></tr>` : ''}
+        <tr><th>Total Stay Price</th><td><strong>£${data.totalPrice}</strong></td></tr>
+        <tr style="background: #fefce8;"><th>Deposit Required Now (25%)</th><td><strong style="color: #854d0e; font-size: 15px;">£${data.depositAmount}</strong></td></tr>
+        <tr><th>Remaining Balance</th><td>£${data.balanceDue} (due prior to arrival)</td></tr>
+      </table>
+
+      <!-- What happens next -->
+      <div style="background: #f8fafc; border-radius: 8px; padding: 16px 18px; margin: 22px 0; font-size: 13px; line-height: 1.6; color: #475569;">
+        <strong style="color: #0f172a; font-size: 14px; display: block; margin-bottom: 6px;">What happens after you pay?</strong>
+        1. Once your transfer of <strong>£${data.depositAmount}</strong> clears, we will immediately send your official <strong>Booking Confirmation</strong>.<br>
+        2. Four weeks prior to your arrival, we will send your full <strong>Welcome Pack, key safe code, and driving directions</strong>.<br>
+        3. The remaining balance of <strong>£${data.balanceDue}</strong> will be due prior to arrival.
+      </div>
+
+      <p style="font-size: 13px; color: #64748b; line-height: 1.6;">
+        If you have any questions or wish to discuss anything, please reply directly to this email or call us on <strong>${phone}</strong>.
+      </p>
+
+      <div style="margin-top: 28px; padding-top: 20px; border-top: 1px solid #edf2f7;">
+        <p style="font-size: 14px; margin: 0 0 4px; color: #1e293b;">
+          Warmest regards,<br>
+          <strong>${hosts}</strong><br>
+          <span style="color: #64748b; font-size: 13px;">Plas Hafod Cottage &amp; Bryn Bugeiliaid Bach</span>
+        </p>
+        <span style="font-size: 12px; color: #64748b;">Nebo, Caernarfon, Gwynedd, LL54 6EE • Eryri / Snowdonia National Park</span>
+      </div>
+    </div>
+
+    <div class="footer">
+      Plas Hafod Cottage &amp; Bryn Bugeiliaid Bach<br>
+      Website: <a href="https://plashafodcottage.co.uk" style="color: #4f46e5; text-decoration: none;">plashafodcottage.co.uk</a> • Email: <a href="mailto:info@plashafodcottage.co.uk" style="color: #4f46e5; text-decoration: none;">info@plashafodcottage.co.uk</a>
+    </div>
+  </div>
+</body>
+</html>
+`;
+}
+
+/**
+ * Plain Text Alternative: Guest Deposit Request
+ */
+export function generateDepositRequestText(data: DepositRequestEmailData): string {
+  const holdHours = data.holdHours || 48;
+  const hosts = data.hostNames || 'Siwsan & Neil';
+
+  return `PROVISIONAL RESERVATION ACCEPTED: ${data.propertyTitle}
+
+Dear ${data.guestName},
+
+Great news! We have reviewed your reservation inquiry for ${data.propertyTitle} and are delighted to provisionally hold your dates: ${formatDateUK(data.checkIn)} to ${formatDateUK(data.checkOut)} (${data.totalNights} nights).
+
+${data.customHostNote ? `NOTE FROM YOUR HOSTS:\n"${data.customHostNote}"\n\n` : ''}DEPOSIT REQUIRED TO SECURE RESERVATION:
+Amount: £${data.depositAmount} (25% of total stay £${data.totalPrice})
+Payment Deadline: Within ${holdHours} hours${data.depositDeadline ? ` (${data.depositDeadline})` : ''}
+
+BANK TRANSFER (BACS) DETAILS:
+- Bank Name: ${data.bankName}
+- Account Name: ${data.bankAccountName}
+- Sort Code: ${data.bankSortCode}
+- Account Number: ${data.bankAccountNumber}
+${data.bankIban ? `- IBAN: ${data.bankIban}\n` : ''}${data.bankBic ? `- BIC/SWIFT: ${data.bankBic}\n` : ''}- PAYMENT REFERENCE: ${data.paymentReference}
+
+IMPORTANT: Please quote reference "${data.paymentReference}" on your bank transfer so we can instantly match your payment.
+
+BOOKING SUMMARY:
+- Property: ${data.propertyTitle}
+- Check-in: ${formatDateUK(data.checkIn)} (from 4:00 PM)
+- Check-out: ${formatDateUK(data.checkOut)} (by 10:00 AM)
+- Duration: ${data.totalNights} Nights
+- Party: ${data.adults} Adults, ${data.children} Children, ${data.pets} Pets
+${data.appliedDiscountName ? `- Discount: ${data.appliedDiscountName} (-£${data.discountAmount})\n` : ''}- Total Stay: £${data.totalPrice}
+- Deposit Due Now: £${data.depositAmount}
+- Remaining Balance: £${data.balanceDue}
+
+WHAT HAPPENS NEXT:
+1. Once your deposit transfer clears, we will send your official Booking Confirmation.
+2. Four weeks prior to arrival, you will receive full arrival directions and key collection info.
+3. If you have questions, reply directly to this email or call ${data.contactPhone || '+44 (0) 1286 880 000'}.
+
+Warmest regards,
+${hosts}
+Plas Hafod Cottage & Bryn Bugeiliaid Bach
+Nebo, Caernarfon, Gwynedd, LL54 6EE • Eryri / Snowdonia National Park
+Website: https://plashafodcottage.co.uk
+Email: info@plashafodcottage.co.uk`;
+}
+

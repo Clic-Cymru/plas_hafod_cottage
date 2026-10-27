@@ -100,9 +100,10 @@ export function calculateStayPrice(
 
     // 1. Check for blocked conflict
     if (isDateBlocked(dateFormatted, blockedDates)) {
+      const ukDate = format(currentNight, 'dd/MM/yyyy');
       return {
         isValid: false,
-        errorMessage: `The date ${dateFormatted} is not available. Please choose alternate dates.`,
+        errorMessage: `The date ${ukDate} is not available. Please choose alternate dates.`,
         totalNights,
         nightlyBreakdown: [],
         baseRateAverage: config.baseRate,

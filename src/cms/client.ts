@@ -254,16 +254,35 @@ export const cmsClient = {
   async getBlockedDates(propertyId: 'plas-hafod' | 'bryn-bugeiliaid-bach' = 'plas-hafod'): Promise<BlockedDateRange[]> {
     if (isSanityLive && sanityClient) {
       try {
-        const query = `*[_type == "blockedDates" && (propertyId == $propertyId || propertyId == "both")]`;
+        const query = `{
+          "manual": *[_type == "blockedDates" && (propertyId == $propertyId || propertyId == "both") && defined(startDate) && defined(endDate)],
+          "confirmed": *[_type == "bookingInquiry" && (propertyId == $propertyId || (!defined(propertyId) && $propertyId == "plas-hafod")) && status in ["confirmed", "deposit_paid", "paid", "deposit_requested"] && defined(checkIn) && defined(checkOut)]
+        }`;
         const data = await sanityClient.fetch(query, { propertyId });
-        if (Array.isArray(data) && data.length > 0) {
-          return data.map((item: any) => ({
-            id: item._id,
-            startDate: item.startDate,
-            endDate: item.endDate,
-            reason: item.reason,
-            notes: item.notes || item.title,
-          }));
+
+        const manualRanges: BlockedDateRange[] = Array.isArray(data?.manual)
+          ? data.manual.map((item: any) => ({
+              id: item._id,
+              startDate: item.startDate,
+              endDate: item.endDate,
+              reason: item.reason || 'booked',
+              notes: item.notes || item.title || 'Blocked',
+            }))
+          : [];
+
+        const confirmedRanges: BlockedDateRange[] = Array.isArray(data?.confirmed)
+          ? data.confirmed.map((item: any) => ({
+              id: item._id,
+              startDate: item.checkIn,
+              endDate: item.checkOut,
+              reason: 'booked' as const,
+              notes: `Confirmed: ${item.guestName || 'Guest'}`,
+            }))
+          : [];
+
+        const combined = [...manualRanges, ...confirmedRanges];
+        if (combined.length > 0) {
+          return combined;
         }
       } catch (err) {
         console.warn('Failed to fetch blocked dates from Sanity, using fallback:', err);
@@ -335,8 +354,22 @@ export const cmsClient = {
    * Uses CMS Mutation API to create a new "Booking Inquiry" document.
    */
   async createBookingInquiry(inquiry: Omit<BookingInquiry, 'id' | 'createdAt' | 'status'>): Promise<BookingInquiry> {
+    const calculatedTotal = inquiry.calculatedTotal ?? inquiry.totalPrice;
+    const nightlyBreakdown = Array.isArray(inquiry.nightlyBreakdown)
+      ? inquiry.nightlyBreakdown.map((item: any, idx: number) => ({
+          _key: item._key || `night-${(item.date || '').replace(/[^a-zA-Z0-9]/g, '') || idx}-${idx}`,
+          _type: 'nightRate',
+          date: item.date,
+          rate: item.rate,
+          seasonName: item.seasonName || '',
+        }))
+      : [];
+
     const newRecord: BookingInquiry = {
       ...inquiry,
+      nightlyBreakdown,
+      calculatedTotal,
+      totalPrice: inquiry.totalPrice ?? calculatedTotal,
       id: `inquiry-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`,
       status: 'pending',
       createdAt: new Date().toISOString(),
@@ -349,7 +382,7 @@ export const cmsClient = {
     if (projId && projId !== 'demo-project' && token) {
       const sanityUrl = `https://${projId}.api.sanity.io/v2024-01-01/data/mutate/${dataset}`;
       try {
-        await fetch(sanityUrl, {
+        const res = await fetch(sanityUrl, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -366,6 +399,10 @@ export const cmsClient = {
             ],
           }),
         });
+        if (!res.ok) {
+          const errBody = await res.text();
+          console.error(`Sanity mutation HTTP ${res.status}:`, errBody);
+        }
       } catch (err) {
         console.error('Failed to submit Sanity mutation:', err);
       }
@@ -581,6 +618,14 @@ export const cmsClient = {
             offerButtonTextEn: site.offerButtonTextEn || defaultSiteSettings.offerButtonTextEn,
             offerButtonTextCy: site.offerButtonTextCy || defaultSiteSettings.offerButtonTextCy,
             offerButtonLink: site.offerButtonLink || defaultSiteSettings.offerButtonLink,
+            bankAccountName: site.bankAccountName || defaultSiteSettings.bankAccountName,
+            bankName: site.bankName || defaultSiteSettings.bankName,
+            bankSortCode: site.bankSortCode || defaultSiteSettings.bankSortCode,
+            bankAccountNumber: site.bankAccountNumber || defaultSiteSettings.bankAccountNumber,
+            bankIban: site.bankIban || defaultSiteSettings.bankIban,
+            bankBic: site.bankBic || defaultSiteSettings.bankBic,
+            depositHoldHours: site.depositHoldHours ?? defaultSiteSettings.depositHoldHours,
+            depositInstructions: site.depositInstructions || defaultSiteSettings.depositInstructions,
           };
         }
       } catch (err) {
@@ -829,6 +874,13 @@ export const defaultSiteSettings: SiteSettings = {
   offerButtonLink: '#book',
   bannerLink: '#book',
   offerDisplayMode: 'popup',
+  bankAccountName: 'Plas Hafod Cottage',
+  bankName: 'Barclays Bank UK',
+  bankSortCode: '20-00-00',
+  bankAccountNumber: '12345678',
+  depositHoldHours: 48,
+  depositInstructions:
+    'Please quote your unique payment reference on your bank transfer so we can instantly identify your payment and confirm your reservation.',
 };
 
 export const defaultHeroSlides: HeroSlide[] = [

@@ -31,14 +31,20 @@ export const blockedDatesSchema = {
     },
     {
       name: 'startDate',
-      title: 'First Unavailable Night (Check-in day blocked)',
+      title: 'First Unavailable Night (dd/mm/yyyy)',
       type: 'date',
+      options: {
+        dateFormat: 'DD/MM/YYYY',
+      },
       validation: (Rule: any) => Rule.required(),
     },
     {
       name: 'endDate',
-      title: 'Final Unavailable Night (Departure morning)',
+      title: 'Final Unavailable Night / Checkout (dd/mm/yyyy)',
       type: 'date',
+      options: {
+        dateFormat: 'DD/MM/YYYY',
+      },
       validation: (Rule: any) => Rule.required(),
     },
     {
@@ -71,6 +77,11 @@ export const blockedDatesSchema = {
       propertyId: 'propertyId',
     },
     prepare({ title, start, end, reason, propertyId }: any) {
+      const formatUk = (d: string) => {
+        if (!d) return '';
+        const m = String(d).match(/^(\d{4})-(\d{2})-(\d{2})/);
+        return m ? `${m[3]}/${m[2]}/${m[1]}` : d;
+      };
       const propLabel =
         propertyId === 'bryn-bugeiliaid-bach'
           ? '[BBB]'
@@ -79,7 +90,7 @@ export const blockedDatesSchema = {
           : '[Plas Hafod]';
       return {
         title: `${propLabel} ${title || 'Blocked Period'}`,
-        subtitle: `${start} → ${end} (${reason || 'booked'})`,
+        subtitle: `${formatUk(start)} → ${formatUk(end)} (${reason || 'booked'})`,
       };
     },
   },

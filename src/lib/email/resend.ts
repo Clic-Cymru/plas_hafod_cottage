@@ -1,55 +1,88 @@
 import { Resend } from 'resend';
+import { formatDateUK } from '@/lib/date-utils';
 import {
   BookingEmailData,
   ContactEmailData,
+  DepositRequestEmailData,
   generateOwnerBookingAlertHtml,
   generateGuestConfirmationHtml,
   generateOwnerContactAlertHtml,
   generateVisitorContactAutoReplyHtml,
+  generateOwnerBookingAlertText,
+  generateGuestConfirmationText,
+  generateOwnerContactAlertText,
+  generateVisitorContactAutoReplyText,
+  generateDepositRequestHtml,
+  generateDepositRequestText,
 } from './templates';
 
-const apiKey = process.env.RESEND_API_KEY;
-export const resend = apiKey ? new Resend(apiKey) : null;
+export function getResendClient() {
+  const apiKey = process.env.RESEND_API_KEY;
+  return apiKey ? new Resend(apiKey) : null;
+}
 
-// Before domain verification, Resend free accounts send from 'onboarding@resend.dev'
-// Once custom domain is added in Resend, set RESEND_FROM_EMAIL='Plas Hafod <info@plashafodcottage.co.uk>'
-const FROM_EMAIL =
-  process.env.RESEND_FROM_EMAIL || 'Plas Hafod Cottage <info@plashafodcottage.co.uk>';
-// Destination where owner notifications are delivered (e.g. testing email, or plashafodcottage@gmail.com in prod)
-const OWNER_EMAIL = process.env.NOTIFICATION_EMAIL || 'info@plashafodcottage.co.uk';
-// Public business address customer sees when clicking reply (forwarded via Cloudflare/cPanel to Gmail)
-const PUBLIC_REPLY_EMAIL = process.env.PUBLIC_REPLY_EMAIL || 'info@plashafodcottage.co.uk';
+export function getEmailConfig() {
+  return {
+    fromEmail: process.env.RESEND_FROM_EMAIL || 'Plas Hafod Cottage <info@plashafodcottage.co.uk>',
+    ownerEmail: process.env.NOTIFICATION_EMAIL || 'info@plashafodcottage.co.uk',
+    publicReplyEmail: process.env.PUBLIC_REPLY_EMAIL || 'info@plashafodcottage.co.uk',
+  };
+}
+
+// Retain export for backward compatibility
+export const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 
 export async function sendBookingEmails(data: BookingEmailData) {
-  if (!resend) {
-    console.log('[Resend Simulation] RESEND_API_KEY not configured. Emails simulated:', {
-      owner: OWNER_EMAIL,
+  const client = getResendClient();
+  const { fromEmail, ownerEmail, publicReplyEmail } = getEmailConfig();
+
+  if (!client) {
+    console.warn('[Resend Simulation] RESEND_API_KEY not configured. Emails simulated:', {
+      owner: ownerEmail,
       guest: data.guestEmail,
       property: data.propertyTitle,
-      dates: `${data.checkIn} to ${data.checkOut}`,
+      dates: `${formatDateUK(data.checkIn)} to ${formatDateUK(data.checkOut)}`,
       total: data.totalPrice,
     });
     return { success: true, simulated: true };
   }
 
   try {
+    const refHeader = data.inquiryId || `ph-${Date.now()}`;
+
     // 1. Send Alert to Cottage Owner (replying to this email goes straight to the guest)
-    const ownerRes = await resend.emails.send({
-      from: FROM_EMAIL,
-      to: OWNER_EMAIL,
+    const ownerRes = await client.emails.send({
+      from: fromEmail,
+      to: ownerEmail,
       replyTo: data.guestEmail,
-      subject: `🔔 New Booking Inquiry: ${data.propertyTitle} from ${data.guestName} (${data.checkIn} to ${data.checkOut})`,
+      subject: `🔔 New Booking Inquiry: ${data.propertyTitle} from ${data.guestName} (${formatDateUK(data.checkIn)} to ${formatDateUK(data.checkOut)})`,
       html: generateOwnerBookingAlertHtml(data),
+      text: generateOwnerBookingAlertText(data),
+      headers: {
+        'X-Entity-Ref-ID': refHeader,
+      },
     });
 
-    // 2. Send Confirmation to Guest (replying to this goes to the business email, e.g. info@plashafodcottage.co.uk)
-    const guestRes = await resend.emails.send({
-      from: FROM_EMAIL,
+    if (ownerRes.error) {
+      console.error('Resend error sending owner alert:', ownerRes.error);
+    }
+
+    // 2. Send Confirmation to Guest (replying to this goes to the business email)
+    const guestRes = await client.emails.send({
+      from: fromEmail,
       to: data.guestEmail,
-      replyTo: PUBLIC_REPLY_EMAIL,
+      replyTo: publicReplyEmail,
       subject: `Booking Request Received – ${data.propertyTitle}`,
       html: generateGuestConfirmationHtml(data),
+      text: generateGuestConfirmationText(data),
+      headers: {
+        'X-Entity-Ref-ID': refHeader,
+      },
     });
+
+    if (guestRes.error) {
+      console.error('Resend error sending guest confirmation:', guestRes.error);
+    }
 
     return { success: true, ownerRes, guestRes };
   } catch (error) {
@@ -59,9 +92,12 @@ export async function sendBookingEmails(data: BookingEmailData) {
 }
 
 export async function sendContactEmails(data: ContactEmailData) {
-  if (!resend) {
-    console.log('[Resend Simulation] RESEND_API_KEY not configured. Contact message simulated:', {
-      owner: OWNER_EMAIL,
+  const client = getResendClient();
+  const { fromEmail, ownerEmail, publicReplyEmail } = getEmailConfig();
+
+  if (!client) {
+    console.warn('[Resend Simulation] RESEND_API_KEY not configured. Contact message simulated:', {
+      owner: ownerEmail,
       from: data.email,
       name: data.name,
       message: data.message,
@@ -71,22 +107,32 @@ export async function sendContactEmails(data: ContactEmailData) {
 
   try {
     // 1. Send Alert to Cottage Owner (replying to this email goes straight to the sender)
-    const ownerRes = await resend.emails.send({
-      from: FROM_EMAIL,
-      to: OWNER_EMAIL,
+    const ownerRes = await client.emails.send({
+      from: fromEmail,
+      to: ownerEmail,
       replyTo: data.email,
       subject: `📬 Website Message: ${data.subject || 'General Inquiry'} from ${data.name}`,
       html: generateOwnerContactAlertHtml(data),
+      text: generateOwnerContactAlertText(data),
     });
 
+    if (ownerRes.error) {
+      console.error('Resend error sending owner contact alert:', ownerRes.error);
+    }
+
     // 2. Send Auto-reply to Visitor (replying to this goes to business email)
-    const visitorRes = await resend.emails.send({
-      from: FROM_EMAIL,
+    const visitorRes = await client.emails.send({
+      from: fromEmail,
       to: data.email,
-      replyTo: PUBLIC_REPLY_EMAIL,
+      replyTo: publicReplyEmail,
       subject: `Thank You for Contacting Plas Hafod Cottage`,
       html: generateVisitorContactAutoReplyHtml(data),
+      text: generateVisitorContactAutoReplyText(data),
     });
+
+    if (visitorRes.error) {
+      console.error('Resend error sending visitor auto-reply:', visitorRes.error);
+    }
 
     return { success: true, ownerRes, visitorRes };
   } catch (error) {
@@ -94,3 +140,48 @@ export async function sendContactEmails(data: ContactEmailData) {
     return { success: false, error };
   }
 }
+
+export async function sendDepositRequestEmail(data: DepositRequestEmailData) {
+  const client = getResendClient();
+  const { fromEmail, ownerEmail, publicReplyEmail } = getEmailConfig();
+
+  if (!client) {
+    console.warn('[Resend Simulation] RESEND_API_KEY not configured. Deposit request simulated:', {
+      guest: data.guestEmail,
+      property: data.propertyTitle,
+      depositAmount: data.depositAmount,
+      reference: data.paymentReference,
+      bank: `${data.bankName} - Sort: ${data.bankSortCode} - Acc: ${data.bankAccountNumber}`,
+    });
+    return { success: true, simulated: true };
+  }
+
+  try {
+    const refHeader = data.paymentReference || data.inquiryId || `ph-dep-${Date.now()}`;
+
+    // Send Deposit Request directly to Guest (cc owner so owner has immediate record)
+    const guestRes = await client.emails.send({
+      from: fromEmail,
+      to: data.guestEmail,
+      bcc: ownerEmail,
+      replyTo: publicReplyEmail,
+      subject: `Deposit Request – Secure Your Stay at ${data.propertyTitle} (${formatDateUK(data.checkIn)} to ${formatDateUK(data.checkOut)})`,
+      html: generateDepositRequestHtml(data),
+      text: generateDepositRequestText(data),
+      headers: {
+        'X-Entity-Ref-ID': refHeader,
+      },
+    });
+
+    if (guestRes.error) {
+      console.error('Resend error sending deposit request:', guestRes.error);
+      return { success: false, error: guestRes.error };
+    }
+
+    return { success: true, guestRes };
+  } catch (error) {
+    console.error('Failed to send deposit request email via Resend:', error);
+    return { success: false, error };
+  }
+}
+

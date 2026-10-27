@@ -51,11 +51,21 @@ export interface BookingInquiry {
   discountAmount: number;
   appliedDiscountName?: string;
   totalPrice: number;
+  calculatedTotal?: number;
   depositAmount: number;
   balanceDue: number;
   notes?: string;
-  status: 'pending' | 'confirmed' | 'declined';
+  status: 'pending' | 'deposit_requested' | 'confirmed' | 'declined';
   createdAt: string;
+  paymentReference?: string;
+  depositSentAt?: string;
+  depositEmailStatus?: 'not_sent' | 'sent' | 'failed';
+  customDepositNote?: string;
+  overrideBankDetails?: boolean;
+  customBankAccountName?: string;
+  customBankName?: string;
+  customBankSortCode?: string;
+  customBankAccountNumber?: string;
 }
 
 export interface LocalizedString {
@@ -165,6 +175,15 @@ export interface SiteSettings {
   offerButtonTextEn?: string;
   offerButtonTextCy?: string;
   offerButtonLink?: string;
+  // Bank Account & Deposit Settings (BACS)
+  bankAccountName?: string;
+  bankName?: string;
+  bankSortCode?: string;
+  bankAccountNumber?: string;
+  bankIban?: string;
+  bankBic?: string;
+  depositHoldHours?: number;
+  depositInstructions?: string;
 }
 
 export interface HeroSlide {

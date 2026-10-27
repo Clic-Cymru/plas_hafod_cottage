@@ -3,6 +3,7 @@ import { structureTool } from 'sanity/structure';
 import { schemaTypes } from './src/cms/schemas';
 import { ClicCymruLogo } from './src/cms/studio/ClicCymruLogo';
 import { ClicCymruNavbar } from './src/cms/studio/ClicCymruNavbar';
+import { SendDepositRequestAction } from './src/cms/studio/SendDepositRequestAction';
 
 const projectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID || 'iji5mij0';
 const dataset = process.env.NEXT_PUBLIC_SANITY_DATASET || 'production';
@@ -199,5 +200,13 @@ export default defineConfig({
   ],
   schema: {
     types: schemaTypes,
+  },
+  document: {
+    actions: (prev, context) => {
+      if (context.schemaType === 'bookingInquiry') {
+        return [...prev, SendDepositRequestAction];
+      }
+      return prev;
+    },
   },
 });

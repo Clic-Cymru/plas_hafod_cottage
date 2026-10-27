@@ -18,6 +18,7 @@ import {
   isWithinInterval,
 } from 'date-fns';
 import { CheckCircle2, AlertCircle, Loader2, Dog, Ban } from 'lucide-react';
+import { formatDateUK } from '@/lib/date-utils';
 
 interface LiveSiteBookingProps {
   propertyId?: 'plas-hafod' | 'bryn-bugeiliaid-bach';
@@ -30,11 +31,28 @@ export function LiveSiteBooking({
   propertyId = 'plas-hafod',
   isCymraeg = false,
   pricingConfig,
-  blockedDates,
+  blockedDates: initialBlockedDates,
 }: LiveSiteBookingProps) {
   const isBBB = propertyId === 'bryn-bugeiliaid-bach';
   const propertyNameEn = isBBB ? 'Bryn Bugeiliaid Bach' : 'Bwthyn Plas Hafod Cottage';
   const propertyNameCy = isBBB ? 'Bryn Bugeiliaid Bach' : 'Fwthyn Plas Hafod';
+
+  const [blockedDates, setBlockedDates] = useState<BlockedDateRange[]>(initialBlockedDates || []);
+
+  React.useEffect(() => {
+    let isMounted = true;
+    fetch(`/api/booking?propertyId=${propertyId}`)
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (isMounted && data?.blockedDates && Array.isArray(data.blockedDates)) {
+          setBlockedDates(data.blockedDates);
+        }
+      })
+      .catch(() => {});
+    return () => {
+      isMounted = false;
+    };
+  }, [propertyId]);
 
   const [currentCalendarDate, setCurrentCalendarDate] = useState(new Date(2026, 9, 1)); // October 2026
   const [checkIn, setCheckIn] = useState('');
@@ -235,7 +253,7 @@ export function LiveSiteBooking({
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4 items-end">
             <div>
               <label className="block text-xs font-bold text-stone-700 uppercase tracking-wider font-sans mb-1">
-                {isCymraeg ? 'Cyrraedd' : 'Check-in'}
+                {isCymraeg ? 'Cyrraedd (dd/mm/yyyy)' : 'Check-in (dd/mm/yyyy)'}
               </label>
               <input
                 type="date"
@@ -247,7 +265,7 @@ export function LiveSiteBooking({
 
             <div>
               <label className="block text-xs font-bold text-stone-700 uppercase tracking-wider font-sans mb-1">
-                {isCymraeg ? 'Gadael' : 'Check-out'}
+                {isCymraeg ? 'Gadael (dd/mm/yyyy)' : 'Check-out (dd/mm/yyyy)'}
               </label>
               <input
                 type="date"
@@ -323,7 +341,7 @@ export function LiveSiteBooking({
                     <div>
                       <p className="font-architects text-xl text-stone-900">
                         {propertyNameEn}: {calculation.totalNights} {isCymraeg ? 'Noson' : 'Nights'} (
-                        {checkIn} &rarr; {checkOut})
+                        {formatDateUK(checkIn)} &rarr; {formatDateUK(checkOut)})
                       </p>
                       <p className="text-xs text-stone-500 font-sans mt-1">
                         Average rate: £{calculation.baseRateAverage} / night

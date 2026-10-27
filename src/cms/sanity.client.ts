@@ -12,9 +12,9 @@ export const sanityClient = isSanityLive
       projectId,
       dataset,
       apiVersion,
-      // Guardrail: Use Sanity edge CDN in production (1,000,000 free requests/mo)
-      // and fresh data in local development.
-      useCdn: process.env.NODE_ENV === 'production',
+      token: process.env.SANITY_API_WRITE_TOKEN,
+      // Always fetch fresh data so confirmed bookings and blocked dates reflect immediately
+      useCdn: false,
     })
   : null;
 

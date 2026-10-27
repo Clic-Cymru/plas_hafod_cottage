@@ -52,8 +52,12 @@ export const contactMessageSchema = {
     },
     {
       name: 'createdAt',
-      title: 'Received At',
+      title: 'Received At (dd/mm/yyyy)',
       type: 'datetime',
+      options: {
+        dateFormat: 'DD/MM/YYYY',
+        timeFormat: 'HH:mm',
+      },
       readOnly: true,
     },
   ],

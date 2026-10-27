@@ -64,11 +64,18 @@ export async function POST(request: Request) {
       children: Number(children),
       pets: Number(pets),
       totalNights: calculation.totalNights,
-      nightlyBreakdown: calculation.nightlyBreakdown,
+      nightlyBreakdown: (calculation.nightlyBreakdown || []).map((item, idx) => ({
+        _key: `night-${item.date || idx}`,
+        _type: 'nightRate',
+        date: item.date,
+        rate: item.rate,
+        seasonName: item.seasonName || '',
+      })),
       subtotal: calculation.subtotal,
       discountAmount: calculation.discountAmount,
       appliedDiscountName: calculation.appliedDiscountName,
       totalPrice: calculation.totalPrice,
+      calculatedTotal: calculation.totalPrice,
       depositAmount: calculation.depositAmount,
       balanceDue: calculation.balanceDue,
       notes,
@@ -114,13 +121,21 @@ export async function POST(request: Request) {
   }
 }
 
-export async function GET() {
+export const dynamic = 'force-dynamic';
+
+export async function GET(req: Request) {
   try {
-    const pricingConfig = await cmsClient.getPricingConfig();
-    const blockedDates = await cmsClient.getBlockedDates();
+    const { searchParams } = new URL(req.url);
+    const propertyId = (searchParams.get('propertyId') || 'plas-hafod') as 'plas-hafod' | 'bryn-bugeiliaid-bach';
+    const pricingConfig = await cmsClient.getPricingConfig(propertyId);
+    const blockedDates = await cmsClient.getBlockedDates(propertyId);
     return NextResponse.json({
       pricingConfig,
       blockedDates,
+    }, {
+      headers: {
+        'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+      },
     });
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });
