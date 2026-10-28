@@ -174,17 +174,17 @@ export function LiveSiteAboutAndGallery({ isCymraeg = false }: AboutAndGalleryPr
               {isCymraeg ? (
                 <>
                   <p>
-                    Wedi&#39;i adeiladu yn y 1800au, mae Plas Hafod wedi&#39;i adnewyddu, ei ymestyn
-                    a&#39;i ddodrefnu&#39;n feddylgar i&#39;n safon uchel arferol. Wedi&#39;i leoli
+                    Wedi’i adeiladu yn y 1800au, mae Plas Hafod wedi’i adnewyddu, ei ymestyn
+                    a’i ddodrefnu’n feddylgar i’n safon uchel arferol. Wedi’i leoli
                     oddi ar y llwybr arferol gyda llawer o nodweddion gwreiddiol. Encil rhamantus a
-                    chlyd delfrydol ar gyfer cyplau sy&#39;n chwilio am y dihangfa berffaith neu ar
-                    gyfer selogion cerdded/dringo neu deuluoedd/ffrindiau sy&#39;n mwynhau ac yn
+                    chlyd delfrydol ar gyfer cyplau sy’n chwilio am y dihangfa berffaith neu ar
+                    gyfer selogion cerdded/dringo neu deuluoedd/ffrindiau sy’n mwynhau ac yn
                     gwerthfawrogi bywyd gwyllt a ffyrdd o fyw gwledig.
                   </p>
                   <p>
-                    Wedi&#39;i leoli ar ymyl Parc Cenedlaethol Eryri, gyda llwybr cerdded Crib Nantlle
-                    ychydig lathenni o&#39;n mynedfa â gatiau, ym mhentref heddychlon Nebo uwchben
-                    Dyffryn Nantlle, mae&#39;r Bwthyn hwn yn mwynhau golygfeydd ysblennydd a
+                    Wedi’i leoli ar ymyl Parc Cenedlaethol Eryri, gyda llwybr cerdded Crib Nantlle
+                    ychydig lathenni o’n mynedfa â gatiau, ym mhentref heddychlon Nebo uwchben
+                    Dyffryn Nantlle, mae’r Bwthyn hwn yn mwynhau golygfeydd ysblennydd a
                     bythgofiadwy o fryniau a mynyddoedd mawreddog Gogledd Cymru, cefn gwlad garw,
                     arfordiroedd euraidd, Ynys Môn ac ar ddiwrnodau clir gellir gweld hyd yn oed
                     Mynyddoedd Wicklow mawreddog Iwerddon ar y gorwel.
@@ -193,7 +193,7 @@ export function LiveSiteAboutAndGallery({ isCymraeg = false }: AboutAndGalleryPr
               ) : (
                 <>
                   <p>
-                    Built in 1800&#39;s Plas Hafod has been carefully and thoughtfully renovated,
+                    Built in 1800’s Plas Hafod has been carefully and thoughtfully renovated,
                     extended and furnished to our usual high standard. Situated off the beaten
                     track with many original features. Ideal romantic and cosy retreat for couples
                     looking for the perfect getaway break or for walking/climbing enthusiasts or
@@ -230,7 +230,7 @@ export function LiveSiteAboutAndGallery({ isCymraeg = false }: AboutAndGalleryPr
             <div className="w-16 h-1 bg-[#EFDA07] mx-auto mt-2" />
             <p className="text-xs sm:text-sm text-stone-500 font-sans mt-2">
               {isCymraeg
-                ? `Archwiliwch ein horiel o ${total} llun - cliciwch ar unrhyw ddelwedd i&#39;w chwyddo`
+                ? `Archwiliwch ein horiel o ${total} llun - cliciwch ar unrhyw ddelwedd i’w chwyddo`
                 : `Explore our complete gallery of ${total} authentic photos — click any image to enlarge`}
             </p>
           </div>
@@ -375,7 +375,7 @@ export function LiveSiteAboutAndGallery({ isCymraeg = false }: AboutAndGalleryPr
 
             <p className="text-base sm:text-lg text-stone-700 font-sans font-light">
               {isCymraeg
-                ? 'Mae Bwthyn Plas Hafod wedi&#39;i asesu gan Croeso Cymru ac mae wedi ennill Graddfa Ansawdd 5* ragorol yn y meysydd canlynol:'
+                ? 'Mae Bwthyn Plas Hafod wedi’i asesu gan Croeso Cymru ac mae wedi ennill Graddfa Ansawdd 5* ragorol yn y meysydd canlynol:'
                 : 'Plas Hafod Cottage has been assessed by Visit Wales and has acquired an excellent 5* Quality Grading in the following areas:'}
             </p>
 

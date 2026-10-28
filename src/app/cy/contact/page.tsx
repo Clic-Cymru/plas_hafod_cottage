@@ -191,24 +191,24 @@ export default async function WelshContactPage() {
               {/* Directions Details */}
               <div className="lg:col-span-5 space-y-4 text-stone-700 text-sm leading-relaxed">
                 <div className="p-5 rounded-2xl bg-stone-50 border border-stone-200">
-                  <h4 className="font-bold text-stone-900 mb-1">O Gaernarfon (A487 i&#39;r De):</h4>
+                  <h4 className="font-bold text-stone-900 mb-1">O Gaernarfon (A487 i’r De):</h4>
                   <p className="text-xs sm:text-sm text-stone-600">
-                    Dilynwch yr A487 i&#39;r de tuag at Borthmadog. Wrth y gylchfan ar gyfer Pen-y-groes,
-                    cymerwch yr allanfa tuag at Lanllyfni/Nebo. Dilynwch y ffordd fynydd i fyny&#39;r allt i
+                    Dilynwch yr A487 i’r de tuag at Borthmadog. Wrth y gylchfan ar gyfer Pen-y-groes,
+                    cymerwch yr allanfa tuag at Lanllyfni/Nebo. Dilynwch y ffordd fynydd i fyny’r allt i
                     bentref Nebo.
                   </p>
                 </div>
 
                 <div className="p-5 rounded-2xl bg-stone-50 border border-stone-200">
-                  <h4 className="font-bold text-stone-900 mb-1">O Borthmadog a&#39;r A55:</h4>
+                  <h4 className="font-bold text-stone-900 mb-1">O Borthmadog a’r A55:</h4>
                   <p className="text-xs sm:text-sm text-stone-600">
-                    Wrth deithio o&#39;r de, ymunwch â&#39;r A487 i&#39;r gogledd trwy Dremadog. Trowch i&#39;r dde ar
-                    y B4418 tuag at Dalysarn a dilynwch yr arwyddion i fyny&#39;r allt i Nebo.
+                    Wrth deithio o’r de, ymunwch â’r A487 i’r gogledd trwy Dremadog. Trowch i’r dde ar
+                    y B4418 tuag at Dalysarn a dilynwch yr arwyddion i fyny’r allt i Nebo.
                   </p>
                 </div>
 
                 <div className="p-4 rounded-xl bg-amber-50/60 border border-amber-200/60 text-amber-900 text-xs">
-                  <strong>Lôn Fynydd Hardd:</strong> Mae&#39;r dull olaf o gyrraedd ar hyd lôn wledig dawel.
+                  <strong>Lôn Fynydd Hardd:</strong> Mae’r dull olaf o gyrraedd ar hyd lôn wledig dawel.
                   Anfonir cyfarwyddiadau cyrraedd manwl a chodau clo allwedd yn eich pecyn archebu terfynol
                   7 diwrnod cyn cyrraedd.
                 </div>

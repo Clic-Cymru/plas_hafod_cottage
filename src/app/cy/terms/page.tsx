@@ -78,9 +78,9 @@ export default async function WelshTermsPage() {
                 1. Cytundeb a Threfniadau Talu
               </h2>
               <p className="mb-3">
-                Daw cytundeb rhwng y Gwesteion a&#39;r Perchennog i rym pan dderbynnir blaendal i sicrhau&#39;r
-                arhosiad a phan roddir cadarnhad archebu sy&#39;n dangos dyddiadau gwyliau wedi&#39;u cadarnhau.
-                Mae&#39;r contract yn rhwymo chi a holl aelodau eich parti.
+                Daw cytundeb rhwng y Gwesteion a’r Perchennog i rym pan dderbynnir blaendal i sicrhau’r
+                arhosiad a phan roddir cadarnhad archebu sy’n dangos dyddiadau gwyliau wedi’u cadarnhau.
+                Mae’r contract yn rhwymo chi a holl aelodau eich parti.
               </p>
               <ul className="list-disc pl-6 space-y-2 text-stone-600">
                 <li>
@@ -88,11 +88,11 @@ export default async function WelshTermsPage() {
                   ar adeg archebu.
                 </li>
                 <li>
-                  Rhaid talu archebion a wneir lai nag wyth wythnos cyn cyrraedd yn llawn, ynghyd â&#39;r
+                  Rhaid talu archebion a wneir lai nag wyth wythnos cyn cyrraedd yn llawn, ynghyd â’r
                   blaendal difrod ad-daladwy o £50.
                 </li>
                 <li>
-                  Rhaid talu&#39;r gweddill ddim hwyrach nag <strong>8 wythnos cyn dechrau</strong> eich gwyliau.
+                  Rhaid talu’r gweddill ddim hwyrach nag <strong>8 wythnos cyn dechrau</strong> eich gwyliau.
                 </li>
               </ul>
             </div>
@@ -108,7 +108,7 @@ export default async function WelshTermsPage() {
                 erys y balans llawn yn ddyledus ac ni ellir ei ad-dalu.
               </p>
               <p className="bg-amber-50 p-4 rounded-xl border border-amber-200 text-amber-900 text-sm">
-                <strong>Pwysig:</strong> Rydym yn eich cynghori&#39;n gryf i gymryd yswiriant teithio cynhwysfawr
+                <strong>Pwysig:</strong> Rydym yn eich cynghori’n gryf i gymryd yswiriant teithio cynhwysfawr
                 i gynnwys canslo, oedi fferi/hediad, neu ddigwyddiadau annisgwyl.
               </p>
             </div>
@@ -131,8 +131,8 @@ export default async function WelshTermsPage() {
                   swnllyd, nac ymwelwyr dros nos heb awdurdod.
                 </li>
                 <li>
-                  <strong>Dim Ysmygu:</strong> Dim ysmygu na fepio o gwbl yn unrhyw le y tu mewn i&#39;r adeilad.
-                  Ni chaniateir canhwyllau y tu mewn i&#39;r tŷ.
+                  <strong>Dim Ysmygu:</strong> Dim ysmygu na fepio o gwbl yn unrhyw le y tu mewn i’r adeilad.
+                  Ni chaniateir canhwyllau y tu mewn i’r tŷ.
                 </li>
               </ul>
             </div>
@@ -143,7 +143,7 @@ export default async function WelshTermsPage() {
                 4. Polisi Anifeiliaid Anwes (Plas Hafod yn Unig)
               </h2>
               <p className="mb-3">
-                Mae croeso cynnes i&#39;r rhan fwyaf o gŵn ym Mhlas Hafod (uchafswm o 2 gi fesul archeb). Ni
+                Mae croeso cynnes i’r rhan fwyaf o gŵn ym Mhlas Hafod (uchafswm o 2 gi fesul archeb). Ni
                 chaniateir cŵn <strong>yn Bryn Bugeiliaid Bach</strong>.
               </p>
               <ul className="list-disc pl-6 space-y-2 text-stone-600">
@@ -153,7 +153,7 @@ export default async function WelshTermsPage() {
                   ychwanegol yn cael eu didynnu o flaendaliadau diogelwch os ceir blew ar ddillad gwely.
                 </li>
                 <li>
-                  Mae gwesteion yn gyfrifol am godi baw ci yn yr ardd a&#39;i roi mewn biniau dynodedig yn y
+                  Mae gwesteion yn gyfrifol am godi baw ci yn yr ardd a’i roi mewn biniau dynodedig yn y
                   sied. Darperir bagiau ci am ddim o dan sinc y gegin.
                 </li>
               </ul>
@@ -166,7 +166,7 @@ export default async function WelshTermsPage() {
               </h2>
               <p className="mb-3">
                 Mae Plas Hafod yn falch o fod yn Hyrwyddwr Busnes Di-Blasdig ac yn encil eco-ymwybodol. Helpwch
-                ni i amddiffyn ein hamgylchedd yn Eryri trwy ddidoli gwastraff i&#39;r cynwysyddion a ddarperir
+                ni i amddiffyn ein hamgylchedd yn Eryri trwy ddidoli gwastraff i’r cynwysyddion a ddarperir
                 yn y sied:
               </p>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs sm:text-sm">

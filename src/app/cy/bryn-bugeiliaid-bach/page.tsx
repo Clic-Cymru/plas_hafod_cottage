@@ -131,30 +131,30 @@ export default async function WelshBrynBugeiliaidBachPage() {
                 className="text-lg sm:text-xl font-architects text-stone-700 tracking-wide"
                 style={{ fontFamily: "'Architects Daughter', cursive, sans-serif" }}
               >
-                Llety anecs hunangynhwysol clyd i&#39;r brif eiddo yn cynnig yr un golygfeydd godidog
+                Llety anecs hunangynhwysol clyd i’r brif eiddo yn cynnig yr un golygfeydd godidog
               </p>
 
               <p>
-                Llety 2 ystafell wely wedi&#39;i adnewyddu&#39;n hyfryd yn edrych dros Ddyffryn Nantlle ac yn
+                Llety 2 ystafell wely wedi’i adnewyddu’n hyfryd yn edrych dros Ddyffryn Nantlle ac yn
                 swatio ychydig o dan Grib Nantlle drawiadol yn Eryri hardd. Mwynhewch olygfeydd heb eu hail
-                o arfordir Gogledd Cymru yn edrych drosodd i Ynys Môn a thu hwnt o&#39;r ystafell wydr braf.
+                o arfordir Gogledd Cymru yn edrych drosodd i Ynys Môn a thu hwnt o’r ystafell wydr braf.
               </p>
               <p>
-                Mae&#39;r eiddo&#39;n cynnwys tân coed clyd yn y brif ardal fyw, gan gynnwys gwres dan y llawr ar
+                Mae’r eiddo’n cynnwys tân coed clyd yn y brif ardal fyw, gan gynnwys gwres dan y llawr ar
                 y llawr gwaelod a gwres canolog ar y llawr 1af lle mae 2 ystafell wely gyda gwelyau dwbl
                 cyfforddus ac ystafell gawod fawr.
               </p>
               <p>
-                Mae&#39;r gegin wedi&#39;i chyfarparu&#39;n dda ac yn cynnwys ardal fwyta ar gyfer 4 person neu beth
-                am fwynhau&#39;r awyr agored ac ymlacio gyda&#39;r nos wrth ymyl y pwll tân yn yr ardd lechi a glaswellt
-                sy&#39;n cynnwys ardal fwyta ac ardal eistedd ar wahân i werthfawrogi&#39;r golygfeydd syfrdanol.
+                Mae’r gegin wedi’i chyfarparu’n dda ac yn cynnwys ardal fwyta ar gyfer 4 person neu beth
+                am fwynhau’r awyr agored ac ymlacio gyda’r nos wrth ymyl y pwll tân yn yr ardd lechi a glaswellt
+                sy’n cynnwys ardal fwyta ac ardal eistedd ar wahân i werthfawrogi’r golygfeydd syfrdanol.
               </p>
 
               {/* Pet notice */}
               <div className="flex items-center gap-3 p-4 bg-amber-50 border border-[#efda07] rounded-2xl text-amber-900 text-sm font-medium">
                 <Ban className="w-5 h-5 text-amber-700 shrink-0" />
                 <span>
-                  <strong>Sylwch:</strong> Yn wahanol i&#39;n prif fwthyn Plas Hafod, ni all Bryn Bugeiliaid Bach
+                  <strong>Sylwch:</strong> Yn wahanol i’n prif fwthyn Plas Hafod, ni all Bryn Bugeiliaid Bach
                   dderbyn anifeiliaid anwes.
                 </span>
               </div>

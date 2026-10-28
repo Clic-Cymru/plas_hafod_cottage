@@ -225,7 +225,7 @@ export const defaultAccreditations: Accreditation[] = [
     description:
       'Consecutive years of unbroken 10/10 guest satisfaction and memorable self-catering escapes in Snowdonia.',
     descriptionCy:
-      'Cydnabyddiaeth flynyddol am ddarparu profiadau gwyliau o&#39;r radd flaenaf i westeion o bob cwr o&#39;r byd.',
+      'Cydnabyddiaeth flynyddol am ddarparu profiadau gwyliau o’r radd flaenaf i westeion o bob cwr o’r byd.',
     imageUrl: '/images/wp/bbb-award-superhost.jpeg',
     property: 'bryn-bugeiliaid-bach',
     year: '2025',

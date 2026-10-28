@@ -210,8 +210,8 @@ export default async function WelshLocalAreaPage() {
               </h2>
               <div className="w-16 h-1 bg-[#efda07] mx-auto mt-3 mb-4" />
               <p className="max-w-2xl mx-auto text-stone-600 text-sm sm:text-base">
-                Gyda&#39;i gopa yn 3,560 tr (1,085m), Yr Wyddfa yw&#39;r copa uchaf yng Nghymru a Lloegr.
-                Mae chwe phrif lwybr cerdded i&#39;r copa, pob un yn cynnig heriau a golygfeydd unigryw.
+                Gyda’i gopa yn 3,560 tr (1,085m), Yr Wyddfa yw’r copa uchaf yng Nghymru a Lloegr.
+                Mae chwe phrif lwybr cerdded i’r copa, pob un yn cynnig heriau a golygfeydd unigryw.
               </p>
             </div>
 
@@ -251,10 +251,10 @@ export default async function WelshLocalAreaPage() {
                   Cyngor Diogelwch ar y Mynydd
                 </h3>
                 <p className="text-stone-700 text-sm leading-relaxed">
-                  Mynnwch ragolwg tywydd lleol dibynadwy cyn cychwyn a chynlluniwch lwybr sy&#39;n addas i&#39;r
+                  Mynnwch ragolwg tywydd lleol dibynadwy cyn cychwyn a chynlluniwch lwybr sy’n addas i’r
                   amodau. Gwiriwch eich offer cyn gadael: ewch â dillad gwrth-ddŵr, dillad cynnes ychwanegol,
                   het, menig, bwyd, digon o ddŵr, map, cwmpas a bag goroesi. Dysgwch sgiliau sylfaenol o fordwyo
-                  mynydd. Os bydd y tywydd yn gwaethygu, trowch yn ôl. Peidiwch â dibynnu&#39;n llwyr ar ffonau
+                  mynydd. Os bydd y tywydd yn gwaethygu, trowch yn ôl. Peidiwch â dibynnu’n llwyr ar ffonau
                   symudol, oherwydd gall signalau mynydd fod yn ysbeidiol.
                 </p>
               </div>

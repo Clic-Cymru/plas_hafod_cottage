@@ -45,7 +45,7 @@ export function BrynBugeiliaidBachAccreditations({ isCymraeg = false, accreditat
           source: 'Booking.com',
           score: '10 / 10 Sgôr Eithriadol',
           description:
-            'Cydnabyddiaeth flynyddol am ddarparu profiadau gwyliau o&#39;r radd flaenaf i westeion o bob cwr o&#39;r byd.',
+            'Cydnabyddiaeth flynyddol am ddarparu profiadau gwyliau o’r radd flaenaf i westeion o bob cwr o’r byd.',
         },
       ]
     : [
@@ -124,7 +124,7 @@ export function BrynBugeiliaidBachAccreditations({ isCymraeg = false, accreditat
           <div className="w-20 sm:w-28 h-1.5 bg-[#efda07] mx-auto mt-3 mb-4" />
           <p className="max-w-2xl mx-auto text-sm sm:text-base text-stone-600 font-sans leading-relaxed">
             {isCymraeg
-              ? 'Rydym yn hynod falch o&#39;r cydnabyddiaethau swyddogol a dderbyniwyd ar gyfer Bryn Bugeiliaid Bach gan Croeso Cymru a llwyfannau teithio blaenllaw.'
+              ? 'Rydym yn hynod falch o’r cydnabyddiaethau swyddogol a dderbyniwyd ar gyfer Bryn Bugeiliaid Bach gan Croeso Cymru a llwyfannau teithio blaenllaw.'
               : 'We take great pride in maintaining the highest standards of luxury, cleanliness, and guest comfort, officially certified by Visit Wales and leading hospitality awards.'}
           </p>
         </div>

@@ -204,7 +204,7 @@ export function LiveSiteSisterPropertyAndAccreditations({
                   : 'Our traditional 5-star detached Welsh stone cottage with inglenook fireplace, panoramic mountain & sea views, and pet-friendly garden.'
               ) : (
                 isCymraeg
-                  ? 'Llety 2 wely wedi&#39;i adfer yn hyfryd yn edrych dros Ddyffryn Nantlle ac yn swatio ychydig o dan Grib Nantlle drawiadol yn Eryri hardd.'
+                  ? 'Llety 2 wely wedi’i adfer yn hyfryd yn edrych dros Ddyffryn Nantlle ac yn swatio ychydig o dan Grib Nantlle drawiadol yn Eryri hardd.'
                   : 'A beautifully restored 2 bed accommodation overlooking Dyffryn Nantlle and nestled just below the impressive Nantlle Ridge in beautiful Snowdonia.'
               )}
             </p>
