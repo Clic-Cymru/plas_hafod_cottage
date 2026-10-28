@@ -97,8 +97,8 @@ async function handleAutomatedEmails(request: Request) {
 
   try {
     const siteSettings = await cmsClient.getSiteSettings(false);
-    const checkInDays = siteSettings.checkInDaysBeforeArrival ?? 14;
-    const balanceDays = siteSettings.balanceReminderDaysBeforeArrival ?? 14;
+    const checkInDays = siteSettings.checkInDaysBeforeArrival ?? 30;
+    const balanceDays = siteSettings.balanceReminderDaysBeforeArrival ?? 60;
 
     // Fetch bookings to evaluate
     let bookings: InquiryRecord[] = [];
@@ -164,8 +164,8 @@ async function handleAutomatedEmails(request: Request) {
 
       if (shouldTriggerCheckIn) {
         const defaultKeySafe = isPlasHafod
-          ? (siteSettings.plasHafodKeySafe || 'PH-4821')
-          : (siteSettings.bbbKeySafe || 'BBB-7193');
+          ? (siteSettings.plasHafodKeySafe || 'Unlocked (Key inside)')
+          : (siteSettings.bbbKeySafe || 'Unlocked (Key inside)');
         const keySafeCode = booking.keySafeCodeOverride || defaultKeySafe;
 
         const emailData = {
@@ -249,10 +249,10 @@ async function handleAutomatedEmails(request: Request) {
           depositPaid: booking.depositAmount || 0,
           balanceDue: booking.balanceDue || Math.max(0, (booking.totalPrice || 0) - (booking.depositAmount || 0)),
           paymentReference: booking.paymentReference || `PH-${(booking.checkIn || '').replace(/[^0-9]/g, '').slice(2, 6)}-${(booking.guestName || 'GUEST').split(/\s+/).pop()?.toUpperCase()}`,
-          bankAccountName: siteSettings.bankAccountName || 'Plas Hafod Cottage',
-          bankName: siteSettings.bankName || 'Barclays Bank UK',
-          bankSortCode: siteSettings.bankSortCode || '20-00-00',
-          bankAccountNumber: siteSettings.bankAccountNumber || '12345678',
+          bankAccountName: siteSettings.bankAccountName || 'SIWSAN BRODA - Plas Hafod',
+          bankName: siteSettings.bankName || 'Lloyds Bank',
+          bankSortCode: siteSettings.bankSortCode || '77-48-24',
+          bankAccountNumber: siteSettings.bankAccountNumber || '15999760',
           bankIban: siteSettings.bankIban,
           bankBic: siteSettings.bankBic,
           emergencyPhone: siteSettings.emergencyHostPhone || siteSettings.phone,

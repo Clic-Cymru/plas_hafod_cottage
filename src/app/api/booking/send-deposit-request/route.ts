@@ -89,30 +89,30 @@ export async function POST(request: Request) {
       bankDetailsOverride?.bankAccountName ||
       inquiry.customBankAccountName ||
       siteSettings.bankAccountName ||
-      'Plas Hafod Cottage';
+      'SIWSAN BRODA - Plas Hafod';
 
     const bankName =
       bankDetailsOverride?.bankName ||
       inquiry.customBankName ||
       siteSettings.bankName ||
-      'Barclays Bank UK';
+      'Lloyds Bank';
 
     const bankSortCode =
       bankDetailsOverride?.bankSortCode ||
       inquiry.customBankSortCode ||
       siteSettings.bankSortCode ||
-      '20-00-00';
+      '77-48-24';
 
     const bankAccountNumber =
       bankDetailsOverride?.bankAccountNumber ||
       inquiry.customBankAccountNumber ||
       siteSettings.bankAccountNumber ||
-      '12345678';
+      '15999760';
 
     const bankIban = bankDetailsOverride?.bankIban || siteSettings.bankIban;
     const bankBic = bankDetailsOverride?.bankBic || siteSettings.bankBic;
     const holdHours = Number(
-      bankDetailsOverride?.depositHoldHours || siteSettings.depositHoldHours || 48
+      bankDetailsOverride?.depositHoldHours || siteSettings.depositHoldHours || 24
     );
 
     // 3. Generate or preserve unique payment reference
@@ -239,13 +239,13 @@ export async function GET(request: Request) {
     if (!inquiryId) {
       return NextResponse.json({
         defaultBankDetails: {
-          bankAccountName: siteSettings.bankAccountName || 'Plas Hafod Cottage',
-          bankName: siteSettings.bankName || 'Barclays Bank UK',
-          bankSortCode: siteSettings.bankSortCode || '20-00-00',
-          bankAccountNumber: siteSettings.bankAccountNumber || '12345678',
+          bankAccountName: siteSettings.bankAccountName || 'SIWSAN BRODA - Plas Hafod',
+          bankName: siteSettings.bankName || 'Lloyds Bank',
+          bankSortCode: siteSettings.bankSortCode || '77-48-24',
+          bankAccountNumber: siteSettings.bankAccountNumber || '15999760',
           bankIban: siteSettings.bankIban || '',
           bankBic: siteSettings.bankBic || '',
-          depositHoldHours: siteSettings.depositHoldHours || 48,
+          depositHoldHours: siteSettings.depositHoldHours || 24,
         },
       });
     }

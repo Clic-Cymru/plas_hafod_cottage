@@ -243,10 +243,10 @@ Deposit Required (25%): £${depositAmount}
 Payment Reference: ${computedRef}
 
 Bank Transfer Details:
-Bank: ${bankDetails?.bankName || 'Barclays Bank UK'}
-Account Name: ${bankDetails?.bankAccountName || 'Plas Hafod Cottage'}
-Sort Code: ${bankDetails?.bankSortCode || '20-00-00'}
-Account Number: ${bankDetails?.bankAccountNumber || '12345678'}
+Bank: ${bankDetails?.bankName || 'Lloyds Bank'}
+Account Name: ${bankDetails?.bankAccountName || 'SIWSAN BRODA - Plas Hafod'}
+Sort Code: ${bankDetails?.bankSortCode || '77-48-24'}
+Account Number: ${bankDetails?.bankAccountNumber || '15999760'}
 
 Please quote reference "${computedRef}" with your transfer.`;
 

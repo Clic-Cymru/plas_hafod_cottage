@@ -14,40 +14,72 @@ interface TemplateOption {
 
 const TEMPLATES: TemplateOption[] = [
   {
-    id: 'guest-confirmation',
-    name: 'Guest Booking Confirmation',
-    badge: 'Guest Receipt',
-    description: 'Instant branded confirmation receipt sent to guests upon booking inquiry submission.',
-    supportsWelsh: true,
-    sampleSubject: '✨ Booking Request Received – Plas Hafod Cottage',
-  },
-  {
     id: 'owner-booking',
-    name: 'Owner Booking Alert',
+    name: '1. Admin Notification (New Inquiry)',
     badge: 'Owner Alert',
     description: 'High-priority alert sent to hosts containing guest details, pricing breakdown, and Studio links.',
     supportsWelsh: false,
     sampleSubject: '🔔 New Booking Inquiry: Plas Hafod Cottage from Jane Doe',
   },
   {
+    id: 'guest-confirmation',
+    name: '2. Pending Reservation (Guest Auto-Reply)',
+    badge: 'Guest Receipt',
+    description: 'Instant branded pending confirmation receipt sent to guests upon booking inquiry submission.',
+    supportsWelsh: true,
+    sampleSubject: '✨ Booking Request Received – Plas Hafod Cottage',
+  },
+  {
     id: 'deposit-request',
-    name: 'Guest Deposit Request (BACS)',
+    name: '3. Deposit Request (24h BACS Hold)',
     badge: 'Payment Callout',
-    description: 'Luxury branded payment invitation with bank transfer details, deadline, and payment reference.',
+    description: 'Branded payment invitation with bank transfer details, 24-hour deadline, and Booking Id reference.',
     supportsWelsh: false,
     sampleSubject: '🏦 Deposit Request – Secure Your Stay at Plas Hafod Cottage',
   },
   {
+    id: 'deposit-receipt',
+    name: '4. Deposit Receipt (Dates Confirmed)',
+    badge: 'Deposit Paid',
+    description: 'Confirmation receipt sent to guests once their BACS deposit payment clears.',
+    supportsWelsh: true,
+    sampleSubject: '✅ Deposit Receipt – Plas Hafod Cottage',
+  },
+  {
+    id: 'balance-reminder',
+    name: '5. Payment Due Reminder (60 Days)',
+    badge: '60 Days Prior',
+    description: 'Automated payment request sent 60 days before arrival for remaining balance.',
+    supportsWelsh: true,
+    sampleSubject: '💳 Payment Request: Outstanding Balance Due – Plas Hafod Cottage',
+  },
+  {
+    id: 'checkin-guide',
+    name: '6. Directions & Arrival Guide (30 Days)',
+    badge: '30 Days Prior',
+    description: 'Automated directions, Google Maps route, and entry details sent 30 days before check-in.',
+    supportsWelsh: true,
+    sampleSubject: '🚗 Your Holiday in Eryri / Snowdonia – Directions & Arrival Guide',
+  },
+  {
+    id: 'full-payment-receipt',
+    name: '7. Full Payment Receipt (Paid in Full)',
+    badge: 'Final Receipt',
+    description: 'Final payment confirmation receipt sent once the remaining balance is paid in full.',
+    supportsWelsh: true,
+    sampleSubject: '🎉 Full Payment Receipt – Plas Hafod Cottage',
+  },
+  {
     id: 'visitor-contact',
-    name: 'Visitor Contact Auto-Reply',
-    badge: 'Auto-Reply',
+    name: '8. Visitor Contact Auto-Reply',
+    badge: 'Contact Reply',
     description: 'Polite branded auto-reply thanking website visitors and confirming 24h response.',
     supportsWelsh: true,
     sampleSubject: 'Thank You for Contacting Plas Hafod Cottage',
   },
   {
     id: 'owner-contact',
-    name: 'Owner Contact Alert',
+    name: '9. Owner Contact Alert',
     badge: 'Message Alert',
     description: 'Alert sent to hosts with visitor questions, phone number, and direct reply capability.',
     supportsWelsh: false,
@@ -55,11 +87,24 @@ const TEMPLATES: TemplateOption[] = [
   },
 ];
 
+const TEMPLATE_KEY_MAP: Record<string, string> = {
+  admin_notification: 'owner-booking',
+  pending_reservation: 'guest-confirmation',
+  deposit_request: 'deposit-request',
+  deposit_receipt: 'deposit-receipt',
+  payment_due_reminder: 'balance-reminder',
+  directions_guide: 'checkin-guide',
+  full_payment_receipt: 'full-payment-receipt',
+};
+
 export function EmailTemplatePreviewAndTest() {
   const notificationRecipients = (useFormValue(['notificationRecipients']) as string) || '';
+  const docTemplateKey = (useFormValue(['templateKey']) as string) || '';
   const defaultEmail = notificationRecipients.split(',')[0]?.trim() || 'info@plashafodcottage.co.uk';
 
-  const [activeTemplate, setActiveTemplate] = useState('guest-confirmation');
+  const [activeTemplate, setActiveTemplate] = useState(
+    (docTemplateKey && TEMPLATE_KEY_MAP[docTemplateKey]) || 'guest-confirmation'
+  );
   const [lang, setLang] = useState<'en' | 'cy'>('en');
   const [property, setProperty] = useState<'plas-hafod' | 'bbb'>('plas-hafod');
   const [viewport, setViewport] = useState<'desktop' | 'mobile'>('desktop');
@@ -68,6 +113,13 @@ export function EmailTemplatePreviewAndTest() {
   const [recipient, setRecipient] = useState(defaultEmail);
   const [isSending, setIsSending] = useState(false);
   const [statusMessage, setStatusMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+
+  // Sync active template when navigating between different E-mail Template documents in Sanity Studio
+  useEffect(() => {
+    if (docTemplateKey && TEMPLATE_KEY_MAP[docTemplateKey]) {
+      setActiveTemplate(TEMPLATE_KEY_MAP[docTemplateKey]);
+    }
+  }, [docTemplateKey]);
 
   // Update default recipient when form value changes
   useEffect(() => {
@@ -179,10 +231,9 @@ export function EmailTemplatePreviewAndTest() {
       {/* Template Selection Tabs */}
       <div
         style={{
-          display: 'flex',
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
           gap: '8px',
-          overflowX: 'auto',
-          paddingBottom: '12px',
           marginBottom: '16px',
         }}
       >

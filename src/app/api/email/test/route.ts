@@ -7,14 +7,24 @@ import {
   generateOwnerContactAlertHtml,
   generateVisitorContactAutoReplyHtml,
   generateDepositRequestHtml,
+  generateDepositReceiptHtml,
+  generateFullPaymentReceiptHtml,
+  generateCheckInGuideHtml,
+  generateBalanceReminderHtml,
   generateOwnerBookingAlertText,
   generateGuestConfirmationText,
   generateOwnerContactAlertText,
   generateVisitorContactAutoReplyText,
   generateDepositRequestText,
+  generateDepositReceiptText,
+  generateFullPaymentReceiptText,
+  generateCheckInGuideText,
+  generateBalanceReminderText,
   BookingEmailData,
   ContactEmailData,
   DepositRequestEmailData,
+  CheckInGuideEmailData,
+  BalanceReminderEmailData,
 } from '@/lib/email/templates';
 
 export const dynamic = 'force-dynamic';
@@ -60,19 +70,74 @@ function getMockDepositData(propertyTitle: string, siteSettings: any): DepositRe
   return {
     ...booking,
     paymentReference: propertyTitle.includes('Bryn') ? 'BBB-2611-MORGAN' : 'PH-2611-MORGAN',
-    bankAccountName: siteSettings.bankAccountName || 'Plas Hafod Cottage',
-    bankName: siteSettings.bankName || 'Barclays Bank UK',
-    bankSortCode: siteSettings.bankSortCode || '20-00-00',
-    bankAccountNumber: siteSettings.bankAccountNumber || '12345678',
-    bankIban: siteSettings.bankIban || 'GB29 BUKB 2000 0012 3456 78',
-    bankBic: siteSettings.bankBic || 'BUKBGB22',
-    holdHours: siteSettings.depositHoldHours || 48,
+    bankAccountName: siteSettings.bankAccountName || 'SIWSAN BRODA - Plas Hafod',
+    bankName: siteSettings.bankName || 'Lloyds Bank',
+    bankSortCode: siteSettings.bankSortCode || '77-48-24',
+    bankAccountNumber: siteSettings.bankAccountNumber || '15999760',
+    bankIban: siteSettings.bankIban || '',
+    bankBic: siteSettings.bankBic || '',
+    holdHours: siteSettings.depositHoldHours || 24,
     depositDeadline: 'Friday, 13 Nov, 12:00 pm',
     depositInstructions: siteSettings.depositInstructions,
     customHostNote:
       'We are delighted to reserve these November dates for you! Please let us know if you need any recommendations for local dining in Penygroes, Caernarfon, or the surrounding area.',
     hostNames: siteSettings.hostNames || 'Siwsan & Neil',
     contactPhone: siteSettings.emergencyHostPhone || siteSettings.phone,
+  };
+}
+
+function getMockBalanceData(propertyTitle: string, siteSettings: any): BalanceReminderEmailData {
+  const booking = getMockBookingData(propertyTitle);
+  return {
+    propertyTitle,
+    propertyId: propertyTitle.includes('Bryn') ? 'bryn-bugeiliaid-bach' : 'plas-hafod',
+    guestName: booking.guestName,
+    guestEmail: booking.guestEmail,
+    guestPhone: booking.guestPhone,
+    checkIn: booking.checkIn,
+    checkOut: booking.checkOut,
+    totalNights: booking.totalNights,
+    totalPrice: booking.totalPrice,
+    depositPaid: booking.depositAmount,
+    balanceDue: booking.balanceDue,
+    paymentReference: propertyTitle.includes('Bryn') ? 'BBB-2611-DOE' : 'PH-2611-DOE',
+    bankAccountName: siteSettings.bankAccountName || 'SIWSAN BRODA - Plas Hafod',
+    bankName: siteSettings.bankName || 'Lloyds Bank',
+    bankSortCode: siteSettings.bankSortCode || '77-48-24',
+    bankAccountNumber: siteSettings.bankAccountNumber || '15999760',
+    bankIban: siteSettings.bankIban,
+    bankBic: siteSettings.bankBic,
+    emergencyPhone: siteSettings.emergencyHostPhone || siteSettings.phone,
+    hostNames: siteSettings.hostNames || 'Siwsan & Neil',
+    inquiryId: booking.inquiryId,
+  };
+}
+
+function getMockCheckInData(propertyTitle: string, siteSettings: any): CheckInGuideEmailData {
+  const booking = getMockBookingData(propertyTitle);
+  const isBBB = propertyTitle.includes('Bryn');
+  return {
+    propertyTitle,
+    propertyId: isBBB ? 'bryn-bugeiliaid-bach' : 'plas-hafod',
+    guestName: booking.guestName,
+    guestEmail: booking.guestEmail,
+    guestPhone: booking.guestPhone,
+    checkIn: booking.checkIn,
+    checkOut: booking.checkOut,
+    totalNights: booking.totalNights,
+    adults: booking.adults,
+    children: booking.children,
+    pets: booking.pets,
+    keySafeCode: (isBBB ? siteSettings.bbbKeySafe : siteSettings.plasHafodKeySafe) || 'Unlocked (Key inside)',
+    wifiSsid: isBBB ? siteSettings.bbbWifiSsid : siteSettings.plasHafodWifiSsid,
+    wifiPassword: isBBB ? siteSettings.bbbWifiPassword : siteSettings.plasHafodWifiPassword,
+    directions: siteSettings.checkInDirectionsEn,
+    wasteInstructions: siteSettings.wasteBinInstructionsEn,
+    checkInTime: siteSettings.checkInTime || '3:00 PM',
+    checkOutTime: siteSettings.checkOutTime || '10:00 AM',
+    emergencyPhone: siteSettings.emergencyHostPhone || siteSettings.phone,
+    hostNames: siteSettings.hostNames || 'Siwsan & Neil',
+    inquiryId: booking.inquiryId,
   };
 }
 
@@ -101,6 +166,18 @@ export async function GET(request: Request) {
         break;
       case 'deposit-request':
         html = generateDepositRequestHtml(getMockDepositData(propertyTitle, siteSettings), siteSettings);
+        break;
+      case 'deposit-receipt':
+        html = generateDepositReceiptHtml(getMockBookingData(propertyTitle), siteSettings, isCymraeg);
+        break;
+      case 'full-payment-receipt':
+        html = generateFullPaymentReceiptHtml(getMockBookingData(propertyTitle), siteSettings, isCymraeg);
+        break;
+      case 'balance-reminder':
+        html = generateBalanceReminderHtml(getMockBalanceData(propertyTitle, siteSettings), siteSettings, isCymraeg);
+        break;
+      case 'checkin-guide':
+        html = generateCheckInGuideHtml(getMockCheckInData(propertyTitle, siteSettings), siteSettings, isCymraeg);
         break;
       case 'guest-confirmation':
       default:
@@ -187,6 +264,42 @@ export async function POST(request: Request) {
         html = generateDepositRequestHtml(data, siteSettings);
         text = generateDepositRequestText(data, siteSettings);
         subject = `🏦 [TEST PREVIEW] Deposit Request – Secure Your Stay at ${propertyTitle}`;
+        break;
+      }
+      case 'deposit-receipt': {
+        const data = getMockBookingData(propertyTitle);
+        html = generateDepositReceiptHtml(data, siteSettings, isCymraeg);
+        text = generateDepositReceiptText(data, siteSettings, isCymraeg);
+        subject = isCymraeg
+          ? `✅ [PRAWF PREVIEW] Blaendal Wedi’i Dderbyn – ${propertyTitle}`
+          : `✅ [TEST PREVIEW] Deposit Receipt – ${propertyTitle}`;
+        break;
+      }
+      case 'full-payment-receipt': {
+        const data = getMockBookingData(propertyTitle);
+        html = generateFullPaymentReceiptHtml(data, siteSettings, isCymraeg);
+        text = generateFullPaymentReceiptText(data, siteSettings, isCymraeg);
+        subject = isCymraeg
+          ? `🎉 [PRAWF PREVIEW] Taliad Terfynol Wedi’i Dderbyn – ${propertyTitle}`
+          : `🎉 [TEST PREVIEW] Full Payment Receipt – ${propertyTitle}`;
+        break;
+      }
+      case 'balance-reminder': {
+        const data = getMockBalanceData(propertyTitle, siteSettings);
+        html = generateBalanceReminderHtml(data, siteSettings, isCymraeg);
+        text = generateBalanceReminderText(data, siteSettings, isCymraeg);
+        subject = isCymraeg
+          ? `💳 [PRAWF PREVIEW] Taliad Gweddill Dyledus – ${propertyTitle}`
+          : `💳 [TEST PREVIEW] Payment Request: Outstanding Balance Due – ${propertyTitle}`;
+        break;
+      }
+      case 'checkin-guide': {
+        const data = getMockCheckInData(propertyTitle, siteSettings);
+        html = generateCheckInGuideHtml(data, siteSettings, isCymraeg);
+        text = generateCheckInGuideText(data, siteSettings, isCymraeg);
+        subject = isCymraeg
+          ? `🚗 [PRAWF PREVIEW] Eich Gwyliau yn Eryri – Cyfarwyddiadau i ${propertyTitle}`
+          : `🚗 [TEST PREVIEW] Your Holiday in Eryri/Snowdonia – Directions to ${propertyTitle}`;
         break;
       }
       case 'guest-confirmation':

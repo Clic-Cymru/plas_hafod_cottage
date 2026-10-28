@@ -52,12 +52,6 @@ export const emailTemplateSchema = {
       initialValue: 'guest',
     },
     {
-      name: 'triggerTiming',
-      title: 'Sending Trigger',
-      type: 'string',
-      description: 'e.g. "Sent immediately upon new booking inquiry", "Sent manually by host", "60 days before check-in"',
-    },
-    {
       name: 'subjectEn',
       title: 'Email Subject (English)',
       type: 'string',
@@ -121,13 +115,22 @@ export const emailTemplateSchema = {
       title: 'title',
       order: 'order',
       audience: 'targetAudience',
-      timing: 'triggerTiming',
+      templateKey: 'templateKey',
     },
-    prepare({ title, order, audience, timing }: any) {
+    prepare({ title, order, audience, templateKey }: any) {
       const audLabel = audience === 'admin' ? '[Owner]' : '[Guest]';
+      const triggerLabels: Record<string, string> = {
+        admin_notification: 'Sent immediately to host upon new booking inquiry',
+        pending_reservation: 'Sent immediately to guest confirming inquiry is under review',
+        deposit_request: 'Sent manually by host to request BACS deposit',
+        deposit_receipt: 'Sent when deposit clears to confirm booking dates',
+        payment_due_reminder: 'Automated reminder for remaining balance before check-in',
+        directions_guide: 'Automated arrival directions & check-in guide (30 days before check-in)',
+        full_payment_receipt: 'Sent once final balance is cleared',
+      };
       return {
         title: `${order ? `#${order} ` : ''}${audLabel} ${title}`,
-        subtitle: timing || 'Booking Email Workflow',
+        subtitle: triggerLabels[templateKey] || 'Booking Email Workflow',
       };
     },
   },
