@@ -70,7 +70,7 @@ function getMockDepositData(propertyTitle: string, siteSettings: any): DepositRe
     depositDeadline: 'Friday, 13 Nov, 12:00 pm',
     depositInstructions: siteSettings.depositInstructions,
     customHostNote:
-      'We are delighted to reserve these November dates for you! Please let us know if you need any recommendations for local dining in Llanrug or Caernarfon.',
+      'We are delighted to reserve these November dates for you! Please let us know if you need any recommendations for local dining in Penygroes, Caernarfon, or the surrounding area.',
     hostNames: siteSettings.hostNames || 'Siwsan & Neil',
     contactPhone: siteSettings.emergencyHostPhone || siteSettings.phone,
   };

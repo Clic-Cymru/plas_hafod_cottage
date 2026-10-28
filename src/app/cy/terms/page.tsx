@@ -5,10 +5,12 @@ import { SubpageHero } from '@/components/navigation/SubpageHero';
 import { cmsClient } from '@/cms/client';
 import { CheckCircle2, AlertTriangle, ShieldCheck, Dog, Sparkles } from 'lucide-react';
 
+import { generateBreadcrumbJsonLd, SITE_URL } from '@/lib/seo/jsonld';
+
 export const metadata: Metadata = {
-  title: 'Telerau ac Amodau Archebu - Bwthyn Plas Hafod',
+  title: 'Telerau ac Amodau Archebu | Bwthyn Plas Hafod a Bryn Bugeiliaid Bach',
   description:
-    'Telerau archebu llawn, polisïau canslo, rheolau anifeiliaid anwes, a chanllawiau ar gyfer Bwthyn Plas Hafod a Bryn Bugeiliaid Bach.',
+    'Telerau archebu swyddogol, polisïau canslo, canllawiau anifeiliaid anwes, a manylion cyrraedd ar gyfer Bwthyn Plas Hafod a Bryn Bugeiliaid Bach yn Nebo.',
   alternates: {
     canonical: 'https://plashafodcottage.co.uk/cy/terms',
     languages: {
@@ -16,13 +18,46 @@ export const metadata: Metadata = {
       'cy-GB': 'https://plashafodcottage.co.uk/cy/terms',
     },
   },
+  openGraph: {
+    title: 'Telerau ac Amodau Archebu | Bwthyn Plas Hafod a Bryn Bugeiliaid Bach',
+    description:
+      'Telerau archebu swyddogol, polisïau canslo, canllawiau anifeiliaid anwes, a manylion cyrraedd ar gyfer Bwthyn Plas Hafod a Bryn Bugeiliaid Bach yn Nebo.',
+    url: 'https://plashafodcottage.co.uk/cy/terms',
+    siteName: 'Bwthyn Plas Hafod a Bryn Bugeiliaid Bach',
+    images: [
+      {
+        url: '/images/wp/hero-slide-1.jpg',
+        width: 1920,
+        height: 1080,
+        alt: 'Telerau archebu Bwthyn Plas Hafod',
+      },
+    ],
+    locale: 'cy_GB',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Telerau ac Amodau Archebu | Bwthyn Plas Hafod',
+    description:
+      'Telerau archebu swyddogol a chanllawiau gwesteion.',
+    images: ['/images/wp/hero-slide-1.jpg'],
+  },
 };
 
 export default async function WelshTermsPage() {
   const siteSettings = await cmsClient.getSiteSettings(false);
 
+  const breadcrumbsJsonLd = generateBreadcrumbJsonLd([
+    { name: 'Hafan', url: `${SITE_URL}/cy` },
+    { name: 'Telerau ac Amodau', url: `${SITE_URL}/cy/terms` },
+  ]);
+
   return (
     <div className="min-h-screen bg-[#fbfbfd] text-[#333333] flex flex-col font-sans selection:bg-[#efda07]/30 selection:text-stone-900">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbsJsonLd) }}
+      />
       <LiveSiteNavbar currentPath="/cy/terms" isCymraeg={true} siteSettings={siteSettings} />
 
       <main className="flex-1">

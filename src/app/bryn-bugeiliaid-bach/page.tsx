@@ -10,16 +10,42 @@ import { cmsClient } from '@/cms/client';
 import { Sparkles, Flame, Bed, Bath, Coffee, Ban } from 'lucide-react';
 
 
+import { generateBreadcrumbJsonLd, COTTAGE_ADDRESS, COTTAGE_GEO, SITE_URL } from '@/lib/seo/jsonld';
+
 export const metadata: Metadata = {
-  title: 'Bryn Bugeiliaid Bach - Luxury Annexe in Snowdonia',
+  title: 'Bryn Bugeiliaid Bach | Luxury 2-Bed Cottage Annexe in Nebo, Dyffryn Nantlle',
   description:
-    'A beautifully restored 2-bed self-contained annexe overlooking Dyffryn Nantlle with cozy log burner, conservatory, underfloor heating, and 5-star comfort.',
+    'Peaceful 5-star Visit Wales annexe in Nebo near Penygroes overlooking Dyffryn Nantlle. Log burner, conservatory, underfloor heating, breathtaking Snowdonia views.',
   alternates: {
     canonical: 'https://plashafodcottage.co.uk/bryn-bugeiliaid-bach',
     languages: {
       'en-GB': 'https://plashafodcottage.co.uk/bryn-bugeiliaid-bach',
       'cy-GB': 'https://plashafodcottage.co.uk/cy/bryn-bugeiliaid-bach',
     },
+  },
+  openGraph: {
+    title: 'Bryn Bugeiliaid Bach | Luxury 2-Bed Cottage Annexe in Nebo, Dyffryn Nantlle',
+    description:
+      'Peaceful 5-star Visit Wales annexe in Nebo near Penygroes overlooking Dyffryn Nantlle. Log burner, conservatory, underfloor heating, breathtaking Snowdonia views.',
+    url: 'https://plashafodcottage.co.uk/bryn-bugeiliaid-bach',
+    siteName: 'Plas Hafod Cottage & Bryn Bugeiliaid Bach',
+    images: [
+      {
+        url: '/images/wp/bbb-hero-bg.jpg',
+        width: 1920,
+        height: 1080,
+        alt: 'Bryn Bugeiliaid Bach luxury annexe in Nebo, Dyffryn Nantlle',
+      },
+    ],
+    locale: 'en_GB',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Bryn Bugeiliaid Bach | Luxury 2-Bed Annexe in Nebo',
+    description:
+      'Peaceful 5-star Visit Wales annexe overlooking Dyffryn Nantlle in Nebo near Penygroes.',
+    images: ['/images/wp/bbb-hero-bg.jpg'],
   },
 };
 
@@ -34,8 +60,49 @@ export default async function BrynBugeiliaidBachPage() {
     cmsClient.getSiteSettings(false),
   ]);
 
+  const breadcrumbsJsonLd = generateBreadcrumbJsonLd([
+    { name: 'Home', url: SITE_URL },
+    { name: 'Bryn Bugeiliaid Bach', url: `${SITE_URL}/bryn-bugeiliaid-bach` },
+  ]);
+
+  const bbbJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': ['Accommodation', 'VacationRental'],
+    name: 'Bryn Bugeiliaid Bach',
+    description:
+      'Peaceful 5-star Visit Wales annexe in Nebo near Penygroes overlooking Dyffryn Nantlle. Log burner, conservatory, underfloor heating, breathtaking Snowdonia views.',
+    url: `${SITE_URL}/bryn-bugeiliaid-bach`,
+    address: COTTAGE_ADDRESS,
+    geo: {
+      '@type': 'GeoCoordinates',
+      latitude: COTTAGE_GEO.latitude,
+      longitude: COTTAGE_GEO.longitude,
+    },
+    occupancy: {
+      '@type': 'QuantitativeValue',
+      maxValue: 4,
+    },
+    numberOfBedrooms: 2,
+    numberOfBathroomsTotal: 1,
+    petsAllowed: false,
+    smokingAllowed: false,
+    starRating: {
+      '@type': 'Rating',
+      ratingValue: '5',
+      bestRating: '5',
+    },
+  };
+
   return (
     <div className="min-h-screen bg-[#fbfbfd] text-[#333333] flex flex-col font-sans selection:bg-[#efda07]/30 selection:text-stone-900">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbsJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(bbbJsonLd) }}
+      />
       <LiveSiteNavbar currentPath="/bryn-bugeiliaid-bach" isCymraeg={false} siteSettings={siteSettings} />
 
       <main className="flex-1">

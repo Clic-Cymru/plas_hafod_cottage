@@ -7,16 +7,42 @@ import { TrustindexWidget } from '@/components/reviews/TrustindexWidget';
 import { DualGuestbookGallery } from '@/components/reviews/DualGuestbookGallery';
 
 
+import { generateBreadcrumbJsonLd, SITE_URL } from '@/lib/seo/jsonld';
+
 export const metadata: Metadata = {
-  title: 'Adolygiadau a Thystiolaethau Gwesteion - Bwthyn Plas Hafod',
+  title: 'Adolygiadau Gwesteion | Bwthyn Plas Hafod a Bryn Bugeiliaid Bach',
   description:
-    'Darllenwch adolygiadau go iawn a sylwadau llyfr gwesteion gan ymwelwyr Plas Hafod a Bryn Bugeiliaid Bach o Airbnb, Vrbo, a TripAdvisor.',
+    'Darllenwch adolygiadau 5 seren go iawn a thystiolaethau llyfr gwesteion gan ymwelwyr Plas Hafod a Bryn Bugeiliaid Bach yn Nebo, Eryri.',
   alternates: {
     canonical: 'https://plashafodcottage.co.uk/cy/reviews',
     languages: {
       'en-GB': 'https://plashafodcottage.co.uk/reviews',
       'cy-GB': 'https://plashafodcottage.co.uk/cy/reviews',
     },
+  },
+  openGraph: {
+    title: 'Adolygiadau Gwesteion | Bwthyn Plas Hafod a Bryn Bugeiliaid Bach',
+    description:
+      'Darllenwch adolygiadau 5 seren go iawn a thystiolaethau llyfr gwesteion gan ymwelwyr Plas Hafod a Bryn Bugeiliaid Bach yn Nebo, Eryri.',
+    url: 'https://plashafodcottage.co.uk/cy/reviews',
+    siteName: 'Bwthyn Plas Hafod a Bryn Bugeiliaid Bach',
+    images: [
+      {
+        url: '/images/wp/hero-slide-1.jpg',
+        width: 1920,
+        height: 1080,
+        alt: 'Tirwedd mynydd Bwthyn Plas Hafod yn Eryri',
+      },
+    ],
+    locale: 'cy_GB',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Adolygiadau Gwesteion | Bwthyn Plas Hafod a Bryn Bugeiliaid Bach',
+    description:
+      'Darllenwch adolygiadau 5 seren gan ymwelwyr ein bythynnod yn Nebo, Eryri.',
+    images: ['/images/wp/hero-slide-1.jpg'],
   },
 };
 
@@ -31,8 +57,17 @@ export default async function WelshReviewsPage() {
     reviewSettings.trustindexEnabled &&
     Boolean(reviewSettings.trustindexScriptUrl || reviewSettings.trustindexEmbedCode);
 
+  const breadcrumbsJsonLd = generateBreadcrumbJsonLd([
+    { name: 'Hafan', url: `${SITE_URL}/cy` },
+    { name: 'Adolygiadau', url: `${SITE_URL}/cy/reviews` },
+  ]);
+
   return (
     <div className="min-h-screen bg-[#fbfbfd] text-[#333333] flex flex-col font-sans selection:bg-[#efda07]/30 selection:text-stone-900">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbsJsonLd) }}
+      />
       <LiveSiteNavbar currentPath="/cy/reviews" isCymraeg={true} siteSettings={siteSettings} />
 
       <main className="flex-1">

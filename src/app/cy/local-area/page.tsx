@@ -7,16 +7,42 @@ import { cmsClient } from '@/cms/client';
 import { Compass, ExternalLink, Mountain, ShieldAlert, MapPin } from 'lucide-react';
 
 
+import { generateBreadcrumbJsonLd, SITE_URL } from '@/lib/seo/jsonld';
+
 export const metadata: Metadata = {
-  title: "Ardal Leol a Chanllaw Eryri - Bwthyn Plas Hafod",
+  title: 'Ardal Leol a Chanllaw Eryri | Atyniadau ger Nebo a Phen-y-groes',
   description:
-    'Archwiliwch Eryri o Fwthyn Plas Hafod. Darganfyddwch lwybrau cerdded lleol, Yr Wyddfa, cestyll, trenau stêm, traethau ac atyniadau gwych.',
+    'Archwiliwch Eryri o Nebo ger Pen-y-groes. Darganfyddwch lwybrau cerdded, Yr Wyddfa, Crib Nantlle, Castell Caernarfon, traeth Dinas Dinlle a rheilffyrdd stêm.',
   alternates: {
     canonical: 'https://plashafodcottage.co.uk/cy/local-area',
     languages: {
       'en-GB': 'https://plashafodcottage.co.uk/local-area',
       'cy-GB': 'https://plashafodcottage.co.uk/cy/local-area',
     },
+  },
+  openGraph: {
+    title: 'Ardal Leol a Chanllaw Eryri | Atyniadau ger Nebo a Phen-y-groes',
+    description:
+      'Archwiliwch Eryri o Nebo ger Pen-y-groes. Darganfyddwch lwybrau cerdded, Yr Wyddfa, Crib Nantlle, Castell Caernarfon, traeth Dinas Dinlle a rheilffyrdd stêm.',
+    url: 'https://plashafodcottage.co.uk/cy/local-area',
+    siteName: 'Bwthyn Plas Hafod a Bryn Bugeiliaid Bach',
+    images: [
+      {
+        url: '/images/wp/snowdon.jpg',
+        width: 1920,
+        height: 1080,
+        alt: 'Mynyddoedd Eryri ger Nebo a Phen-y-groes',
+      },
+    ],
+    locale: 'cy_GB',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Ardal Leol a Chanllaw Eryri | Atyniadau ger Nebo a Phen-y-groes',
+    description:
+      'Archwiliwch Eryri o Nebo ger Pen-y-groes: llwybrau cerdded, cestyll, traethau a rheilffyrdd.',
+    images: ['/images/wp/snowdon.jpg'],
   },
 };
 
@@ -71,15 +97,24 @@ export default async function WelshLocalAreaPage() {
     cmsClient.getSiteSettings(false),
   ]);
 
+  const breadcrumbsJsonLd = generateBreadcrumbJsonLd([
+    { name: 'Hafan', url: `${SITE_URL}/cy` },
+    { name: 'Ardal Leol', url: `${SITE_URL}/cy/local-area` },
+  ]);
+
   return (
     <div className="min-h-screen bg-[#fbfbfd] text-[#333333] flex flex-col font-sans selection:bg-[#efda07]/30 selection:text-stone-900">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbsJsonLd) }}
+      />
       <LiveSiteNavbar currentPath="/cy/local-area" isCymraeg={true} siteSettings={siteSettings} />
 
       <main className="flex-1">
         {/* Floating Subpage Hero with Snowdon Landscape Background & Wave Divider */}
         <SubpageHero
           title="ARDAL LEOL"
-          subtitle="Bydd ein portffolio o wybodaeth am ddigwyddiadau lleol, gweithgareddau ac atyniadau twristiaeth yn eich helpu i benderfynu ble i fynd a beth i'w weld yn ystod eich arhosiad ym Mhlas Hafod. Wedi'i leoli oddi ar y prif lwybrau ym mhentrefan Nebo, mae Plas Hafod o fewn cyrraedd hawdd i draeth Dinas Dinlle, llwybrau mynydd Yr Wyddfa, Castell Caernarfon, Rheilffordd Ucheldir Cymru, a Phorthmeirion."
+          subtitle="Bydd ein portffolio o wybodaeth am ddigwyddiadau lleol, gweithgareddau ac atyniadau twristiaeth yn eich helpu i benderfynu ble i fynd a beth i'w weld yn ystod eich arhosiad ym Mhlas Hafod. Wedi'i leoli oddi ar y prif lwybrau ym mhentrefan Nebo ger Pen-y-groes, mae Plas Hafod o fewn cyrraedd hawdd i draeth Dinas Dinlle, llwybrau mynydd Yr Wyddfa, Castell Caernarfon, Rheilffordd Ucheldir Cymru, a Phorthmeirion."
           imageSrc="/images/wp/snowdon.jpg"
           imageAlt="Mynyddoedd Eryri ger Plas Hafod"
         />

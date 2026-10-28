@@ -69,14 +69,14 @@ export const siteSettingsSchema = {
       title: 'Cottage Address (English)',
       type: 'text',
       rows: 3,
-      initialValue: 'Plas Hafod Cottage, Nebo, Caernarfon, Gwynedd, LL54 6EE',
+      initialValue: 'Plas Hafod Cottage, Nebo, Penygroes, Caernarfon, Gwynedd, LL54 6EB',
     },
     {
       name: 'addressCy',
       title: 'Cottage Address (Welsh)',
       type: 'text',
       rows: 3,
-      initialValue: 'Bwthyn Plas Hafod, Nebo, Caernarfon, Gwynedd, LL54 6EE',
+      initialValue: 'Bwthyn Plas Hafod, Nebo, Penygroes, Caernarfon, Gwynedd, LL54 6EB',
       description: 'Welsh translation placeholder for postal address',
     },
     {

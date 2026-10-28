@@ -5,12 +5,30 @@ export interface CottageJsonLdOptions {
   siteUrl?: string;
 }
 
-export function generateCottageJsonLd({ locale, siteUrl = 'https://plashafod.co.uk' }: CottageJsonLdOptions) {
+export const SITE_URL = 'https://plashafodcottage.co.uk';
+
+export const COTTAGE_GEO = {
+  latitude: 53.0335,
+  longitude: -4.2618,
+};
+
+export const COTTAGE_ADDRESS = {
+  '@type': 'PostalAddress',
+  streetAddress: 'Plas Hafod, Nebo',
+  addressLocality: 'Penygroes',
+  addressRegion: 'Gwynedd / Eryri (Snowdonia)',
+  postalCode: 'LL54 6EB',
+  addressCountry: 'GB',
+};
+
+export function generateCottageJsonLd({ locale, siteUrl = SITE_URL }: CottageJsonLdOptions) {
   const isWelsh = locale === 'cy';
-  const name = isWelsh ? 'Plas Hafod - Bwthyn Gwyliau Moethus' : 'Plas Hafod - Luxury Welsh Holiday Cottage';
+  const name = isWelsh
+    ? 'Bwthyn Plas Hafod a Bryn Bugeiliaid Bach - Llety Gwyliau Moethus'
+    : 'Plas Hafod Cottage & Bryn Bugeiliaid Bach - Luxury Welsh Holiday Cottages';
   const description = isWelsh
-    ? 'Bwthyn gwyliau moethus o\'r 18fed ganrif yn Eryri gyda lle tân agored, golygfeydd panoramig o\'r mynyddoedd, a chysuron eithriadol.'
-    : 'Historic 18th-century luxury holiday cottage in Snowdonia / Eryri with inglenook fireplace, mountain views, and modern boutique comforts.';
+    ? 'Llety gwyliau moethus 5 seren Croeso Cymru yn Nebo ger Penygroes, Eryri gyda golygfeydd panoramig o fynyddoedd a\'r môr, lle tân agored, a chysuron eithriadol.'
+    : '5-star Visit Wales certified luxury holiday cottages in Nebo near Penygroes, Snowdonia / Eryri with inglenook fireplaces, panoramic mountain and sea views, and modern comforts.';
 
   const lodgingBusiness = {
     '@context': 'https://schema.org',
@@ -19,41 +37,35 @@ export function generateCottageJsonLd({ locale, siteUrl = 'https://plashafod.co.
     name,
     description,
     url: `${siteUrl}${isWelsh ? '/cy' : ''}`,
-    telephone: '+44 1492 000000',
+    telephone: '+44 1286 880620',
     priceRange: '££',
     currenciesAccepted: 'GBP',
     paymentAccepted: 'Credit Card, Debit Card, Bank Transfer',
     image: [
-      `${siteUrl}/images/hero.jpg`,
-      `${siteUrl}/images/interior.jpg`,
-      `${siteUrl}/images/bedroom.jpg`,
+      `${siteUrl}/images/wp/hero-bg.jpg`,
+      `${siteUrl}/images/wp/bbb-hero-bg.jpg`,
+      `${siteUrl}/images/wp/hero-slide-1.jpg`,
+      `${siteUrl}/images/wp/snowdon.jpg`,
     ],
-    address: {
-      '@type': 'PostalAddress',
-      streetAddress: 'Plas Hafod Lane, Near Betws-y-Coed',
-      addressLocality: 'Conwy County / Eryri',
-      addressRegion: 'North Wales',
-      postalCode: 'LL24 0AA',
-      addressCountry: 'GB',
-    },
+    address: COTTAGE_ADDRESS,
     geo: {
       '@type': 'GeoCoordinates',
-      latitude: 53.0931,
-      longitude: -3.8016,
+      latitude: COTTAGE_GEO.latitude,
+      longitude: COTTAGE_GEO.longitude,
     },
     checkinTime: '16:00',
     checkoutTime: '10:00',
     petsAllowed: true,
-    numberOfRooms: 2,
+    numberOfRooms: 4,
     amenityFeature: [
       {
         '@type': 'LocationFeatureSpecification',
-        name: 'Inglenook Wood Fireplace',
+        name: 'Inglenook Wood Fireplace / Log Burner',
         value: true,
       },
       {
         '@type': 'LocationFeatureSpecification',
-        name: 'Private Mountain View Garden',
+        name: 'Private Panoramic Mountain and Sea Views',
         value: true,
       },
       {
@@ -68,7 +80,17 @@ export function generateCottageJsonLd({ locale, siteUrl = 'https://plashafod.co.
       },
       {
         '@type': 'LocationFeatureSpecification',
-        name: 'Dog Friendly',
+        name: 'Dog Friendly (Plas Hafod Cottage)',
+        value: true,
+      },
+      {
+        '@type': 'LocationFeatureSpecification',
+        name: 'Nantlle Ridge Walking Trail Access Directly from Doorstep',
+        value: true,
+      },
+      {
+        '@type': 'LocationFeatureSpecification',
+        name: 'Visit Wales 5-Star Accredited',
         value: true,
       },
     ],
@@ -79,16 +101,38 @@ export function generateCottageJsonLd({ locale, siteUrl = 'https://plashafod.co.
       bestRating: '5',
       worstRating: '1',
     },
-    containsPlace: {
-      '@type': 'Accommodation',
-      name: 'Plas Hafod Cottage',
-      occupancy: {
-        '@type': 'QuantitativeValue',
-        maxValue: 6,
+    containsPlace: [
+      {
+        '@type': 'Accommodation',
+        name: isWelsh ? 'Bwthyn Plas Hafod' : 'Plas Hafod Cottage',
+        description: isWelsh
+          ? 'Bwthyn hanesyddol o\'r 18fed ganrif gyda lle tân agored, golygfeydd panoramig o\'r môr a\'r mynyddoedd, croeso i gŵn, cysgu 4-6.'
+          : 'Historic 18th-century stone holiday cottage with inglenook wood fireplace, panoramic sea & mountain views, dog friendly, sleeps 4-6.',
+        occupancy: {
+          '@type': 'QuantitativeValue',
+          maxValue: 6,
+        },
+        numberOfBedrooms: 2,
+        numberOfBathroomsTotal: 2,
+        petsAllowed: true,
+        url: `${siteUrl}${isWelsh ? '/cy' : ''}`,
       },
-      numberOfBedrooms: 2,
-      numberOfBathroomsTotal: 2,
-    },
+      {
+        '@type': 'Accommodation',
+        name: 'Bryn Bugeiliaid Bach',
+        description: isWelsh
+          ? 'Llety moethus hunangynhwysol 2 wely gyda llosgwr coed, ystafell wydr, a gwres o dan y llawr yn edrych dros Ddyffryn Nantlle, cysgu 2-4.'
+          : 'Luxury 2-bedroom self-contained annexe overlooking Dyffryn Nantlle with cozy log burner, conservatory, underfloor heating, sleeps 2-4.',
+        occupancy: {
+          '@type': 'QuantitativeValue',
+          maxValue: 4,
+        },
+        numberOfBedrooms: 2,
+        numberOfBathroomsTotal: 1,
+        petsAllowed: false,
+        url: `${siteUrl}${isWelsh ? '/cy/bryn-bugeiliaid-bach' : '/bryn-bugeiliaid-bach'}`,
+      },
+    ],
   };
 
   const breadcrumbs = {
@@ -113,5 +157,39 @@ export function generateCottageJsonLd({ locale, siteUrl = 'https://plashafod.co.
   return {
     lodgingBusiness,
     breadcrumbs,
+  };
+}
+
+export function generateBreadcrumbJsonLd(items: Array<{ name: string; url: string }>) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: items.map((item, index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      name: item.name,
+      item: item.url,
+    })),
+  };
+}
+
+export function generateContactJsonLd({ locale, siteUrl = SITE_URL }: CottageJsonLdOptions) {
+  const isWelsh = locale === 'cy';
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'ContactPage',
+    name: isWelsh ? 'Cysylltu â Bwthyn Plas Hafod' : 'Contact Plas Hafod Cottage',
+    url: `${siteUrl}${isWelsh ? '/cy/contact' : '/contact'}`,
+    mainEntity: {
+      '@type': 'LodgingBusiness',
+      name: 'Plas Hafod Cottage & Bryn Bugeiliaid Bach',
+      telephone: '+44 1286 880620',
+      address: COTTAGE_ADDRESS,
+      geo: {
+        '@type': 'GeoCoordinates',
+        latitude: COTTAGE_GEO.latitude,
+        longitude: COTTAGE_GEO.longitude,
+      },
+    },
   };
 }

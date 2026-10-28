@@ -25,11 +25,19 @@ const roboto = Roboto({
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://plashafodcottage.co.uk'),
-  title: 'Bwthyn Plas Hafod Cottage - Cozy Cottage with Amazing Views',
+  title: {
+    default: 'Plas Hafod Cottage | 5-Star Luxury Holiday Cottage in Nebo, Snowdonia',
+    template: '%s | Plas Hafod Cottage & Bryn Bugeiliaid Bach',
+  },
   description:
-    'Plas Hafod Cottage offers a warm and cozy traditional Welsh cottage in a location with views that will take your breath away. Book now to secure your stay.',
+    'Experience 5-star Visit Wales holiday cottages in Nebo near Penygroes, Snowdonia / Parc Cenedlaethol Eryri. Panoramic mountain and sea views, dog friendly.',
   icons: {
     icon: '/images/wp/logo-color.png',
+  },
+  openGraph: {
+    siteName: 'Plas Hafod Cottage & Bryn Bugeiliaid Bach',
+    locale: 'en_GB',
+    type: 'website',
   },
 };
 

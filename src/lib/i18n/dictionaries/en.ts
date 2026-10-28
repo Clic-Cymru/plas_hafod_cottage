@@ -89,7 +89,7 @@ export const enDictionary = {
   location: {
     heading: 'The Surrounding Landscape',
     subheading: 'Eryri National Park, North Wales',
-    description: 'Centrally located within easy reach of Betws-y-Coed, Yr Wyddfa trails, historic castles of Conwy and Caernarfon, and the serene beaches of Anglesey.',
+    description: 'Peacefully situated in the hamlet of Nebo near Penygroes, within easy reach of Yr Wyddfa (Snowdon) trails, the Nantlle Ridge, Caernarfon Castle, Dinas Dinlle beach, and the Welsh Highland Railway.',
   },
   footer: {
     tagline: 'Plas Hafod — Historic Luxury Cottage Holiday Let, North Wales.',

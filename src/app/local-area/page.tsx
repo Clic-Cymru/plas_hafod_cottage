@@ -8,10 +8,43 @@ import { cmsClient } from '@/cms/client';
 import { Compass, ExternalLink, Mountain, ShieldAlert, MapPin } from 'lucide-react';
 
 
+import { generateBreadcrumbJsonLd, SITE_URL } from '@/lib/seo/jsonld';
+
 export const metadata: Metadata = {
-  title: 'Local Area & Snowdonia Guide - Bwthyn Plas Hafod Cottage',
+  title: 'Local Area & Snowdonia Guide | Things To Do Near Nebo & Penygroes',
   description:
-    'Explore Snowdonia / Eryri from Plas Hafod Cottage. Discover local walks, Mount Snowdon trails, castles, steam railways, beaches, and attractions.',
+    'Explore Snowdonia (Eryri) from Nebo near Penygroes. Discover walking trails, Yr Wyddfa (Snowdon), Nantlle Ridge, Caernarfon Castle, Dinas Dinlle beach & steam railways.',
+  alternates: {
+    canonical: 'https://plashafodcottage.co.uk/local-area',
+    languages: {
+      'en-GB': 'https://plashafodcottage.co.uk/local-area',
+      'cy-GB': 'https://plashafodcottage.co.uk/cy/local-area',
+    },
+  },
+  openGraph: {
+    title: 'Local Area & Snowdonia Guide | Things To Do Near Nebo & Penygroes',
+    description:
+      'Explore Snowdonia (Eryri) from Nebo near Penygroes. Discover walking trails, Yr Wyddfa (Snowdon), Nantlle Ridge, Caernarfon Castle, Dinas Dinlle beach & steam railways.',
+    url: 'https://plashafodcottage.co.uk/local-area',
+    siteName: 'Plas Hafod Cottage & Bryn Bugeiliaid Bach',
+    images: [
+      {
+        url: '/images/wp/snowdon.jpg',
+        width: 1920,
+        height: 1080,
+        alt: 'Snowdonia mountain range near Nebo and Penygroes',
+      },
+    ],
+    locale: 'en_GB',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Local Area & Snowdonia Guide | Things To Do Near Nebo & Penygroes',
+    description:
+      'Explore Snowdonia (Eryri) from Nebo near Penygroes: walks, castles, beaches & railways.',
+    images: ['/images/wp/snowdon.jpg'],
+  },
 };
 
 export default async function LocalAreaPage() {
@@ -21,15 +54,24 @@ export default async function LocalAreaPage() {
     cmsClient.getSiteSettings(false),
   ]);
 
+  const breadcrumbsJsonLd = generateBreadcrumbJsonLd([
+    { name: 'Home', url: SITE_URL },
+    { name: 'Local Area Guide', url: `${SITE_URL}/local-area` },
+  ]);
+
   return (
     <div className="min-h-screen bg-[#fbfbfd] text-[#333333] flex flex-col font-sans selection:bg-[#efda07]/30 selection:text-stone-900">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbsJsonLd) }}
+      />
       <LiveSiteNavbar currentPath="/local-area" isCymraeg={false} siteSettings={siteSettings} />
 
       <main className="flex-1">
         {/* Floating Subpage Hero with Snowdon Landscape Background & Wave Divider */}
         <SubpageHero
           title="LOCAL AREA"
-          subtitle="Our portfolio of information on local events, activities and tourist attractions will help you decide where to go and what to see during your stay at Plas Hafod. Situated off the beaten track in the hamlet of Nebo, Plas Hafod is within easy reach of Dinas Dinlle beach, the mountain trails of Snowdon, Caernarfon Castle, the Welsh Highland Railway, and Portmeirion."
+          subtitle="Our portfolio of information on local events, activities and tourist attractions will help you decide where to go and what to see during your stay at Plas Hafod. Situated off the beaten track in the hamlet of Nebo near Penygroes, Plas Hafod is within easy reach of Dinas Dinlle beach, the mountain trails of Snowdon, Caernarfon Castle, the Welsh Highland Railway, and Portmeirion."
           imageSrc="/images/wp/snowdon.jpg"
           imageAlt="Snowdonia mountain range"
         />

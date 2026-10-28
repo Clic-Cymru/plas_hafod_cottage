@@ -136,7 +136,7 @@ export function generateGuestConfirmationHtml(
   const depositPct = settings?.depositPercentage || 25;
   const address =
     (isCymraeg && settings?.addressCy ? settings.addressCy : settings?.address) ||
-    'Plas Hafod Cottage, Nebo, Caernarfon, Gwynedd, LL54 6EE';
+    'Plas Hafod Cottage, Nebo, Penygroes, Caernarfon, Gwynedd, LL54 6EB';
 
   const rawWelcome = isCymraeg
     ? (settings?.guestBookingEmailWelcomeCy ||
@@ -318,7 +318,7 @@ export function generateVisitorContactAutoReplyHtml(
   const phone = settings?.emergencyHostPhone || settings?.phone || '+44 (0) 1286 880 000';
   const address =
     (isCymraeg && settings?.addressCy ? settings.addressCy : settings?.address) ||
-    'Plas Hafod Cottage, Nebo, Caernarfon, Gwynedd, LL54 6EE';
+    'Plas Hafod Cottage, Nebo, Penygroes, Caernarfon, Gwynedd, LL54 6EB';
 
   const rawReply = isCymraeg
     ? (settings?.guestContactEmailReplyCy ||
@@ -409,7 +409,7 @@ export function generateGuestConfirmationText(
   const depositPct = settings?.depositPercentage || 25;
   const address =
     (isCymraeg && settings?.addressCy ? settings.addressCy : settings?.address) ||
-    'Plas Hafod Cottage, Nebo, Caernarfon, Gwynedd, LL54 6EE';
+    'Plas Hafod Cottage, Nebo, Penygroes, Caernarfon, Gwynedd, LL54 6EB';
 
   const rawWelcome = isCymraeg
     ? (settings?.guestBookingEmailWelcomeCy ||
@@ -525,7 +525,7 @@ export function generateVisitorContactAutoReplyText(
   const phone = settings?.phone || '+44 (0) 1286 880 000';
   const address =
     (isCymraeg && settings?.addressCy ? settings.addressCy : settings?.address) ||
-    'Plas Hafod Cottage, Nebo, Caernarfon, Gwynedd, LL54 6EE';
+    'Plas Hafod Cottage, Nebo, Penygroes, Caernarfon, Gwynedd, LL54 6EB';
 
   const rawReply = isCymraeg
     ? (settings?.guestContactEmailReplyCy ||
@@ -564,7 +564,7 @@ export function generateDepositRequestHtml(
   const checkInTime = settings?.checkInTime || '4:00 PM';
   const checkOutTime = settings?.checkOutTime || '10:00 AM';
   const depositPct = settings?.depositPercentage || 25;
-  const address = settings?.address || 'Plas Hafod Cottage, Nebo, Caernarfon, Gwynedd, LL54 6EE';
+  const address = settings?.address || 'Plas Hafod Cottage, Nebo, Penygroes, Caernarfon, Gwynedd, LL54 6EB';
 
   return `
 <!DOCTYPE html>
@@ -753,7 +753,7 @@ export function generateDepositRequestText(
   const checkOutTime = settings?.checkOutTime || '10:00 AM';
   const depositPct = settings?.depositPercentage || 25;
   const siteTitle = settings?.siteTitle || 'Plas Hafod Cottage & Bryn Bugeiliaid Bach';
-  const address = settings?.address || 'Plas Hafod Cottage, Nebo, Caernarfon, Gwynedd, LL54 6EE';
+  const address = settings?.address || 'Plas Hafod Cottage, Nebo, Penygroes, Caernarfon, Gwynedd, LL54 6EB';
 
   return `PROVISIONAL RESERVATION ACCEPTED: ${data.propertyTitle}
 

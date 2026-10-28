@@ -6,10 +6,12 @@ import { ContactForm } from '@/components/contact/ContactForm';
 import { cmsClient } from '@/cms/client';
 import { Mail, Phone, MapPin, Clock, Compass, ShieldCheck } from 'lucide-react';
 
+import { generateBreadcrumbJsonLd, generateContactJsonLd, SITE_URL } from '@/lib/seo/jsonld';
+
 export const metadata: Metadata = {
-  title: 'Cysylltu â Ni a Chyfarwyddiadau Lleoliad - Bwthyn Plas Hafod',
+  title: 'Cysylltu a Chyfarwyddiadau | Bwthyn Plas Hafod, Nebo, Pen-y-groes',
   description:
-    'Cysylltwch â Siwsan a Neil ym Mhlas Hafod a Bryn Bugeiliaid Bach yn Nebo, Eryri. Cysylltwch ar gyfer ymholiadau archebu, cyfarwyddiadau neu geisiadau arbennig.',
+    'Cysylltwch â Siwsan a Neil ym Mhlas Hafod a Bryn Bugeiliaid Bach yn Nebo ger Pen-y-groes, Gwynedd. Ffoniwch 01286 880620 neu anfonwch ymholiad ar-lein.',
   alternates: {
     canonical: 'https://plashafodcottage.co.uk/cy/contact',
     languages: {
@@ -17,13 +19,52 @@ export const metadata: Metadata = {
       'cy-GB': 'https://plashafodcottage.co.uk/cy/contact',
     },
   },
+  openGraph: {
+    title: 'Cysylltu a Chyfarwyddiadau | Bwthyn Plas Hafod, Nebo, Pen-y-groes',
+    description:
+      'Cysylltwch â Siwsan a Neil ym Mhlas Hafod a Bryn Bugeiliaid Bach yn Nebo ger Pen-y-groes, Gwynedd. Ffoniwch 01286 880620 neu anfonwch ymholiad ar-lein.',
+    url: 'https://plashafodcottage.co.uk/cy/contact',
+    siteName: 'Bwthyn Plas Hafod a Bryn Bugeiliaid Bach',
+    images: [
+      {
+        url: '/images/wp/hero-bg.jpg',
+        width: 1920,
+        height: 1080,
+        alt: 'Golygfeydd mynydd Plas Hafod ger Nebo a Phen-y-groes',
+      },
+    ],
+    locale: 'cy_GB',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Cysylltu a Chyfarwyddiadau | Bwthyn Plas Hafod, Nebo, Pen-y-groes',
+    description:
+      'Cysylltwch â Siwsan a Neil ym Mhlas Hafod a Bryn Bugeiliaid Bach yn Nebo ger Pen-y-groes, Gwynedd.',
+    images: ['/images/wp/hero-bg.jpg'],
+  },
 };
 
 export default async function WelshContactPage() {
   const siteSettings = await cmsClient.getSiteSettings(false);
 
+  const breadcrumbsJsonLd = generateBreadcrumbJsonLd([
+    { name: 'Hafan', url: `${SITE_URL}/cy` },
+    { name: 'Cysylltu a Chyfarwyddiadau', url: `${SITE_URL}/cy/contact` },
+  ]);
+
+  const contactJsonLd = generateContactJsonLd({ locale: 'cy' });
+
   return (
     <div className="min-h-screen bg-[#fbfbfd] text-[#333333] flex flex-col font-sans selection:bg-[#efda07]/30 selection:text-stone-900">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbsJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(contactJsonLd) }}
+      />
       <LiveSiteNavbar currentPath="/cy/contact" isCymraeg={true} siteSettings={siteSettings} />
 
       <main className="flex-1">
@@ -92,9 +133,9 @@ export default async function WelshContactPage() {
                         Plas Hafod & Bryn Bugeiliaid Bach
                       </p>
                       <p className="text-stone-600 text-xs">
-                        Nebo, ger Caernarfon, Gwynedd, LL54 6EG
+                        Nebo (ger Pen-y-groes), Caernarfon, Gwynedd, LL54 6EB
                       </p>
-                      <p className="text-stone-500 text-[11px] mt-0.5">Eryri, Gogledd Cymru</p>
+                      <p className="text-stone-500 text-[11px] mt-0.5">Dyffryn Nantlle · Eryri, Gogledd Cymru</p>
                     </div>
                   </div>
                 </div>

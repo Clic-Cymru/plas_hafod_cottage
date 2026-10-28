@@ -9,10 +9,9 @@ import { generateCottageJsonLd } from '@/lib/seo/jsonld';
 
 
 export const metadata: Metadata = {
-  title: 'Bwthyn Plas Hafod Cottage - Cozy Cottage with Amazing Views in Snowdonia',
-
+  title: 'Plas Hafod Cottage | 5-Star Luxury Holiday Cottage in Nebo, Snowdonia',
   description:
-    'Experience Plas Hafod, a 5-star Visit Wales certified holiday cottage nestled on the edge of Snowdonia National Park in Nebo with panoramic sea and mountain views.',
+    '5-star Visit Wales holiday cottage in Nebo near Penygroes, Snowdonia (Eryri). Panoramic mountain and sea views, inglenook fire, dog-friendly. Book direct.',
   alternates: {
     canonical: 'https://plashafodcottage.co.uk',
     languages: {
@@ -21,21 +20,28 @@ export const metadata: Metadata = {
     },
   },
   openGraph: {
-    title: 'Bwthyn Plas Hafod Cottage - Cozy Cottage with Amazing Views',
+    title: 'Plas Hafod Cottage | 5-Star Luxury Holiday Cottage in Nebo, Snowdonia',
     description:
-      '5-star Visit Wales holiday cottage on the edge of Snowdonia National Park in Nebo with breathtaking views of Snowdonia, Anglesey, and the Irish Sea.',
+      '5-star Visit Wales holiday cottage in Nebo near Penygroes, Snowdonia (Eryri). Panoramic mountain and sea views, inglenook fire, dog-friendly. Book direct.',
     url: 'https://plashafodcottage.co.uk',
-    siteName: 'Plas Hafod Cottage',
+    siteName: 'Plas Hafod Cottage & Bryn Bugeiliaid Bach',
     images: [
       {
         url: '/images/wp/hero-bg.jpg',
         width: 1920,
         height: 1080,
-        alt: 'Plas Hafod mountain views in Snowdonia',
+        alt: 'Plas Hafod panoramic mountain views in Snowdonia',
       },
     ],
     locale: 'en_GB',
     type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Plas Hafod Cottage | 5-Star Holiday Cottage in Nebo, Snowdonia',
+    description:
+      '5-star Visit Wales holiday cottage in Nebo near Penygroes with panoramic Snowdonia mountain views.',
+    images: ['/images/wp/hero-bg.jpg'],
   },
 };
 

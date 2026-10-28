@@ -9,10 +9,9 @@ import { generateCottageJsonLd } from '@/lib/seo/jsonld';
 
 
 export const metadata: Metadata = {
-  title: 'Bwthyn Plas Hafod - Bwthyn Gwyliau Clyd gyda Golygfeydd Rhyfeddol yn Eryri',
-
+  title: 'Bwthyn Plas Hafod | Bwthyn Gwyliau Moethus 5 Seren yn Nebo, Eryri',
   description:
-    'Profwch Plas Hafod, bwthyn gwyliau 5 seren Croeso Cymru ar ymyl Parc Cenedlaethol Eryri yn Nebo gyda golygfeydd panoramig o fynyddoedd a&#39;r môr.',
+    'Bwthyn gwyliau moethus 5 seren Croeso Cymru yn Nebo ger Penygroes, Eryri. Golygfeydd panoramig o fynyddoedd a\'r môr, lle tân agored, croeso i gŵn. Archebwch yn uniongyrchol.',
   alternates: {
     canonical: 'https://plashafodcottage.co.uk/cy',
     languages: {
@@ -21,21 +20,28 @@ export const metadata: Metadata = {
     },
   },
   openGraph: {
-    title: 'Bwthyn Plas Hafod - Bwthyn Clyd gyda Golygfeydd Rhyfeddol',
+    title: 'Bwthyn Plas Hafod | Bwthyn Gwyliau Moethus 5 Seren yn Nebo, Eryri',
     description:
-      'Bwthyn gwyliau 5 seren Croeso Cymru ar ymyl Parc Cenedlaethol Eryri yn Nebo gyda golygfeydd godidog o Eryri, Ynys Môn, a Môr Iwerddon.',
+      'Bwthyn gwyliau moethus 5 seren Croeso Cymru yn Nebo ger Penygroes, Eryri. Golygfeydd panoramig o fynyddoedd a\'r môr, lle tân agored, croeso i gŵn. Archebwch yn uniongyrchol.',
     url: 'https://plashafodcottage.co.uk/cy',
-    siteName: 'Bwthyn Plas Hafod',
+    siteName: 'Bwthyn Plas Hafod a Bryn Bugeiliaid Bach',
     images: [
       {
         url: '/images/wp/hero-bg.jpg',
         width: 1920,
         height: 1080,
-        alt: 'Golygfeydd mynydd Plas Hafod yn Eryri',
+        alt: 'Golygfeydd panoramig mynydd Plas Hafod yn Eryri',
       },
     ],
     locale: 'cy_GB',
     type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Bwthyn Plas Hafod | Bwthyn Gwyliau 5 Seren yn Nebo, Eryri',
+    description:
+      'Bwthyn gwyliau moethus 5 seren Croeso Cymru yn Nebo ger Penygroes, Eryri.',
+    images: ['/images/wp/hero-bg.jpg'],
   },
 };
 

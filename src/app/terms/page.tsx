@@ -6,10 +6,43 @@ import { FileText, CheckCircle2, AlertTriangle, ShieldCheck, Dog, Sparkles } fro
 import { cmsClient } from '@/cms/client';
 
 
+import { generateBreadcrumbJsonLd, SITE_URL } from '@/lib/seo/jsonld';
+
 export const metadata: Metadata = {
-  title: 'Booking Terms and Conditions - Bwthyn Plas Hafod Cottage',
+  title: 'Booking Terms & Conditions | Plas Hafod Cottage & Bryn Bugeiliaid Bach',
   description:
-    'Full booking terms, cancellation policies, pet rules, and guidelines for Plas Hafod Cottage and Bryn Bugeiliaid Bach.',
+    'Official booking terms, direct reservation policies, pet guidelines, check-in details, and cancellation rules for Plas Hafod Cottage & Bryn Bugeiliaid Bach.',
+  alternates: {
+    canonical: 'https://plashafodcottage.co.uk/terms',
+    languages: {
+      'en-GB': 'https://plashafodcottage.co.uk/terms',
+      'cy-GB': 'https://plashafodcottage.co.uk/cy/terms',
+    },
+  },
+  openGraph: {
+    title: 'Booking Terms & Conditions | Plas Hafod Cottage & Bryn Bugeiliaid Bach',
+    description:
+      'Official booking terms, direct reservation policies, pet guidelines, check-in details, and cancellation rules for Plas Hafod Cottage & Bryn Bugeiliaid Bach.',
+    url: 'https://plashafodcottage.co.uk/terms',
+    siteName: 'Plas Hafod Cottage & Bryn Bugeiliaid Bach',
+    images: [
+      {
+        url: '/images/wp/hero-slide-1.jpg',
+        width: 1920,
+        height: 1080,
+        alt: 'Plas Hafod booking terms and policies',
+      },
+    ],
+    locale: 'en_GB',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Booking Terms & Conditions | Plas Hafod Holiday Cottages',
+    description:
+      'Direct booking terms, cancellation policies, and guest guidelines.',
+    images: ['/images/wp/hero-slide-1.jpg'],
+  },
 };
 
 function renderIcon(iconType?: string) {
@@ -36,8 +69,17 @@ export default async function TermsPage() {
     cmsClient.getSiteSettings(false),
   ]);
 
+  const breadcrumbsJsonLd = generateBreadcrumbJsonLd([
+    { name: 'Home', url: SITE_URL },
+    { name: 'Booking Terms & Conditions', url: `${SITE_URL}/terms` },
+  ]);
+
   return (
     <div className="min-h-screen bg-[#fbfbfd] text-[#333333] flex flex-col font-sans selection:bg-[#efda07]/30 selection:text-stone-900">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbsJsonLd) }}
+      />
       <LiveSiteNavbar currentPath="/terms" isCymraeg={false} siteSettings={siteSettings} />
 
       <main className="flex-1">

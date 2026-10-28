@@ -107,7 +107,7 @@ export function LiveSiteFooter({ isCymraeg = false }: FooterProps) {
         <div className="text-center text-xs text-stone-500 font-sans space-y-1">
           <p>© 2026 Plas Hafod Cottage & Bryn Bugeiliaid Bach. Cedwir pob hawl / All rights reserved.</p>
           <p className="text-[11px] text-stone-400">
-            Plas Hafod, Nebo, Caernarfon, Gwynedd, LL54 6EB · Snowdonia / Parc Cenedlaethol Eryri
+            Plas Hafod, Nebo, Penygroes, Caernarfon, Gwynedd, LL54 6EB · Snowdonia / Parc Cenedlaethol Eryri
           </p>
         </div>
       </div>

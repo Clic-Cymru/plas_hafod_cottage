@@ -7,10 +7,43 @@ import { TrustindexWidget } from '@/components/reviews/TrustindexWidget';
 import { DualGuestbookGallery } from '@/components/reviews/DualGuestbookGallery';
 
 
+import { generateBreadcrumbJsonLd, SITE_URL } from '@/lib/seo/jsonld';
+
 export const metadata: Metadata = {
-  title: 'Guest Reviews & Testimonials - Bwthyn Plas Hafod Cottage',
+  title: 'Guest Reviews & Testimonials | Plas Hafod Cottage & Bryn Bugeiliaid Bach',
   description:
-    'Read real guest reviews and guestbook entries from Airbnb, Vrbo, Booking.com, and Google Reviews for Plas Hafod Cottage and Bryn Bugeiliaid Bach in Snowdonia.',
+    'Read genuine 5-star reviews and guestbook memories from Airbnb, Google, Booking.com, and Vrbo for our holiday cottages in Nebo, Snowdonia.',
+  alternates: {
+    canonical: 'https://plashafodcottage.co.uk/reviews',
+    languages: {
+      'en-GB': 'https://plashafodcottage.co.uk/reviews',
+      'cy-GB': 'https://plashafodcottage.co.uk/cy/reviews',
+    },
+  },
+  openGraph: {
+    title: 'Guest Reviews & Testimonials | Plas Hafod Cottage & Bryn Bugeiliaid Bach',
+    description:
+      'Read genuine 5-star reviews and guestbook memories from Airbnb, Google, Booking.com, and Vrbo for our holiday cottages in Nebo, Snowdonia.',
+    url: 'https://plashafodcottage.co.uk/reviews',
+    siteName: 'Plas Hafod Cottage & Bryn Bugeiliaid Bach',
+    images: [
+      {
+        url: '/images/wp/hero-slide-1.jpg',
+        width: 1920,
+        height: 1080,
+        alt: 'Plas Hafod holiday cottage panoramic landscape',
+      },
+    ],
+    locale: 'en_GB',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Guest Reviews | Plas Hafod Cottage & Bryn Bugeiliaid Bach',
+    description:
+      'Read 5-star guest reviews and handwritten guestbook memories for our cottages in Nebo, Snowdonia.',
+    images: ['/images/wp/hero-slide-1.jpg'],
+  },
 };
 
 export default async function ReviewsPage() {
@@ -24,8 +57,17 @@ export default async function ReviewsPage() {
     reviewSettings.trustindexEnabled &&
     Boolean(reviewSettings.trustindexScriptUrl || reviewSettings.trustindexEmbedCode);
 
+  const breadcrumbsJsonLd = generateBreadcrumbJsonLd([
+    { name: 'Home', url: SITE_URL },
+    { name: 'Guest Reviews', url: `${SITE_URL}/reviews` },
+  ]);
+
   return (
     <div className="min-h-screen bg-[#fbfbfd] text-[#333333] flex flex-col font-sans selection:bg-[#efda07]/30 selection:text-stone-900">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbsJsonLd) }}
+      />
       <LiveSiteNavbar currentPath="/reviews" isCymraeg={false} siteSettings={siteSettings} />
 
       <main className="flex-1">

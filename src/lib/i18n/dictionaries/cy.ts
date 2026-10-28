@@ -89,7 +89,7 @@ export const cyDictionary = {
   location: {
     heading: 'Y Dirwedd Amgylchynol',
     subheading: 'Parc Cenedlaethol Eryri, Gogledd Cymru',
-    description: 'Wedi\'i leoli\'n ganolog o fewn cyrraedd hawdd i Fetws-y-Coed, llwybrau Yr Wyddfa, cestyll hanesyddol Conwy a Chaernarfon, a thraethau heddychlon Ynys Môn.',
+    description: 'Wedi\'i leoli ym mhentref heddychlon Nebo ger Penygroes, o fewn cyrraedd hawdd i lwybrau Yr Wyddfa, Crib Nantlle, Castell Caernarfon, traeth Dinas Dinlle, a Rheilffordd Eryri.',
   },
   footer: {
     tagline: 'Plas Hafod — Bwthyn Gwyliau Carreg Moethus Hanesyddol, Gogledd Cymru.',

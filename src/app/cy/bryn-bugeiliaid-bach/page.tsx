@@ -10,16 +10,42 @@ import { cmsClient } from '@/cms/client';
 import { Sparkles, Flame, Bed, Bath, Coffee, Ban } from 'lucide-react';
 
 
+import { generateBreadcrumbJsonLd, COTTAGE_ADDRESS, COTTAGE_GEO, SITE_URL } from '@/lib/seo/jsonld';
+
 export const metadata: Metadata = {
-  title: 'Bryn Bugeiliaid Bach - Anecs Moethus yn Eryri',
+  title: 'Bryn Bugeiliaid Bach | Llety Moethus 2 Wely yn Nebo, Dyffryn Nantlle',
   description:
-    "Llety anecs 2 ystafell wely hunangynhwysol wedi'i adnewyddu'n hyfryd yn edrych dros Ddyffryn Nantlle gyda llosgwr coed, ystafell wydr, gwres dan lawr a chysur 5 seren.",
+    'Llety gwyliau moethus 5 seren Croeso Cymru yn Nebo ger Penygroes yn edrych dros Ddyffryn Nantlle. Llosgwr coed, ystafell wydr, gwres dan lawr, golygfeydd godidog o Eryri.',
   alternates: {
     canonical: 'https://plashafodcottage.co.uk/cy/bryn-bugeiliaid-bach',
     languages: {
       'en-GB': 'https://plashafodcottage.co.uk/bryn-bugeiliaid-bach',
       'cy-GB': 'https://plashafodcottage.co.uk/cy/bryn-bugeiliaid-bach',
     },
+  },
+  openGraph: {
+    title: 'Bryn Bugeiliaid Bach | Llety Moethus 2 Wely yn Nebo, Dyffryn Nantlle',
+    description:
+      'Llety gwyliau moethus 5 seren Croeso Cymru yn Nebo ger Penygroes yn edrych dros Ddyffryn Nantlle. Llosgwr coed, ystafell wydr, gwres dan lawr, golygfeydd godidog o Eryri.',
+    url: 'https://plashafodcottage.co.uk/cy/bryn-bugeiliaid-bach',
+    siteName: 'Bwthyn Plas Hafod a Bryn Bugeiliaid Bach',
+    images: [
+      {
+        url: '/images/wp/bbb-hero-bg.jpg',
+        width: 1920,
+        height: 1080,
+        alt: 'Bryn Bugeiliaid Bach yn Nebo, Dyffryn Nantlle',
+      },
+    ],
+    locale: 'cy_GB',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Bryn Bugeiliaid Bach | Llety Moethus 2 Wely yn Nebo',
+    description:
+      'Llety gwyliau moethus 5 seren Croeso Cymru yn Nebo ger Penygroes yn edrych dros Ddyffryn Nantlle.',
+    images: ['/images/wp/bbb-hero-bg.jpg'],
   },
 };
 
@@ -34,8 +60,49 @@ export default async function WelshBrynBugeiliaidBachPage() {
     cmsClient.getSiteSettings(false),
   ]);
 
+  const breadcrumbsJsonLd = generateBreadcrumbJsonLd([
+    { name: 'Hafan', url: `${SITE_URL}/cy` },
+    { name: 'Bryn Bugeiliaid Bach', url: `${SITE_URL}/cy/bryn-bugeiliaid-bach` },
+  ]);
+
+  const bbbJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': ['Accommodation', 'VacationRental'],
+    name: 'Bryn Bugeiliaid Bach',
+    description:
+      'Llety gwyliau moethus 5 seren Croeso Cymru yn Nebo ger Penygroes yn edrych dros Ddyffryn Nantlle. Llosgwr coed, ystafell wydr, gwres dan lawr, golygfeydd godidog o Eryri.',
+    url: `${SITE_URL}/cy/bryn-bugeiliaid-bach`,
+    address: COTTAGE_ADDRESS,
+    geo: {
+      '@type': 'GeoCoordinates',
+      latitude: COTTAGE_GEO.latitude,
+      longitude: COTTAGE_GEO.longitude,
+    },
+    occupancy: {
+      '@type': 'QuantitativeValue',
+      maxValue: 4,
+    },
+    numberOfBedrooms: 2,
+    numberOfBathroomsTotal: 1,
+    petsAllowed: false,
+    smokingAllowed: false,
+    starRating: {
+      '@type': 'Rating',
+      ratingValue: '5',
+      bestRating: '5',
+    },
+  };
+
   return (
     <div className="min-h-screen bg-[#fbfbfd] text-[#333333] flex flex-col font-sans selection:bg-[#efda07]/30 selection:text-stone-900">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbsJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(bbbJsonLd) }}
+      />
       <LiveSiteNavbar currentPath="/cy/bryn-bugeiliaid-bach" isCymraeg={true} siteSettings={siteSettings} />
 
       <main className="flex-1">

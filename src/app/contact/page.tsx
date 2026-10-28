@@ -6,17 +6,65 @@ import { ContactForm } from '@/components/contact/ContactForm';
 import { cmsClient } from '@/cms/client';
 import { Mail, Phone, MapPin, Clock, Compass, ShieldCheck } from 'lucide-react';
 
+import { generateBreadcrumbJsonLd, generateContactJsonLd, SITE_URL } from '@/lib/seo/jsonld';
+
 export const metadata: Metadata = {
-  title: 'Contact Us & Location Directions - Bwthyn Plas Hafod Cottage',
+  title: 'Contact & Directions | Plas Hafod Cottage, Nebo, Penygroes LL54 6EB',
   description:
-    'Contact Siwsan & Neil at Plas Hafod Cottage & Bryn Bugeiliaid Bach in Nebo, Snowdonia. Get in touch for booking inquiries, directions, or special requests.',
+    'Contact Siwsan & Neil at Plas Hafod & Bryn Bugeiliaid Bach in Nebo near Penygroes, Gwynedd. Call 01286 880620 or enquire online for direct booking availability.',
+  alternates: {
+    canonical: 'https://plashafodcottage.co.uk/contact',
+    languages: {
+      'en-GB': 'https://plashafodcottage.co.uk/contact',
+      'cy-GB': 'https://plashafodcottage.co.uk/cy/contact',
+    },
+  },
+  openGraph: {
+    title: 'Contact & Directions | Plas Hafod Cottage, Nebo, Penygroes LL54 6EB',
+    description:
+      'Contact Siwsan & Neil at Plas Hafod & Bryn Bugeiliaid Bach in Nebo near Penygroes, Gwynedd. Call 01286 880620 or enquire online for direct booking availability.',
+    url: 'https://plashafodcottage.co.uk/contact',
+    siteName: 'Plas Hafod Cottage & Bryn Bugeiliaid Bach',
+    images: [
+      {
+        url: '/images/wp/hero-bg.jpg',
+        width: 1920,
+        height: 1080,
+        alt: 'Plas Hafod mountain views near Nebo and Penygroes',
+      },
+    ],
+    locale: 'en_GB',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Contact & Directions | Plas Hafod Cottage, Nebo, Penygroes LL54 6EB',
+    description:
+      'Contact Siwsan & Neil at Plas Hafod & Bryn Bugeiliaid Bach in Nebo near Penygroes, Gwynedd.',
+    images: ['/images/wp/hero-bg.jpg'],
+  },
 };
 
 export default async function ContactPage() {
   const siteSettings = await cmsClient.getSiteSettings(false);
 
+  const breadcrumbsJsonLd = generateBreadcrumbJsonLd([
+    { name: 'Home', url: SITE_URL },
+    { name: 'Contact & Directions', url: `${SITE_URL}/contact` },
+  ]);
+
+  const contactJsonLd = generateContactJsonLd({ locale: 'en' });
+
   return (
     <div className="min-h-screen bg-[#fbfbfd] text-[#333333] flex flex-col font-sans selection:bg-[#efda07]/30 selection:text-stone-900">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbsJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(contactJsonLd) }}
+      />
       <LiveSiteNavbar currentPath="/contact" isCymraeg={false} siteSettings={siteSettings} />
 
       <main className="flex-1">
@@ -85,9 +133,9 @@ export default async function ContactPage() {
                         Plas Hafod & Bryn Bugeiliaid Bach
                       </p>
                       <p className="text-stone-600 text-xs">
-                        Nebo, near Caernarfon, Gwynedd, LL54 6EG
+                        Nebo (near Penygroes), Caernarfon, Gwynedd, LL54 6EB
                       </p>
-                      <p className="text-stone-500 text-[11px] mt-0.5">Snowdonia / Eryri, North Wales</p>
+                      <p className="text-stone-500 text-[11px] mt-0.5">Dyffryn Nantlle · Snowdonia / Eryri, North Wales</p>
                     </div>
                   </div>
                 </div>
