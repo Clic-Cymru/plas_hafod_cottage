@@ -24,176 +24,321 @@ export default defineConfig({
     structureTool({
       structure: (S) =>
         S.list()
-          .title('Clic Cymru Content Engine')
+          .title('Content & Booking Engine')
           .items([
-            // 1. Holiday Cottages & Content
+            // ==========================================
+            // 1. Pages
+            // ==========================================
             S.listItem()
-              .title('🏡 Tai Gwyliau / Cottages & Media')
+              .title('Pages')
               .child(
                 S.list()
-                  .title('Holiday Cottages & Presentation')
+                  .title('Pages')
                   .items([
+                    // Bryn Bugeiliaid Bach
                     S.listItem()
-                      .title('🌟 Plas Hafod (Main Cottage Specs & Amenities)')
+                      .title('Bryn Bugeiliaid Bach')
                       .child(
                         S.document()
-                          .schemaType('propertyDetails')
-                          .documentId('property-plas-hafod')
-                          .title('Plas Hafod Cottage Specs & Amenities')
+                          .schemaType('pageContent')
+                          .documentId('page-bryn-bugeiliaid-bach')
+                          .title('Bryn Bugeiliaid Bach Page')
                       ),
-                    S.listItem()
-                      .title('🏡 Bryn Bugeiliaid Bach (Annexe Specs & Amenities)')
-                      .child(
-                        S.document()
-                          .schemaType('propertyDetails')
-                          .documentId('property-bryn-bugeiliaid-bach')
-                          .title('Bryn Bugeiliaid Bach Specs & Amenities')
-                      ),
-                    S.documentTypeListItem('heroSlide')
-                      .title('Hero Slideshow (Sleidiau’r Hafan)'),
-                    S.documentTypeListItem('pageContent')
-                      .title('Pages & Bilingual Content (Tudalennau)'),
-                  ])
-              ),
 
-            // 2. Booking Engine & Rates
-            S.listItem()
-              .title('📅 Archebion & Phrisiau / Booking Engine')
-              .child(
-                S.list()
-                  .title('Booking & Calendar Management')
-                  .items([
-                    S.documentTypeListItem('blockedDates')
-                      .title('Blocked Dates Calendar (Dyddiadau Wedi’u Rhwystro)'),
-                    S.documentTypeListItem('pricingConfig')
-                      .title('Seasonal Pricing & Nightly Rates (Prisio)'),
-                    S.documentTypeListItem('bookingInquiry')
-                      .title('Booking Inquiries Inbox (Archebion Newydd)'),
-                  ])
-              ),
-
-            // 3. Contact & Messages Inbox
-            S.listItem()
-              .title('💬 Negeseuon / Messages Inbox')
-              .child(
-                S.documentTypeList('contactMessage')
-                  .title('Guest Contact Inquiries (Negeseuon Cyswllt)')
-              ),
-
-            // 4. Reviews & Accreditations
-            S.listItem()
-              .title('⭐ Adolygiadau & Achrediadau / Reviews & Accreditations')
-              .child(
-                S.list()
-                  .title('Reviews & Accreditations (Adolygiadau ac Achrediadau)')
-                  .items([
+                    // Home page
                     S.listItem()
-                      .title('⚙️ Trustindex Live Reviews Setup (Ffurfweddiad Trustindex)')
-                      .child(
-                        S.document()
-                          .schemaType('reviewSettings')
-                          .documentId('reviewSettings')
-                          .title('Trustindex Live Reviews Setup & Controls')
-                      ),
-                    S.listItem()
-                      .title('🏆 Accreditations & Awards (Achrediadau)')
-                      .child(
-                        S.documentList()
-                          .title('Accreditations & Awards')
-                          .apiVersion('2024-01-01')
-                          .filter('_type == "accreditation"')
-                          .defaultOrdering([{ field: 'order', direction: 'asc' }])
-                      ),
-                    S.listItem()
-                      .title('📖 Handwritten Guestbook Archive (Llyfr Gwesteion)')
+                      .title('Home page')
                       .child(
                         S.list()
-                          .title('Handwritten Guestbook Collections')
+                          .title('Home Page Management')
                           .items([
                             S.listItem()
-                              .title('🏡 Plas Hafod Cottage Guestbook (21 Notes)')
+                              .title('Page Content & SEO')
                               .child(
-                                S.documentList()
-                                  .title('Plas Hafod Cottage Guestbook')
-                                  .apiVersion('2024-01-01')
-                                  .filter(
-                                    '_type == "guestbookEntry" && (!defined(property) || property == "plas-hafod")'
-                                  )
-                                  .defaultOrdering([{ field: 'order', direction: 'asc' }])
+                                S.document()
+                                  .schemaType('pageContent')
+                                  .documentId('page-home')
+                                  .title('Home Page Content')
                               ),
+                            S.documentTypeListItem('heroSlide')
+                              .title('Hero Slideshow'),
+                          ])
+                      ),
+
+                    // Local Area
+                    S.listItem()
+                      .title('Local Area')
+                      .child(
+                        S.list()
+                          .title('Local Area')
+                          .items([
                             S.listItem()
-                              .title('🌿 Bryn Bugeiliaid Bach Guestbook (15 Notes)')
+                              .title('Page Content & SEO')
                               .child(
-                                S.documentList()
-                                  .title('Bryn Bugeiliaid Bach Guestbook')
-                                  .apiVersion('2024-01-01')
-                                  .filter('_type == "guestbookEntry" && property == "bryn-bugeiliaid-bach"')
-                                  .defaultOrdering([{ field: 'order', direction: 'asc' }])
+                                S.document()
+                                  .schemaType('pageContent')
+                                  .documentId('page-local-area')
+                                  .title('Local Area Content')
                               ),
+                            S.documentTypeListItem('localAttraction')
+                              .title('Local Attractions'),
+                            S.documentTypeListItem('snowdonPath')
+                              .title('Snowdon Mountain Walks'),
+                          ])
+                      ),
+
+                    // Reviews
+                    S.listItem()
+                      .title('Reviews')
+                      .child(
+                        S.list()
+                          .title('Reviews')
+                          .items([
                             S.listItem()
-                              .title('📋 All Guestbook Comments (All Cottages)')
+                              .title('Trustindex Live Reviews Setup')
                               .child(
-                                S.documentList()
-                                  .title('All Guestbook Comments')
-                                  .apiVersion('2024-01-01')
-                                  .filter('_type == "guestbookEntry"')
-                                  .defaultOrdering([
-                                    { field: 'property', direction: 'asc' },
-                                    { field: 'order', direction: 'asc' },
+                                S.document()
+                                  .schemaType('reviewSettings')
+                                  .documentId('reviewSettings')
+                                  .title('Trustindex Live Reviews Setup')
+                              ),
+                            S.documentTypeListItem('accreditation')
+                              .title('Accreditations & Awards'),
+                            S.listItem()
+                              .title('Handwritten Guestbook Archive')
+                              .child(
+                                S.list()
+                                  .title('Handwritten Guestbook Archive')
+                                  .items([
+                                    S.listItem()
+                                      .title('Plas Hafod Guestbook')
+                                      .child(
+                                        S.documentList()
+                                          .title('Plas Hafod Guestbook')
+                                          .filter(
+                                            '_type == "guestbookEntry" && (!defined(property) || property == "plas-hafod")'
+                                          )
+                                          .defaultOrdering([{ field: 'order', direction: 'asc' }])
+                                      ),
+                                    S.listItem()
+                                      .title('Bryn Bugeiliaid Bach Guestbook')
+                                      .child(
+                                        S.documentList()
+                                          .title('Bryn Bugeiliaid Bach Guestbook')
+                                          .filter(
+                                            '_type == "guestbookEntry" && property == "bryn-bugeiliaid-bach"'
+                                          )
+                                          .defaultOrdering([{ field: 'order', direction: 'asc' }])
+                                      ),
+                                    S.listItem()
+                                      .title('All Guestbook Notes')
+                                      .child(
+                                        S.documentList()
+                                          .title('All Guestbook Notes')
+                                          .filter('_type == "guestbookEntry"')
+                                          .defaultOrdering([
+                                            { field: 'property', direction: 'asc' },
+                                            { field: 'order', direction: 'asc' },
+                                          ])
+                                      ),
                                   ])
                               ),
                           ])
                       ),
+
+                    // Contact
+                    S.listItem()
+                      .title('Contact')
+                      .child(
+                        S.list()
+                          .title('Contact')
+                          .items([
+                            S.listItem()
+                              .title('Contact Page Content & SEO')
+                              .child(
+                                S.document()
+                                  .schemaType('pageContent')
+                                  .documentId('page-contact')
+                                  .title('Contact Page Content')
+                              ),
+                            S.documentTypeListItem('contactMessage')
+                              .title('Contact Messages Inbox'),
+                          ])
+                      ),
+
+                    // Terms and Conditions
+                    S.listItem()
+                      .title('Terms and Conditions')
+                      .child(
+                        S.documentList()
+                          .title('Terms and Conditions')
+                          .filter('_type == "policySection"')
+                          .defaultOrdering([{ field: 'order', direction: 'asc' }])
+                      ),
                   ])
               ),
 
-            // 5. Local Area & Snowdon Walks
+            // ==========================================
+            // 2. Booking Engine
+            // ==========================================
             S.listItem()
-              .title('🏔️ Ardal Leol / Local Area & Walks')
+              .title('Booking Engine')
               .child(
                 S.list()
-                  .title('Local Guide & Mountain Trails')
+                  .title('Booking Engine')
                   .items([
+                    // Cottages
                     S.listItem()
-                      .title('Local Attractions (Atyniadau Lleol)')
+                      .title('Cottages')
                       .child(
-                        S.documentList()
-                          .title('Local Attractions')
-                          .apiVersion('2024-01-01')
-                          .filter('_type == "localAttraction"')
-                          .defaultOrdering([{ field: 'order', direction: 'asc' }])
+                        S.list()
+                          .title('Cottages')
+                          .items([
+                            // Plas Hafod
+                            S.listItem()
+                              .title('Plas Hafod')
+                              .child(
+                                S.list()
+                                  .title('Plas Hafod')
+                                  .items([
+                                    S.listItem()
+                                      .title('Rates')
+                                      .child(
+                                        S.document()
+                                          .schemaType('pricingConfig')
+                                          .documentId('pricing-plas-hafod')
+                                          .title('Plas Hafod Rates')
+                                      ),
+                                    S.listItem()
+                                      .title('Bookings')
+                                      .child(
+                                        S.documentList()
+                                          .title('Plas Hafod Bookings')
+                                          .filter(
+                                            '_type == "bookingInquiry" && (!defined(propertyId) || propertyId == "plas-hafod")'
+                                          )
+                                          .defaultOrdering([{ field: 'createdAt', direction: 'desc' }])
+                                      ),
+                                    S.listItem()
+                                      .title('Blocked Dates')
+                                      .child(
+                                        S.documentList()
+                                          .title('Plas Hafod Blocked Dates')
+                                          .filter(
+                                            '_type == "blockedDates" && (propertyId == "plas-hafod" || propertyId == "both")'
+                                          )
+                                          .defaultOrdering([{ field: 'startDate', direction: 'asc' }])
+                                      ),
+                                    S.listItem()
+                                      .title('Specs & Amenities')
+                                      .child(
+                                        S.document()
+                                          .schemaType('propertyDetails')
+                                          .documentId('property-plas-hafod')
+                                          .title('Plas Hafod Specs & Amenities')
+                                      ),
+                                  ])
+                              ),
+
+                            // Bryn Bugeiliaid Bach
+                            S.listItem()
+                              .title('Bryn Bugeiliaid Bach')
+                              .child(
+                                S.list()
+                                  .title('Bryn Bugeiliaid Bach')
+                                  .items([
+                                    S.listItem()
+                                      .title('Rates')
+                                      .child(
+                                        S.document()
+                                          .schemaType('pricingConfig')
+                                          .documentId('pricing-bryn-bugeiliaid-bach')
+                                          .title('Bryn Bugeiliaid Bach Rates')
+                                      ),
+                                    S.listItem()
+                                      .title('Bookings')
+                                      .child(
+                                        S.documentList()
+                                          .title('Bryn Bugeiliaid Bach Bookings')
+                                          .filter(
+                                            '_type == "bookingInquiry" && propertyId == "bryn-bugeiliaid-bach"'
+                                          )
+                                          .defaultOrdering([{ field: 'createdAt', direction: 'desc' }])
+                                      ),
+                                    S.listItem()
+                                      .title('Blocked Dates')
+                                      .child(
+                                        S.documentList()
+                                          .title('Bryn Bugeiliaid Bach Blocked Dates')
+                                          .filter(
+                                            '_type == "blockedDates" && (propertyId == "bryn-bugeiliaid-bach" || propertyId == "both")'
+                                          )
+                                          .defaultOrdering([{ field: 'startDate', direction: 'asc' }])
+                                      ),
+                                    S.listItem()
+                                      .title('Specs & Amenities')
+                                      .child(
+                                        S.document()
+                                          .schemaType('propertyDetails')
+                                          .documentId('property-bryn-bugeiliaid-bach')
+                                          .title('Bryn Bugeiliaid Bach Specs & Amenities')
+                                      ),
+                                  ])
+                              ),
+
+                            // All Bookings View (Both Cottages)
+                            S.listItem()
+                              .title('All Bookings (Master Calendar & Inbox)')
+                              .child(
+                                S.documentList()
+                                  .title('All Bookings (Both Cottages)')
+                                  .filter('_type == "bookingInquiry"')
+                                  .defaultOrdering([{ field: 'createdAt', direction: 'desc' }])
+                              ),
+                          ])
                       ),
+
+                    // Seasons
                     S.listItem()
-                      .title('Snowdon Mountain Walks (Llwybrau’r Wyddfa)')
+                      .title('Seasons')
                       .child(
                         S.documentList()
-                          .title('Snowdon Trails')
-                          .apiVersion('2024-01-01')
-                          .filter('_type == "snowdonPath"')
+                          .title('Seasons')
+                          .filter('_type == "season"')
+                          .defaultOrdering([{ field: 'startDate', direction: 'asc' }])
+                      ),
+
+                    // Special offers / discounts
+                    S.listItem()
+                      .title('Special offers / discounts')
+                      .child(
+                        S.documentList()
+                          .title('Special Offers & Discounts')
+                          .filter('_type == "specialOffer"')
+                      ),
+
+                    // E-mail templates
+                    S.listItem()
+                      .title('E-mail templates')
+                      .child(
+                        S.documentList()
+                          .title('E-mail Templates')
+                          .filter('_type == "emailTemplate"')
                           .defaultOrdering([{ field: 'order', direction: 'asc' }])
                       ),
                   ])
               ),
 
-            // 6. Terms & Policies
+            // ==========================================
+            // 3. Site Settings
+            // ==========================================
             S.listItem()
-              .title('📜 Telerau & Pholisïau / Terms & Policies')
-              .child(
-                S.documentList()
-                  .title('Terms & Cancellation Policies')
-                  .apiVersion('2024-01-01')
-                  .filter('_type == "policySection"')
-                  .defaultOrdering([{ field: 'order', direction: 'asc' }])
-              ),
-
-            // 7. Site Settings & Branding (Singleton)
-            S.listItem()
-              .title('⚙️ Gosodiadau Gwefan / Site Settings')
+              .title('Site Settings')
               .child(
                 S.document()
                   .schemaType('siteSettings')
                   .documentId('siteSettings')
-                  .title('Global Site Settings & Branding')
+                  .title('Site Settings')
               ),
           ]),
     }),

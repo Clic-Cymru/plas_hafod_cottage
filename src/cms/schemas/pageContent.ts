@@ -1,16 +1,16 @@
 /**
- * Sanity / Headless CMS Schema: Page Content with Welsh (Cymraeg) & English fields.
+ * Sanity Schema: Page Content with English & Welsh translation placeholders.
  */
 export const pageContentSchema = {
   name: 'pageContent',
-  title: 'Pages & Bilingual Content',
+  title: 'Page Content',
   type: 'document',
   fields: [
     {
       name: 'slug',
-      title: 'Page Slug / Identifier',
+      title: 'Page Identifier / Slug',
       type: 'string',
-      description: 'e.g. "home", "about", "gallery", "booking", "contact"',
+      description: 'e.g. "home", "bryn-bugeiliaid-bach", "local-area", "reviews", "contact", "terms"',
       validation: (Rule: any) => Rule.required(),
     },
     {
@@ -21,9 +21,9 @@ export const pageContentSchema = {
     },
     {
       name: 'titleCy',
-      title: 'Teitl (Cymraeg / Welsh)',
+      title: 'Title (Welsh)',
       type: 'string',
-      validation: (Rule: any) => Rule.required(),
+      description: 'Welsh translation placeholder for page title.',
     },
     {
       name: 'heroHeadingEn',
@@ -32,7 +32,7 @@ export const pageContentSchema = {
     },
     {
       name: 'heroHeadingCy',
-      title: 'Prif Benaeth (Cymraeg)',
+      title: 'Hero Heading (Welsh)',
       type: 'string',
     },
     {
@@ -43,7 +43,7 @@ export const pageContentSchema = {
     },
     {
       name: 'heroSubheadingCy',
-      title: 'Is-bennawd (Cymraeg)',
+      title: 'Hero Subheading (Welsh)',
       type: 'text',
       rows: 2,
     },
@@ -55,7 +55,7 @@ export const pageContentSchema = {
     },
     {
       name: 'bodyCy',
-      title: 'Disgrifiad (Cymraeg)',
+      title: 'Body Description (Welsh)',
       type: 'text',
       rows: 6,
     },
@@ -66,7 +66,7 @@ export const pageContentSchema = {
     },
     {
       name: 'seoTitleCy',
-      title: 'Teitl SEO (Cymraeg)',
+      title: 'SEO Title (Welsh)',
       type: 'string',
     },
     {
@@ -77,7 +77,7 @@ export const pageContentSchema = {
     },
     {
       name: 'seoDescriptionCy',
-      title: 'Disgrifiad Meta (Cymraeg)',
+      title: 'Meta Description (Welsh)',
       type: 'text',
       rows: 2,
     },
@@ -88,4 +88,16 @@ export const pageContentSchema = {
       of: [{ type: 'image', options: { hotspot: true } }],
     },
   ],
+  preview: {
+    select: {
+      title: 'titleEn',
+      slug: 'slug',
+    },
+    prepare({ title, slug }: any) {
+      return {
+        title: title || slug || 'Untitled Page',
+        subtitle: `Slug: /${slug || ''}`,
+      };
+    },
+  },
 };

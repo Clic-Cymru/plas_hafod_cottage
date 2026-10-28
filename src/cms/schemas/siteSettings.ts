@@ -6,55 +6,55 @@ import { EmailTemplatePreviewAndTest } from '../studio/EmailTemplatePreviewAndTe
  */
 export const siteSettingsSchema = {
   name: 'siteSettings',
-  title: 'Site Settings & Branding (Gosodiadau Gwefan)',
+  title: 'Site Settings & Branding',
   type: 'document',
   fieldsets: [
     {
-      name: 'emailCopy',
-      title: '📧 Email Copy & Notifications (Golygu Negeseuon E-bost)',
+      name: 'promotions',
+      title: '🎁 Special Offers & Announcements',
       options: { collapsible: true, collapsed: false },
     },
     {
       name: 'banking',
-      title: '🏦 Bank Transfer & Deposit Details (Manylion Talu a Blaendal)',
+      title: '🏦 Bank Transfer & Deposit Details',
       options: { collapsible: true, collapsed: false },
     },
     {
-      name: 'promotions',
-      title: '🎁 Special Offers & Announcements (Cynigion Arbennig a Baneri)',
-      options: { collapsible: true, collapsed: false },
+      name: 'emailCopy',
+      title: '📧 Notification Alert Settings',
+      options: { collapsible: true, collapsed: true },
     },
     {
       name: 'socials',
-      title: '📱 Social Media Links (Cyfryngau Cymdeithasol)',
+      title: '📱 Social Media Links',
       options: { collapsible: true, collapsed: true },
     },
   ],
   fields: [
     {
       name: 'siteTitle',
-      title: 'Site Title / Enw’r Safle',
+      title: 'Site Title',
       type: 'string',
       initialValue: 'Bwthyn Plas Hafod Cottage & Bryn Bugeiliaid Bach',
       validation: (Rule: any) => Rule.required(),
     },
     {
       name: 'hostNames',
-      title: 'Host Names / Enwau’r Lletywyr',
+      title: 'Host Names',
       type: 'string',
       initialValue: 'Siwsan & Neil',
       description: 'e.g. "Siwsan & Neil"',
     },
     {
       name: 'email',
-      title: 'Contact Email / E-bost Cyswllt',
+      title: 'Contact Email',
       type: 'string',
       initialValue: 'info@plashafodcottage.co.uk',
       validation: (Rule: any) => Rule.required(),
     },
     {
       name: 'phone',
-      title: 'Telephone / Rhif Ffôn',
+      title: 'Telephone',
       type: 'string',
       initialValue: '+44 (0) 1286 880 000',
     },
@@ -73,10 +73,11 @@ export const siteSettingsSchema = {
     },
     {
       name: 'addressCy',
-      title: 'Cyfeiriad (Cymraeg)',
+      title: 'Cottage Address (Welsh)',
       type: 'text',
       rows: 3,
       initialValue: 'Bwthyn Plas Hafod, Nebo, Caernarfon, Gwynedd, LL54 6EE',
+      description: 'Welsh translation placeholder for postal address',
     },
     {
       name: 'checkInTime',
@@ -105,16 +106,16 @@ export const siteSettingsSchema = {
     // Special Offers & Promo Presentation
     {
       name: 'offerDisplayMode',
-      title: 'Offer Presentation Style / Ffordd o Arddangos y Cynnig',
+      title: 'Offer Presentation Style',
       type: 'string',
       fieldset: 'promotions',
       description: 'Choose whether special offers should appear as a Top Announcement Banner or as a Popup Window.',
       options: {
         list: [
-          { title: 'Top Announcement Banner (Baner Cyhoeddi ar y Brig)', value: 'banner' },
-          { title: 'Special Offer Popup / Modal (Ffenestr Bop-yp Cynnig Arbennig)', value: 'popup' },
-          { title: 'Both Banner & Popup (Y Faner a’r Bop-yp)', value: 'both' },
-          { title: 'Disabled / None (Wedi’i Ddiffodd)', value: 'none' },
+          { title: 'Top Announcement Banner', value: 'banner' },
+          { title: 'Special Offer Popup / Modal', value: 'popup' },
+          { title: 'Both Banner & Popup', value: 'both' },
+          { title: 'Disabled / None', value: 'none' },
         ],
         layout: 'radio',
       },
@@ -125,15 +126,16 @@ export const siteSettingsSchema = {
       title: 'Banner Announcement Text (English)',
       type: 'string',
       fieldset: 'promotions',
-      description: 'Yellow highlight banner across top of hero',
+      description: 'Highlight banner across top of hero',
       initialValue: 'BOOK DIRECT & SAVE 10% — BEST PRICE GUARANTEED ON ALL 2026 / 2027 DATES',
     },
     {
       name: 'bannerAnnouncementCy',
-      title: 'Testun y Faner Gyhoeddi (Cymraeg)',
+      title: 'Banner Announcement Text (Welsh)',
       type: 'string',
       fieldset: 'promotions',
       initialValue: 'ARCHEBWCH YN UNIONGYRCHOL AC ARBEDWCH 10% — PRIS GORAU WEDI’I WARANTU',
+      description: 'Welsh translation placeholder for announcement banner',
     },
     {
       name: 'bannerLink',
@@ -154,14 +156,14 @@ export const siteSettingsSchema = {
     // Popup Window Settings
     {
       name: 'offerPosition',
-      title: 'Popup Screen Position (if Popup is chosen)',
+      title: 'Popup Screen Position',
       type: 'string',
       fieldset: 'promotions',
       description: 'Choose whether the popup appears right in the center with a focused backdrop, or in the bottom-right corner.',
       options: {
         list: [
-          { title: 'Centered Modal Overlay (Canol y Dudalen gydag Arlliw Cefndir)', value: 'center' },
-          { title: 'Bottom-Right Floating Toast (Cornel Isaf ar y Dde)', value: 'bottom-right' },
+          { title: 'Centered Modal Overlay', value: 'center' },
+          { title: 'Bottom-Right Floating Toast', value: 'bottom-right' },
         ],
         layout: 'radio',
       },
@@ -176,7 +178,7 @@ export const siteSettingsSchema = {
     },
     {
       name: 'offerBadgeCy',
-      title: 'Bathodyn y Bop-yp (Cymraeg)',
+      title: 'Popup Badge Tag (Welsh)',
       type: 'string',
       fieldset: 'promotions',
       initialValue: 'CYNNIG ARBENNIG HYDREF 2026!',
@@ -190,7 +192,7 @@ export const siteSettingsSchema = {
     },
     {
       name: 'offerTitleCy',
-      title: 'Prif Deitl y Bop-yp (Cymraeg)',
+      title: 'Popup Heading (Welsh)',
       type: 'string',
       fieldset: 'promotions',
       initialValue: 'Archebwch 3 Noson, Cewch y 4edd Noson am Ddim!',
@@ -205,7 +207,7 @@ export const siteSettingsSchema = {
     },
     {
       name: 'offerDescriptionCy',
-      title: 'Disgrifiad a Thelerau’r Bop-yp (Cymraeg)',
+      title: 'Popup Description & Terms (Welsh)',
       type: 'text',
       rows: 3,
       fieldset: 'promotions',
@@ -220,14 +222,14 @@ export const siteSettingsSchema = {
     },
     {
       name: 'offerButtonTextCy',
-      title: 'Testun Botwm y Bop-yp (Cymraeg)',
+      title: 'Popup Button Text (Welsh)',
       type: 'string',
       fieldset: 'promotions',
       initialValue: 'Archebwch Nawr',
     },
     {
       name: 'offerButtonLink',
-      title: 'Popup Button Link (e.g. #book)',
+      title: 'Popup Button Link',
       type: 'string',
       fieldset: 'promotions',
       initialValue: '#book',
@@ -235,7 +237,7 @@ export const siteSettingsSchema = {
     // Banking & Deposit Configuration for BACS payments
     {
       name: 'bankAccountName',
-      title: 'Bank Account Name / Enw’r Cyfrif',
+      title: 'Bank Account Name',
       type: 'string',
       fieldset: 'banking',
       initialValue: 'Plas Hafod Cottage',
@@ -251,7 +253,7 @@ export const siteSettingsSchema = {
     },
     {
       name: 'bankSortCode',
-      title: 'Sort Code (Cod Didoli)',
+      title: 'Sort Code',
       type: 'string',
       fieldset: 'banking',
       initialValue: '20-00-00',
@@ -259,7 +261,7 @@ export const siteSettingsSchema = {
     },
     {
       name: 'bankAccountNumber',
-      title: 'Account Number (Rhif Cyfrif)',
+      title: 'Account Number',
       type: 'string',
       fieldset: 'banking',
       initialValue: '12345678',
@@ -289,7 +291,7 @@ export const siteSettingsSchema = {
     },
     {
       name: 'depositInstructions',
-      title: 'Deposit Payment Instructions / Notes (English)',
+      title: 'Deposit Payment Instructions (English)',
       type: 'text',
       rows: 3,
       fieldset: 'banking',
@@ -298,27 +300,17 @@ export const siteSettingsSchema = {
     },
     {
       name: 'depositInstructionsCy',
-      title: 'Cyfarwyddiadau Talu Blaendal (Cymraeg)',
+      title: 'Deposit Payment Instructions (Welsh)',
       type: 'text',
       rows: 3,
       fieldset: 'banking',
       initialValue: 'Nodwch eich cyfeirnod talu unigryw wrth drosglwyddo arian fel y gallwn nodi eich taliad ar unwaith a chadarnhau eich archeb.',
-      description: 'Cyfarwyddiadau trosglwyddo banc ar gyfer gwesteion Cymraeg',
-    },
-    // Email Template Live Preview & Testing Tool
-    {
-      name: 'emailPreviewTool',
-      title: 'Live Email Preview & Test Dispatcher',
-      type: 'string',
-      fieldset: 'emailCopy',
-      components: {
-        input: EmailTemplatePreviewAndTest,
-      },
+      description: 'Welsh translation placeholder for bank instructions',
     },
     // Email Copy & Notification Settings
     {
       name: 'notificationRecipients',
-      title: 'Notification Alert Recipients / E-byst Rhybudd',
+      title: 'Notification Alert Recipients',
       type: 'string',
       fieldset: 'emailCopy',
       initialValue: 'info@plashafodcottage.co.uk',
@@ -335,7 +327,7 @@ export const siteSettingsSchema = {
     },
     {
       name: 'emergencyHostPhone',
-      title: 'Host Direct / Emergency Phone (Rhif Ffôn Brys)',
+      title: 'Host Direct / Emergency Phone',
       type: 'string',
       fieldset: 'emailCopy',
       initialValue: '+44 (0) 7900 123 456',
@@ -348,16 +340,14 @@ export const siteSettingsSchema = {
       rows: 3,
       fieldset: 'emailCopy',
       initialValue: 'Thank you for your inquiry to stay with us at {property}. We have received your booking request and our team is reviewing availability for your selected dates.',
-      description: 'Opening paragraph in guest booking request receipt email. Use {property} as placeholder.',
     },
     {
       name: 'guestBookingEmailWelcomeCy',
-      title: 'Croeso Archebu Gwesteion (Cymraeg)',
+      title: 'Guest Booking Welcome Message (Welsh)',
       type: 'text',
       rows: 3,
       fieldset: 'emailCopy',
       initialValue: 'Diolch am eich ymholiad i aros gyda ni yn {property}. Rydym wedi derbyn eich cais archebu ac mae ein tîm yn adolygu argaeledd ar gyfer eich dyddiadau dewisol.',
-      description: 'Paragraff croeso mewn e-bost cadarnhau cais archebu',
     },
     {
       name: 'guestBookingEmailNextStepsEn',
@@ -366,16 +356,14 @@ export const siteSettingsSchema = {
       rows: 3,
       fieldset: 'emailCopy',
       initialValue: 'We will review your requested dates and contact you shortly with confirmation and secure deposit payment details to lock in your stay.',
-      description: 'Explanation in highlight box of what happens next after submitting a booking inquiry',
     },
     {
       name: 'guestBookingEmailNextStepsCy',
-      title: 'Gwybodaeth Camau Nesaf (Cymraeg)',
+      title: 'Guest Next Steps Information (Welsh)',
       type: 'text',
       rows: 3,
       fieldset: 'emailCopy',
       initialValue: 'Byddwn yn adolygu eich dyddiadau gofynnol ac yn cysylltu â chi’n fuan gyda chadarnhad a manylion talu blaendal diogel i gadarnhau eich arhosiad.',
-      description: 'Eglurhad o beth sy’n digwydd nesaf ar ôl anfon cais archebu',
     },
     {
       name: 'guestContactEmailReplyEn',
@@ -384,22 +372,20 @@ export const siteSettingsSchema = {
       rows: 3,
       fieldset: 'emailCopy',
       initialValue: 'Thank you for getting in touch with us. We have received your inquiry and will respond to you within 24 hours.',
-      description: 'Automated receipt sent to visitors submitting website contact form',
     },
     {
       name: 'guestContactEmailReplyCy',
-      title: 'Neges Ateb Awtomatig Cyswllt (Cymraeg)',
+      title: 'Contact Form Auto-Reply Message (Welsh)',
       type: 'text',
       rows: 3,
       fieldset: 'emailCopy',
       initialValue: 'Diolch am gysylltu â ni. Rydym wedi derbyn eich neges a byddwn yn ymateb cyn pen 24 awr.',
-      description: 'Neges awtomatig a anfonir at ymwelwyr sy’n cysylltu trwy’r wefan',
     },
   ],
   preview: {
     prepare() {
       return {
-        title: 'Global Site Settings & Branding',
+        title: 'Site Settings & Branding',
         subtitle: 'Phone, Email, Address, Banking, Banner & Socials',
       };
     },

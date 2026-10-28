@@ -1,16 +1,16 @@
 /**
- * Sanity Schema: Handwritten Guestbook Comment / Note (Llyfr Gwesteion)
+ * Sanity Schema: Handwritten Guestbook Comment / Note
  * Enables viewing, uploading, cropping, and editing the handwritten guestbook
  * clipping images and their transcripts in Sanity Studio.
  */
 export const guestbookSchema = {
   name: 'guestbookEntry',
-  title: 'Handwritten Guestbook Archive (Llyfr Gwesteion)',
+  title: 'Guestbook Entry',
   type: 'document',
   fields: [
     {
       name: 'photo',
-      title: 'Guestbook Clipping Image / Llun y Sylw Llawysgrif',
+      title: 'Guestbook Clipping Image',
       type: 'image',
       description:
         'Upload or view the photograph/scan of the handwritten guestbook page from Plas Hafod or Bryn Bugeiliaid Bach.',
@@ -21,11 +21,11 @@ export const guestbookSchema = {
     },
     {
       name: 'property',
-      title: 'Property / Eiddo',
+      title: 'Cottage',
       type: 'string',
       options: {
         list: [
-          { title: 'Plas Hafod Cottage (Bwthyn Plas Hafod)', value: 'plas-hafod' },
+          { title: 'Plas Hafod Cottage', value: 'plas-hafod' },
           { title: 'Bryn Bugeiliaid Bach (Annexe)', value: 'bryn-bugeiliaid-bach' },
         ],
         layout: 'radio',
@@ -35,20 +35,20 @@ export const guestbookSchema = {
     },
     {
       name: 'author',
-      title: 'Guest Name(s) / Enw(au) y Gwesteion (Optional)',
+      title: 'Guest Name(s) (Optional)',
       type: 'string',
       description: 'Optional. Leave blank to let the handwritten note speak for itself.',
       validation: (Rule: any) => Rule.optional(),
     },
     {
       name: 'stayDate',
-      title: 'Stay Date / Month & Year (Dyddiad Arhosiad)',
+      title: 'Stay Date / Month & Year',
       type: 'string',
       description: 'e.g. "August 2026", "October 2026", "Autumn 2026"',
     },
     {
       name: 'location',
-      title: 'Guest Origin / Location (Tarddiad y Gwestai)',
+      title: 'Guest Origin / Location',
       type: 'string',
       description: 'e.g. "Cardiff", "Bristol", "London", "Aberystwyth"',
     },
@@ -61,27 +61,28 @@ export const guestbookSchema = {
     },
     {
       name: 'reviewTextEn',
-      title: 'Transcription / Handwritten Note Content (English)',
+      title: 'Transcription / Note Content (English)',
       type: 'text',
       rows: 4,
       description: 'Optional text transcription of the handwritten note for accessibility and search.',
     },
     {
       name: 'reviewTextCy',
-      title: 'Trawsgrifiad / Cynnwys y Sylw Llawysgrif (Cymraeg)',
+      title: 'Transcription / Note Content (Welsh)',
       type: 'text',
       rows: 4,
+      description: 'Welsh translation placeholder for transcription',
     },
     {
       name: 'order',
-      title: 'Display Order / Trefn',
+      title: 'Display Order',
       type: 'number',
       description: 'Controls the display order on the website (1, 2, 3...)',
       initialValue: 1,
     },
     {
       name: 'isFeatured',
-      title: 'Feature on Homepage (Dangos ar yr Hafan)',
+      title: 'Feature on Homepage',
       type: 'boolean',
       initialValue: false,
     },
@@ -96,7 +97,7 @@ export const guestbookSchema = {
     },
     prepare({ title, property, order, subtitle, media }: any) {
       const propLabel =
-        property === 'bryn-bugeiliaid-bach' ? '🌿 Bryn Bugeiliaid Bach' : '🏡 Plas Hafod';
+        property === 'bryn-bugeiliaid-bach' ? 'Bryn Bugeiliaid Bach' : 'Plas Hafod';
       const numLabel = order ? `Note #${order}` : 'Note';
       return {
         title: title ? `${propLabel} - ${title}` : `${propLabel} ${numLabel}`,

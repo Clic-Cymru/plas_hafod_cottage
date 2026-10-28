@@ -4,7 +4,7 @@
  */
 export const snowdonPathSchema = {
   name: 'snowdonPath',
-  title: 'Snowdon Paths & Walks (Lwybrau’r Wyddfa)',
+  title: 'Snowdon Path / Trail',
   type: 'document',
   fields: [
     {
@@ -16,13 +16,13 @@ export const snowdonPathSchema = {
     },
     {
       name: 'nameCy',
-      title: 'Enw’r Llwybr (Cymraeg)',
+      title: 'Path Name (Welsh)',
       type: 'string',
-      description: 'e.g. "Llwybr y PYG", "Llwybr Watkin", "Llwybr Ceidwad yr Wyddfa"',
+      description: 'Welsh translation placeholder for path name',
     },
     {
       name: 'distance',
-      title: 'Distance / Pellter',
+      title: 'Distance',
       type: 'string',
       description: 'e.g. "3.25 miles each way"',
       validation: (Rule: any) => Rule.required(),
@@ -36,20 +36,20 @@ export const snowdonPathSchema = {
     },
     {
       name: 'startCy',
-      title: 'Man Cychwyn (Cymraeg)',
+      title: 'Starting Point (Welsh)',
       type: 'string',
-      description: 'e.g. "Maes parcio Hostel Ieuenctid Pen-y-Pass"',
+      description: 'Welsh translation placeholder for starting point',
     },
     {
       name: 'difficulty',
-      title: 'Difficulty Level / Graddfa Anhawster',
+      title: 'Difficulty Level',
       type: 'string',
       options: {
         list: [
-          { title: 'Gentle / Hawdd', value: 'Gentle' },
-          { title: 'Moderate / Cymedrol', value: 'Moderate' },
-          { title: 'Demanding / Caled', value: 'Demanding' },
-          { title: 'Hard & Strenuous / Hynod Galetach', value: 'Hard' },
+          { title: 'Gentle', value: 'Gentle' },
+          { title: 'Moderate', value: 'Moderate' },
+          { title: 'Demanding', value: 'Demanding' },
+          { title: 'Hard & Strenuous', value: 'Hard' },
         ],
       },
       initialValue: 'Moderate',
@@ -63,13 +63,14 @@ export const snowdonPathSchema = {
     },
     {
       name: 'descriptionCy',
-      title: 'Disgrifiad (Cymraeg)',
+      title: 'Description (Welsh)',
       type: 'text',
       rows: 4,
+      description: 'Welsh translation placeholder for description',
     },
     {
       name: 'order',
-      title: 'Display Order / Trefn',
+      title: 'Display Order',
       type: 'number',
       initialValue: 10,
     },

@@ -1,6 +1,6 @@
 /**
- * Sanity / Headless CMS Schema: Pricing Configuration
- * Manages Base Rate, Seasonal Multipliers/Rates, and Discount Rules.
+ * Sanity Schema: Pricing Configuration & Rates
+ * Manages standard nightly base rates, seasonal rate overrides, deposit %, and fees.
  */
 export const pricingSchema = {
   name: 'pricingConfig',
@@ -9,7 +9,7 @@ export const pricingSchema = {
   fields: [
     {
       name: 'propertyId',
-      title: 'Property / Cottage',
+      title: 'Cottage',
       type: 'string',
       options: {
         list: [
@@ -20,7 +20,7 @@ export const pricingSchema = {
       },
       initialValue: 'plas-hafod',
       validation: (Rule: any) => Rule.required(),
-      description: 'Select which cottage this pricing configuration applies to.',
+      description: 'Select which cottage this rate configuration applies to.',
     },
     {
       name: 'baseRate',
@@ -28,6 +28,14 @@ export const pricingSchema = {
       type: 'number',
       validation: (Rule: any) => Rule.required().min(50).positive(),
       description: 'Default price per night when no specific seasonal rate applies.',
+    },
+    {
+      name: 'minStayDefault',
+      title: 'Standard Minimum Stay (Nights)',
+      type: 'number',
+      initialValue: 2,
+      validation: (Rule: any) => Rule.required().min(1),
+      description: 'Default minimum booking nights when no season override applies.',
     },
     {
       name: 'depositPercentage',
@@ -44,41 +52,90 @@ export const pricingSchema = {
       initialValue: 0,
     },
     {
-      name: 'seasons',
-      title: 'Seasons & Peak Periods',
+      name: 'petFee',
+      title: 'Pet Fee (£)',
+      type: 'number',
+      initialValue: 0,
+      description: 'Optional surcharge per stay for guests bringing dogs/pets.',
+    },
+    {
+      name: 'seasonalRates',
+      title: 'Seasonal Rates & Peak Periods',
       type: 'array',
-      description: 'Define specific date ranges with custom nightly rates and minimum stay rules.',
+      description: 'Select seasons from the shared Seasons directory and specify this cottage’s nightly rate and minimum stay.',
       of: [
         {
           type: 'object',
-          name: 'season',
-          title: 'Season Period',
+          name: 'seasonalRate',
+          title: 'Seasonal Rate Override',
           fields: [
-            { name: 'name', title: 'Season Name (e.g. Summer Peak, Christmas / New Year)', type: 'string', validation: (Rule: any) => Rule.required() },
-            { name: 'startDate', title: 'Start Date (dd/mm/yyyy)', type: 'date', options: { dateFormat: 'DD/MM/YYYY' }, validation: (Rule: any) => Rule.required() },
-            { name: 'endDate', title: 'End Date (dd/mm/yyyy)', type: 'date', options: { dateFormat: 'DD/MM/YYYY' }, validation: (Rule: any) => Rule.required() },
-            { name: 'nightlyRate', title: 'Nightly Rate (£)', type: 'number', validation: (Rule: any) => Rule.required().positive() },
-            { name: 'minStay', title: 'Minimum Stay (Nights)', type: 'number', initialValue: 3, validation: (Rule: any) => Rule.required().min(1) },
+            {
+              name: 'season',
+              title: 'Season',
+              type: 'reference',
+              to: [{ type: 'season' }],
+              validation: (Rule: any) => Rule.required(),
+              description: 'Select the season from the global Seasons list.',
+            },
+            {
+              name: 'nightlyRate',
+              title: 'Nightly Rate (£)',
+              type: 'number',
+              validation: (Rule: any) => Rule.required().positive(),
+            },
+            {
+              name: 'minStay',
+              title: 'Minimum Stay (Nights)',
+              type: 'number',
+              initialValue: 3,
+              validation: (Rule: any) => Rule.required().min(1),
+            },
+            {
+              name: 'notes',
+              title: 'Notes (Optional)',
+              type: 'string',
+            },
           ],
           preview: {
             select: {
-              title: 'name',
-              start: 'startDate',
-              end: 'endDate',
+              seasonName: 'season.name',
+              start: 'season.startDate',
+              end: 'season.endDate',
               rate: 'nightlyRate',
+              minStay: 'minStay',
             },
-            prepare({ title, start, end, rate }: any) {
+            prepare({ seasonName, start, end, rate, minStay }: any) {
               const formatUk = (d: string) => {
                 if (!d) return '';
                 const m = String(d).match(/^(\d{4})-(\d{2})-(\d{2})/);
                 return m ? `${m[3]}/${m[2]}/${m[1]}` : d;
               };
+              const dateRange = start && end ? `${formatUk(start)} → ${formatUk(end)}` : 'Dates pending';
               return {
-                title: `${title} (£${rate}/night)`,
-                subtitle: `${formatUk(start)} → ${formatUk(end)}`,
+                title: `${seasonName || 'Season'}: £${rate || 0}/night`,
+                subtitle: `${dateRange} • Min stay: ${minStay || 1} nights`,
               };
             },
           },
+        },
+      ],
+    },
+    {
+      name: 'seasons',
+      title: 'Legacy Embedded Seasons',
+      type: 'array',
+      hidden: true,
+      of: [
+        {
+          type: 'object',
+          name: 'season',
+          fields: [
+            { name: 'name', type: 'string' },
+            { name: 'startDate', type: 'date' },
+            { name: 'endDate', type: 'date' },
+            { name: 'nightlyRate', type: 'number' },
+            { name: 'minStay', type: 'number' },
+          ],
         },
       ],
     },
@@ -128,7 +185,7 @@ export const pricingSchema = {
           ? 'Bryn Bugeiliaid Bach (Annexe)'
           : 'Plas Hafod Cottage (Main)';
       return {
-        title: name,
+        title: `${name} Rates`,
         subtitle: `Standard Rate: £${baseRate || 0} / night`,
       };
     },

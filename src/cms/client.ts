@@ -233,15 +233,53 @@ export const cmsClient = {
   async getPricingConfig(propertyId: 'plas-hafod' | 'bryn-bugeiliaid-bach' = 'plas-hafod'): Promise<PricingConfig> {
     if (isSanityLive && sanityClient) {
       try {
-        const query = `*[_type == "pricingConfig" && propertyId == $propertyId][0]`;
+        const query = `*[_type == "pricingConfig" && propertyId == $propertyId][0] {
+          ...,
+          "resolvedRates": seasonalRates[] {
+            ...,
+            "seasonDoc": season->
+          }
+        }`;
         const data = await sanityClient.fetch(query, { propertyId });
         if (data && typeof data.baseRate === 'number') {
+          let seasons = data.seasons || [];
+          if (Array.isArray(data.resolvedRates) && data.resolvedRates.length > 0) {
+            seasons = data.resolvedRates
+              .filter((r: any) => r?.seasonDoc?.startDate && r?.seasonDoc?.endDate)
+              .map((r: any) => ({
+                name: r.seasonDoc.name || r.notes || 'Seasonal Rate',
+                startDate: r.seasonDoc.startDate,
+                endDate: r.seasonDoc.endDate,
+                nightlyRate: r.nightlyRate,
+                minStay: r.minStay ?? r.seasonDoc.minStayDefault ?? 3,
+              }));
+          }
+
+          let discounts = data.discounts || [];
+          try {
+            const offers = await sanityClient.fetch(
+              `*[_type == "specialOffer" && active == true && (propertyId == $propertyId || propertyId == "both")] | order(minNights asc)`,
+              { propertyId }
+            );
+            if (Array.isArray(offers) && offers.length > 0) {
+              discounts = offers.map((o: any) => ({
+                name: o.title,
+                code: o.code,
+                minNights: o.minNights ?? 7,
+                validFrom: o.validFrom,
+                validTo: o.validTo,
+                discountType: o.discountType ?? 'percentage',
+                value: o.value,
+              }));
+            }
+          } catch (_) {}
+
           return {
             baseRate: data.baseRate,
             depositPercentage: data.depositPercentage ?? 25,
             cleaningFee: data.cleaningFee ?? (propertyId === 'bryn-bugeiliaid-bach' ? 35 : 45),
-            seasons: data.seasons || [],
-            discounts: data.discounts || [],
+            seasons,
+            discounts,
           };
         }
       } catch (err) {

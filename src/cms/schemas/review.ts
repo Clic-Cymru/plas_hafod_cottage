@@ -4,19 +4,19 @@
  */
 export const reviewSchema = {
   name: 'review',
-  title: 'Guest Reviews & Testimonials (Adolygiadau Gwesteion)',
+  title: 'Guest Review & Testimonial',
   type: 'document',
   fields: [
     {
       name: 'author',
-      title: 'Guest Name / Enw’r Gwestai',
+      title: 'Guest Name',
       type: 'string',
       description: 'e.g. "Megan", "Andrew", "Rosie & Clive J."',
       validation: (Rule: any) => Rule.required(),
     },
     {
       name: 'source',
-      title: 'Review Source / Platfform',
+      title: 'Review Source',
       type: 'string',
       options: {
         list: [
@@ -25,7 +25,7 @@ export const reviewSchema = {
           { title: 'Booking.com', value: 'Booking.com' },
           { title: 'Google Reviews', value: 'Google' },
           { title: 'TripAdvisor', value: 'TripAdvisor' },
-          { title: 'Direct Guestbook / Llyfr Gwesteion', value: 'Direct' },
+          { title: 'Direct Guestbook', value: 'Direct' },
         ],
       },
       initialValue: 'Airbnb',
@@ -33,11 +33,11 @@ export const reviewSchema = {
     },
     {
       name: 'property',
-      title: 'Property / Eiddo',
+      title: 'Cottage',
       type: 'string',
       options: {
         list: [
-          { title: 'Both Properties / Y Ddau', value: 'both' },
+          { title: 'Both Cottages', value: 'both' },
           { title: 'Plas Hafod Cottage', value: 'plas-hafod' },
           { title: 'Bryn Bugeiliaid Bach', value: 'bryn-bugeiliaid-bach' },
         ],
@@ -53,7 +53,7 @@ export const reviewSchema = {
     },
     {
       name: 'stayDate',
-      title: 'Stay Date / Month / Dyddiad Aros',
+      title: 'Stay Date / Month',
       type: 'string',
       description: 'e.g. "August 2026" or "October 2026"',
     },
@@ -66,25 +66,26 @@ export const reviewSchema = {
     },
     {
       name: 'textCy',
-      title: 'Testun yr Adolygiad (Cymraeg)',
+      title: 'Review Text (Welsh)',
       type: 'text',
       rows: 4,
+      description: 'Welsh translation placeholder for review text',
     },
     {
       name: 'guestPhoto',
-      title: 'Guest Photo / Holiday Photo (Optional)',
+      title: 'Guest Photo (Optional)',
       type: 'image',
       options: { hotspot: true },
     },
     {
       name: 'featured',
-      title: 'Featured on Homepage / Amlygu ar yr Hafan',
+      title: 'Featured on Homepage',
       type: 'boolean',
       initialValue: true,
     },
     {
       name: 'order',
-      title: 'Display Order / Trefn',
+      title: 'Display Order',
       type: 'number',
       initialValue: 10,
     },

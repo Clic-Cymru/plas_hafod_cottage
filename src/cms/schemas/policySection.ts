@@ -4,7 +4,7 @@
  */
 export const policySectionSchema = {
   name: 'policySection',
-  title: 'Terms & Policies (Telerau ac Amodau)',
+  title: 'Terms & Policy Section',
   type: 'document',
   fields: [
     {
@@ -16,9 +16,9 @@ export const policySectionSchema = {
     },
     {
       name: 'titleCy',
-      title: 'Teitl yr Adran (Cymraeg)',
+      title: 'Section Title (Welsh)',
       type: 'string',
-      description: 'e.g. "1. Cytundeb ac Amserlen Dalu"',
+      description: 'Welsh translation placeholder for section title.',
     },
     {
       name: 'icon',
@@ -44,9 +44,10 @@ export const policySectionSchema = {
     },
     {
       name: 'leadParagraphCy',
-      title: 'Crynodeb Arweiniol (Cymraeg)',
+      title: 'Lead Summary Paragraph (Welsh)',
       type: 'text',
       rows: 3,
+      description: 'Welsh translation placeholder for lead paragraph.',
     },
     {
       name: 'bulletsEn',
@@ -56,13 +57,14 @@ export const policySectionSchema = {
     },
     {
       name: 'bulletsCy',
-      title: 'Pwyntiau / Cymalau (Cymraeg)',
+      title: 'Bullet Points / Clauses (Welsh)',
       type: 'array',
       of: [{ type: 'string' }],
+      description: 'Welsh translation placeholder for bullet points.',
     },
     {
       name: 'order',
-      title: 'Display Order / Trefn',
+      title: 'Display Order',
       type: 'number',
       initialValue: 1,
     },

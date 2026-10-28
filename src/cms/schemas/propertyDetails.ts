@@ -4,12 +4,12 @@
  */
 export const propertyDetailsSchema = {
   name: 'propertyDetails',
-  title: 'Cottage Features & Amenities (Manylion y Bythynnod)',
+  title: 'Cottage Features & Amenities',
   type: 'document',
   fields: [
     {
       name: 'propertyId',
-      title: 'Property / Eiddo',
+      title: 'Cottage',
       type: 'string',
       options: {
         list: [
@@ -27,42 +27,42 @@ export const propertyDetailsSchema = {
     },
     {
       name: 'nameCy',
-      title: 'Enw’r Eiddo (Cymraeg)',
+      title: 'Property Name (Welsh)',
       type: 'string',
     },
     {
       name: 'taglineEn',
-      title: 'Tagline / Slogan (English)',
+      title: 'Tagline (English)',
       type: 'string',
       description: 'e.g. "Cozy 5-Star Cottage with Amazing Views"',
     },
     {
       name: 'taglineCy',
-      title: 'Llinell Tag (Cymraeg)',
+      title: 'Tagline (Welsh)',
       type: 'string',
       description: 'e.g. "Bwthyn Clyd 5-Seren gyda Golygfeydd Rhyfeddol"',
     },
     {
       name: 'sleeps',
-      title: 'Maximum Guests / Cwsg',
+      title: 'Maximum Guests',
       type: 'number',
       initialValue: 4,
     },
     {
       name: 'bedrooms',
-      title: 'Bedrooms / Ystafelloedd Gwely',
+      title: 'Bedrooms',
       type: 'number',
       initialValue: 2,
     },
     {
       name: 'bathrooms',
-      title: 'Bathrooms / Ystafelloedd Ymolchi',
+      title: 'Bathrooms',
       type: 'number',
       initialValue: 1,
     },
     {
       name: 'petFriendly',
-      title: 'Pet Friendly / Cyfeillgar i Gwn',
+      title: 'Pet Friendly',
       type: 'boolean',
       initialValue: true,
     },
@@ -74,7 +74,7 @@ export const propertyDetailsSchema = {
     },
     {
       name: 'shortDescriptionCy',
-      title: 'Disgrifiad Byr (Cymraeg)',
+      title: 'Short Description (Welsh)',
       type: 'text',
       rows: 3,
     },
@@ -86,7 +86,7 @@ export const propertyDetailsSchema = {
     },
     {
       name: 'fullStoryCy',
-      title: 'Stori a Hanes Llawn (Cymraeg)',
+      title: 'Full Story & History (Welsh)',
       type: 'text',
       rows: 6,
     },
@@ -98,7 +98,7 @@ export const propertyDetailsSchema = {
     },
     {
       name: 'featuresCy',
-      title: 'Pwyntiau Allweddol (Cymraeg)',
+      title: 'Key Feature Bullets (Welsh)',
       type: 'array',
       of: [{ type: 'string' }],
     },

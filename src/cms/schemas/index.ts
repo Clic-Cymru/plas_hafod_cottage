@@ -13,6 +13,9 @@ import { reviewSchema } from './review';
 import { policySectionSchema } from './policySection';
 import { propertyDetailsSchema } from './propertyDetails';
 import { reviewSettingsSchema } from './reviewSettings';
+import { seasonSchema } from './season';
+import { specialOfferSchema } from './specialOffer';
+import { emailTemplateSchema } from './emailTemplate';
 
 export const schemaTypes = [
   // Properties & Content
@@ -21,9 +24,12 @@ export const schemaTypes = [
   pageContentSchema,
   // Pricing & Bookings
   pricingSchema,
+  seasonSchema,
+  specialOfferSchema,
   blockedDatesSchema,
   bookingInquirySchema,
   contactMessageSchema,
+  emailTemplateSchema,
   // Reviews & Accreditations
   reviewSettingsSchema,
   reviewSchema,
@@ -39,9 +45,12 @@ export const schemaTypes = [
 
 export {
   pricingSchema,
+  seasonSchema,
+  specialOfferSchema,
   blockedDatesSchema,
   bookingInquirySchema,
   contactMessageSchema,
+  emailTemplateSchema,
   pageContentSchema,
   guestbookSchema,
   localAttractionSchema,

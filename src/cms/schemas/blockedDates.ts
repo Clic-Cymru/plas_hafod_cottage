@@ -1,15 +1,15 @@
 /**
- * Sanity / Headless CMS Schema: Blocked Dates
- * Manages unavailable calendar dates (direct bookings, OTA sync, maintenance, owner use).
+ * Sanity Schema: Blocked Dates
+ * Manages unavailable calendar dates (direct bookings, maintenance, owner use).
  */
 export const blockedDatesSchema = {
   name: 'blockedDates',
-  title: 'Blocked Dates / Calendar Restrictions',
+  title: 'Blocked Dates',
   type: 'document',
   fields: [
     {
       name: 'propertyId',
-      title: 'Property',
+      title: 'Cottage',
       type: 'string',
       options: {
         list: [

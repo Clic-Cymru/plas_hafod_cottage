@@ -16,9 +16,9 @@ export const localAttractionSchema = {
     },
     {
       name: 'titleCy',
-      title: 'Teitl (Cymraeg / Welsh)',
+      title: 'Title (Welsh)',
       type: 'string',
-      description: 'Welsh title translation',
+      description: 'Welsh translation placeholder for attraction title',
     },
     {
       name: 'slug',
@@ -57,8 +57,9 @@ export const localAttractionSchema = {
     },
     {
       name: 'categoryCy',
-      title: 'Categori (Cymraeg)',
+      title: 'Category (Welsh)',
       type: 'string',
+      description: 'Welsh translation placeholder for category badge',
     },
     {
       name: 'image',
@@ -84,9 +85,10 @@ export const localAttractionSchema = {
     },
     {
       name: 'descriptionCy',
-      title: 'Disgrifiad (Cymraeg / Welsh)',
+      title: 'Description (Welsh)',
       type: 'text',
       rows: 4,
+      description: 'Welsh translation placeholder for description',
     },
     {
       name: 'url',

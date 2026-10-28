@@ -17,9 +17,9 @@ export const accreditationSchema = {
     },
     {
       name: 'titleCy',
-      title: 'Teitl y Wobr (Cymraeg / Welsh)',
+      title: 'Award / Accreditation Title (Welsh)',
       type: 'string',
-      description: 'Welsh title translation e.g. "Gwobr Adolygu Teithwyr 2026"',
+      description: 'Welsh translation placeholder for award title',
     },
     {
       name: 'source',
@@ -61,9 +61,9 @@ export const accreditationSchema = {
     },
     {
       name: 'scoreCy',
-      title: 'Sgôr / Amlygiad (Cymraeg / Welsh)',
+      title: 'Rating / Score Highlight (Welsh)',
       type: 'string',
-      description: 'Welsh rating translation e.g. "10 / 10 Sgôr Eithriadol"',
+      description: 'Welsh translation placeholder for rating e.g. "10 / 10 Sgôr Eithriadol"',
     },
     {
       name: 'description',
@@ -75,10 +75,10 @@ export const accreditationSchema = {
     },
     {
       name: 'descriptionCy',
-      title: 'Disgrifiad (Cymraeg / Welsh)',
+      title: 'Description (Welsh)',
       type: 'text',
       rows: 3,
-      description: 'Welsh translation of the award description',
+      description: 'Welsh translation placeholder for award description',
     },
     {
       name: 'image',

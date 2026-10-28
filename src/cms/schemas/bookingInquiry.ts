@@ -1,12 +1,12 @@
 import { DepositRequestComponent } from '../studio/DepositRequestComponent';
 
 /**
- * Sanity / Headless CMS Schema: Booking Inquiries (Booking Inbox)
- * Where form submissions from guests are saved directly into the client dashboard.
+ * Sanity Schema: Booking Inquiries (Booking Inbox)
+ * Where guest reservation submissions are stored and managed.
  */
 export const bookingInquirySchema = {
   name: 'bookingInquiry',
-  title: 'Booking Inquiries (Inbox)',
+  title: 'Booking Inquiry',
   type: 'document',
   fields: [
     {
@@ -19,7 +19,7 @@ export const bookingInquirySchema = {
     },
     {
       name: 'propertyId',
-      title: 'Property Booked',
+      title: 'Cottage',
       type: 'string',
       options: {
         list: [

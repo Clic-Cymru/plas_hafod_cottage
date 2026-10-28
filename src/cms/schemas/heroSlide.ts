@@ -4,7 +4,7 @@
  */
 export const heroSlideSchema = {
   name: 'heroSlide',
-  title: 'Hero Slideshow (Lluniau Sleidiau’r Hafan)',
+  title: 'Hero Slideshow Slide',
   type: 'document',
   fields: [
     {
@@ -38,20 +38,21 @@ export const heroSlideSchema = {
     },
     {
       name: 'altCy',
-      title: 'Testun Alt (Cymraeg)',
+      title: 'Alt Text (Welsh)',
       type: 'string',
       initialValue: 'Golygfeydd panoramig Bwthyn Plas Hafod dros Eryri a Môr Iwerddon',
+      description: 'Welsh translation placeholder for alt text',
     },
     {
       name: 'order',
-      title: 'Display Order / Trefn',
+      title: 'Display Order',
       type: 'number',
       initialValue: 1,
       description: '1 = First slide, 2 = Second slide, etc.',
     },
     {
       name: 'active',
-      title: 'Active / Gweithredol',
+      title: 'Active Slide',
       type: 'boolean',
       initialValue: true,
       description: 'Uncheck to temporarily hide this slide without deleting it',

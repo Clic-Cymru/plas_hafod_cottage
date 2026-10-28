@@ -1,10 +1,10 @@
 /**
- * Sanity / Headless CMS Schema: Contact Messages (Contact Form Submissions)
- * Where inquiries from the /contact page are logged in Sanity Studio.
+ * Sanity Schema: Contact Message
+ * Inquiries submitted through the website /contact form.
  */
 export const contactMessageSchema = {
   name: 'contactMessage',
-  title: 'Contact Messages (Inbox)',
+  title: 'Contact Message',
   type: 'document',
   fields: [
     {

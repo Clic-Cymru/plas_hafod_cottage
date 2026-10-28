@@ -1,10 +1,10 @@
 /**
- * Sanity Schema: Review & Accreditation Settings (Gosodiadau Adolygiadau)
+ * Sanity Schema: Review & Accreditation Settings
  * Dedicated singleton configuration for Trustindex Live Reviews, review displays, and guestbook archive.
  */
 export const reviewSettingsSchema = {
   name: 'reviewSettings',
-  title: 'Review & Trustindex Settings (Gosodiadau Adolygiadau)',
+  title: 'Review & Trustindex Settings',
   type: 'document',
   fields: [
     {
@@ -17,7 +17,7 @@ export const reviewSettingsSchema = {
     },
     {
       name: 'trustindexEnabled',
-      title: 'Enable Trustindex Live Reviews / Galluogi Trustindex',
+      title: 'Enable Trustindex Live Reviews',
       type: 'boolean',
       description:
         'Toggle this switch on to display the live Trustindex multi-platform review slider on the website.',
@@ -53,9 +53,10 @@ export const reviewSettingsSchema = {
     },
     {
       name: 'reviewHeadingCy',
-      title: 'Pennawd yr Adran Adolygiadau (Cymraeg)',
+      title: 'Reviews Section Heading (Welsh)',
       type: 'string',
       initialValue: 'GWELWCH BETH MAE EIN CWSMERIAID YN EI FEDDWL',
+      description: 'Welsh translation placeholder for reviews heading',
     },
     {
       name: 'guestbookHeadingEn',
@@ -65,9 +66,10 @@ export const reviewSettingsSchema = {
     },
     {
       name: 'guestbookHeadingCy',
-      title: 'Pennawd yr Archif Llyfr Gwesteion (Cymraeg)',
+      title: 'Handwritten Guestbook Archive Heading (Welsh)',
       type: 'string',
       initialValue: 'GEIRIAU GAN EIN HYMWELWYR',
+      description: 'Welsh translation placeholder for guestbook heading',
     },
     {
       name: 'guestbookDescriptionEn',
@@ -79,11 +81,12 @@ export const reviewSettingsSchema = {
     },
     {
       name: 'guestbookDescriptionCy',
-      title: 'Disgrifiad Llyfr Gwesteion (Cymraeg)',
+      title: 'Guestbook Description (Welsh)',
       type: 'text',
       rows: 2,
       initialValue:
         'Toriadau a gymerwyd yn uniongyrchol o’r llyfr gwesteion llawysgrif sydd yn lolfa Plas Hafod.',
+      description: 'Welsh translation placeholder for guestbook description',
     },
     {
       name: 'showPlatformReviews',
