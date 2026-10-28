@@ -20,20 +20,25 @@ import { liveCarouselImages, CarouselSlide } from '@/data/carouselImages';
 
 interface AboutAndGalleryProps {
   isCymraeg?: boolean;
+  galleryImages?: { id: number; src: string; alt: string }[] | null;
 }
 
-export function LiveSiteAboutAndGallery({ isCymraeg = false }: AboutAndGalleryProps) {
-  const total = liveCarouselImages.length; // 44
-  const CLONE_COUNT = 4;
+export function LiveSiteAboutAndGallery({ isCymraeg = false, galleryImages }: AboutAndGalleryProps) {
+  const slides = useMemo(
+    () => (galleryImages && galleryImages.length > 0 ? galleryImages : liveCarouselImages),
+    [galleryImages]
+  );
+  const total = slides.length; // 44
+  const CLONE_COUNT = Math.min(4, total);
 
   // Extended slides array with clones at both ends for infinite seamless loop
   const extendedSlides = useMemo(
     () => [
-      ...liveCarouselImages.slice(-CLONE_COUNT),
-      ...liveCarouselImages,
-      ...liveCarouselImages.slice(0, CLONE_COUNT),
+      ...slides.slice(-CLONE_COUNT),
+      ...slides,
+      ...slides.slice(0, CLONE_COUNT),
     ],
-    [total]
+    [slides, CLONE_COUNT]
   );
 
   // Carousel state
@@ -475,8 +480,8 @@ export function LiveSiteAboutAndGallery({ isCymraeg = false }: AboutAndGalleryPr
             onClick={(e) => e.stopPropagation()}
           >
             <Image
-              src={liveCarouselImages[lightboxIndex].src}
-              alt={liveCarouselImages[lightboxIndex].alt}
+              src={slides[lightboxIndex].src}
+              alt={slides[lightboxIndex].alt}
               fill
               className="object-contain"
               priority

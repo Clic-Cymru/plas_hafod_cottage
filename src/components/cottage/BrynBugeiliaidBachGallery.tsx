@@ -78,10 +78,19 @@ const bbbAllImagesCy: BBBImageItem[] = [
 
 interface Props {
   isCymraeg?: boolean;
+  galleryImages?: BBBImageItem[] | null;
 }
 
-export function BrynBugeiliaidBachGallery({ isCymraeg = false }: Props) {
-  const images = isCymraeg ? bbbAllImagesCy : bbbAllImagesEn;
+export function BrynBugeiliaidBachGallery({ isCymraeg = false, galleryImages }: Props) {
+  const defaultImages = isCymraeg ? bbbAllImagesCy : bbbAllImagesEn;
+  const images =
+    galleryImages && galleryImages.length > 0
+      ? galleryImages.map((img, idx) => ({
+          id: img.id || idx + 1,
+          src: img.src,
+          alt: img.alt || defaultImages[idx]?.alt || `Bryn Bugeiliaid Bach #${idx + 1}`,
+        }))
+      : defaultImages;
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
   const [showAll, setShowAll] = useState<boolean>(false);
 

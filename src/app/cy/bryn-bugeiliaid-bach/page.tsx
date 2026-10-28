@@ -53,11 +53,12 @@ export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
 export default async function WelshBrynBugeiliaidBachPage() {
-  const [pricingConfig, blockedDates, accreditations, siteSettings] = await Promise.all([
+  const [pricingConfig, blockedDates, accreditations, siteSettings, galleryImages] = await Promise.all([
     cmsClient.getPricingConfig('bryn-bugeiliaid-bach'),
     cmsClient.getBlockedDates('bryn-bugeiliaid-bach'),
     cmsClient.getAccreditations('bryn-bugeiliaid-bach', true),
     cmsClient.getSiteSettings(false),
+    cmsClient.getGalleryImages('bryn-bugeiliaid-bach'),
   ]);
 
   const breadcrumbsJsonLd = generateBreadcrumbJsonLd([
@@ -208,7 +209,7 @@ export default async function WelshBrynBugeiliaidBachPage() {
         <BrynBugeiliaidBachAccreditations isCymraeg={true} accreditations={accreditations} />
 
         {/* Interactive 30-Photo Gallery with Lightbox Modal */}
-        <BrynBugeiliaidBachGallery isCymraeg={true} />
+        <BrynBugeiliaidBachGallery isCymraeg={true} galleryImages={galleryImages} />
 
         {/* BBB Booking Widget */}
         <LiveSiteBooking

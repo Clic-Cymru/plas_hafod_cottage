@@ -900,6 +900,50 @@ export const cmsClient = {
     }
     return defaultPolicySections;
   },
+
+  async getGalleryImages(
+    propertyId: 'plas-hafod' | 'bryn-bugeiliaid-bach' = 'plas-hafod'
+  ): Promise<{ id: number; src: string; alt: string }[] | null> {
+    if (isSanityLive && sanityClient) {
+      try {
+        const slug = propertyId === 'bryn-bugeiliaid-bach' ? 'bryn-bugeiliaid-bach' : 'home';
+        const query = `{
+          "pageGallery": *[_type == "pageContent" && slug == $slug][0].galleryImages[]{
+            "url": asset->url,
+            caption
+          },
+          "propGallery": *[_type == "propertyDetails" && propertyId == $propertyId][0].galleryImages[]{
+            "url": asset->url,
+            caption
+          }
+        }`;
+        const data = await sanityClient.fetch(query, { slug, propertyId });
+        const list =
+          Array.isArray(data?.pageGallery) && data.pageGallery.length > 0
+            ? data.pageGallery
+            : Array.isArray(data?.propGallery) && data.propGallery.length > 0
+            ? data.propGallery
+            : null;
+        if (list) {
+          const valid = list.filter((img: any) => Boolean(img?.url));
+          if (valid.length > 0) {
+            return valid.map((img: any, idx: number) => ({
+              id: idx + 1,
+              src: img.url,
+              alt:
+                img.caption ||
+                (propertyId === 'bryn-bugeiliaid-bach'
+                  ? `Bryn Bugeiliaid Bach Gallery Photo #${idx + 1}`
+                  : `Plas Hafod Cottage Gallery Photo #${idx + 1}`),
+            }));
+          }
+        }
+      } catch (err) {
+        console.warn('Failed to fetch gallery images from Sanity, using fallback:', err);
+      }
+    }
+    return null;
+  },
 };
 
 // Default Fallback Datasets
