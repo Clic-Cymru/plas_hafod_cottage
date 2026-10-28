@@ -674,6 +674,18 @@ export const cmsClient = {
             guestBookingEmailNextStepsCy: site.guestBookingEmailNextStepsCy || defaultSiteSettings.guestBookingEmailNextStepsCy,
             guestContactEmailReplyEn: site.guestContactEmailReplyEn || defaultSiteSettings.guestContactEmailReplyEn,
             guestContactEmailReplyCy: site.guestContactEmailReplyCy || defaultSiteSettings.guestContactEmailReplyCy,
+            checkInDaysBeforeArrival: site.checkInDaysBeforeArrival ?? defaultSiteSettings.checkInDaysBeforeArrival,
+            balanceReminderDaysBeforeArrival: site.balanceReminderDaysBeforeArrival ?? defaultSiteSettings.balanceReminderDaysBeforeArrival,
+            plasHafodKeySafe: site.plasHafodKeySafe || defaultSiteSettings.plasHafodKeySafe,
+            plasHafodWifiSsid: site.plasHafodWifiSsid || defaultSiteSettings.plasHafodWifiSsid,
+            plasHafodWifiPassword: site.plasHafodWifiPassword || defaultSiteSettings.plasHafodWifiPassword,
+            bbbKeySafe: site.bbbKeySafe || defaultSiteSettings.bbbKeySafe,
+            bbbWifiSsid: site.bbbWifiSsid || defaultSiteSettings.bbbWifiSsid,
+            bbbWifiPassword: site.bbbWifiPassword || defaultSiteSettings.bbbWifiPassword,
+            checkInDirectionsEn: site.checkInDirectionsEn || defaultSiteSettings.checkInDirectionsEn,
+            checkInDirectionsCy: site.checkInDirectionsCy || defaultSiteSettings.checkInDirectionsCy,
+            wasteBinInstructionsEn: site.wasteBinInstructionsEn || defaultSiteSettings.wasteBinInstructionsEn,
+            wasteBinInstructionsCy: site.wasteBinInstructionsCy || defaultSiteSettings.wasteBinInstructionsCy,
           };
         }
       } catch (err) {
@@ -946,6 +958,22 @@ export const defaultSiteSettings: SiteSettings = {
     'Thank you for getting in touch with us. We have received your inquiry and will respond to you within 24 hours.',
   guestContactEmailReplyCy:
     'Diolch am gysylltu â ni. Rydym wedi derbyn eich neges a byddwn yn ymateb cyn pen 24 awr.',
+  checkInDaysBeforeArrival: 14,
+  balanceReminderDaysBeforeArrival: 14,
+  plasHafodKeySafe: 'PH-4821',
+  plasHafodWifiSsid: 'PlasHafod_Guest_5G',
+  plasHafodWifiPassword: 'eryri-mountain-peace',
+  bbbKeySafe: 'BBB-7193',
+  bbbWifiSsid: 'BrynBugeiliaid_Guest',
+  bbbWifiPassword: 'nantlle-ridge-views',
+  checkInDirectionsEn:
+    'From the A487 at Penygroes roundabout, take the exit signposted Nebo (B4418). Ascend through the village of Nebo following signs for Plas Hafod. Turn left onto the private gated lane directly opposite the stone chapel.',
+  checkInDirectionsCy:
+    'O gylchfan yr A487 ym Mhen-y-groes, cymerwch yr allanfa wedi’i harwyddo i Nebo (B4418). Esgynwch trwy bentref Nebo gan ddilyn arwyddion Plas Hafod. Trowch i’r chwith i’r lôn breifat gyferbyn â’r capel carreg.',
+  wasteBinInstructionsEn:
+    'General refuse (black bin) and mixed recycling (blue/green caddies) are located beside the timber woodshed. Collection is early Wednesday morning.',
+  wasteBinInstructionsCy:
+    'Mae sbwriel cyffredinol (bin du) ac ailgylchu cymysg wrth ymyl y sied goed. Cynhelir casgliadau yn gynnar fore Mercher.',
 };
 
 export const defaultHeroSlides: HeroSlide[] = [

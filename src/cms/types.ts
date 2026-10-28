@@ -66,6 +66,14 @@ export interface BookingInquiry {
   customBankName?: string;
   customBankSortCode?: string;
   customBankAccountNumber?: string;
+  // Final Balance & Automated Check-in Workflow
+  finalBalancePaid?: boolean;
+  finalBalancePaidAt?: string;
+  keySafeCodeOverride?: string;
+  checkInEmailStatus?: 'not_sent' | 'sent' | 'failed';
+  checkInEmailSentAt?: string;
+  balanceReminderStatus?: 'not_sent' | 'sent' | 'failed';
+  balanceReminderSentAt?: string;
 }
 
 export interface LocalizedString {
@@ -195,6 +203,19 @@ export interface SiteSettings {
   guestBookingEmailNextStepsCy?: string;
   guestContactEmailReplyEn?: string;
   guestContactEmailReplyCy?: string;
+  // Check-in, Key Safe & WiFi Automation
+  checkInDaysBeforeArrival?: number;
+  balanceReminderDaysBeforeArrival?: number;
+  plasHafodKeySafe?: string;
+  plasHafodWifiSsid?: string;
+  plasHafodWifiPassword?: string;
+  bbbKeySafe?: string;
+  bbbWifiSsid?: string;
+  bbbWifiPassword?: string;
+  checkInDirectionsEn?: string;
+  checkInDirectionsCy?: string;
+  wasteBinInstructionsEn?: string;
+  wasteBinInstructionsCy?: string;
 }
 
 export interface HeroSlide {

@@ -39,6 +39,13 @@ export function DepositRequestComponent(props: DepositRequestProps) {
   const depositEmailStatus = (useFormValue(['depositEmailStatus']) as string) || '';
   const currentNote = (useFormValue(['customDepositNote']) as string) || '';
 
+  // Final Balance & Automated Check-in Workflow Hooks
+  const finalBalancePaid = Boolean(useFormValue(['finalBalancePaid']));
+  const checkInEmailStatus = (useFormValue(['checkInEmailStatus']) as string) || 'not_sent';
+  const checkInEmailSentAt = (useFormValue(['checkInEmailSentAt']) as string) || '';
+  const balanceReminderStatus = (useFormValue(['balanceReminderStatus']) as string) || 'not_sent';
+  const balanceReminderSentAt = (useFormValue(['balanceReminderSentAt']) as string) || '';
+
   const [customNote, setCustomNote] = useState(currentNote || '');
   const [bankDetails, setBankDetails] = useState<BankDetailsSummary | null>(null);
   const [isSending, setIsSending] = useState(false);
@@ -154,6 +161,75 @@ export function DepositRequestComponent(props: DepositRequestProps) {
         type: 'success',
         text: 'Status updated to Confirmed (Deposit Paid)! Dates are now fully booked.',
       });
+    }
+  };
+
+  const handleToggleFinalBalance = () => {
+    if (onChange) {
+      const nextVal = !finalBalancePaid;
+      onChange(
+        PatchEvent.from([
+          set(nextVal, ['finalBalancePaid']),
+          set(nextVal ? new Date().toISOString() : null, ['finalBalancePaidAt']),
+        ])
+      );
+      setStatusMessage({
+        type: 'success',
+        text: nextVal
+          ? '✓ Final balance marked as Paid! Check-in instructions can now be released.'
+          : 'Final balance marked as Unpaid.',
+      });
+    }
+  };
+
+  const handleDispatchAction = async (actionType: 'checkin' | 'balance') => {
+    setIsSending(true);
+    setStatusMessage(null);
+    try {
+      const res = await fetch(
+        `/api/cron/automated-emails?inquiryId=${docId || inquiryRefId}&action=${actionType}&force=true&secret=plas-hafod-cron-2026`,
+        { method: 'POST' }
+      );
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setStatusMessage({
+          type: 'success',
+          text:
+            actionType === 'checkin'
+              ? '✓ Check-in Guide & Key Safe Code successfully emailed to guest!'
+              : '✓ 14-Day Balance Reminder successfully emailed to guest!',
+        });
+        if (onChange) {
+          const sentAt = new Date().toISOString();
+          if (actionType === 'checkin') {
+            onChange(
+              PatchEvent.from([
+                set('sent', ['checkInEmailStatus']),
+                set(sentAt, ['checkInEmailSentAt']),
+              ])
+            );
+          } else {
+            onChange(
+              PatchEvent.from([
+                set('sent', ['balanceReminderStatus']),
+                set(sentAt, ['balanceReminderSentAt']),
+              ])
+            );
+          }
+        }
+      } else {
+        setStatusMessage({
+          type: 'error',
+          text: `Failed to dispatch email: ${data.error || 'Server error'}`,
+        });
+      }
+    } catch (err: any) {
+      setStatusMessage({
+        type: 'error',
+        text: `Error contacting dispatch API: ${err.message}`,
+      });
+    } finally {
+      setIsSending(false);
     }
   };
 
@@ -474,6 +550,124 @@ Please quote reference "${computedRef}" with your transfer.`;
           </button>
         )}
       </div>
+
+      {/* Check-in & Final Balance Automation Box (For Confirmed Bookings) */}
+      {isConfirmed && (
+        <div
+          style={{
+            marginTop: '20px',
+            paddingTop: '20px',
+            borderTop: '2px dashed #e2e8f0',
+          }}
+        >
+          <div
+            style={{
+              background: finalBalancePaid ? '#f0fdf4' : '#fffbeb',
+              border: `1px solid ${finalBalancePaid ? '#86efac' : '#fde68a'}`,
+              borderRadius: '10px',
+              padding: '16px 18px',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px', flexWrap: 'wrap', gap: '8px' }}>
+              <div>
+                <strong style={{ fontSize: '14px', color: finalBalancePaid ? '#166534' : '#92400e', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  {finalBalancePaid ? '✅ Final Balance: PAID IN FULL' : '⏳ Final Balance: PENDING PAYMENT'}
+                </strong>
+                <p style={{ margin: '4px 0 0', fontSize: '12px', color: '#4b5563' }}>
+                  Remaining balance due: <strong>£{balanceDue}</strong>
+                </p>
+              </div>
+
+              <button
+                type="button"
+                onClick={handleToggleFinalBalance}
+                style={{
+                  background: finalBalancePaid ? '#ffffff' : '#15803d',
+                  color: finalBalancePaid ? '#374151' : '#ffffff',
+                  border: `1px solid ${finalBalancePaid ? '#d1d5db' : '#15803d'}`,
+                  borderRadius: '6px',
+                  padding: '7px 14px',
+                  fontSize: '12px',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                }}
+              >
+                {finalBalancePaid ? '↩ Mark as Unpaid' : '✓ Mark Final Balance as Paid (BACS Received)'}
+              </button>
+            </div>
+
+            <div
+              style={{
+                background: '#ffffff',
+                border: '1px solid #e5e7eb',
+                borderRadius: '8px',
+                padding: '12px 14px',
+                marginTop: '10px',
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px' }}>
+                <div>
+                  <div style={{ fontSize: '13px', fontWeight: 600, color: '#1f2937' }}>
+                    🔑 Check-in Guide &amp; Key Safe Code (14-Day Automation)
+                  </div>
+                  <div style={{ fontSize: '12px', color: '#6b7280', marginTop: '2px' }}>
+                    Status:{' '}
+                    {checkInEmailStatus === 'sent' ? (
+                      <span style={{ color: '#15803d', fontWeight: 600 }}>
+                        Sent to guest on {checkInEmailSentAt ? new Date(checkInEmailSentAt).toLocaleDateString('en-GB') : 'Yes'}
+                      </span>
+                    ) : (
+                      <span style={{ color: '#b45309' }}>
+                        Not yet dispatched (fires automatically 14 days before stay once balance is paid)
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                <div style={{ display: 'flex', gap: '8px' }}>
+                  {finalBalancePaid ? (
+                    <button
+                      type="button"
+                      onClick={() => handleDispatchAction('checkin')}
+                      disabled={isSending}
+                      style={{
+                        background: '#323149',
+                        color: '#efda07',
+                        border: 'none',
+                        borderRadius: '6px',
+                        padding: '8px 14px',
+                        fontSize: '12px',
+                        fontWeight: 700,
+                        cursor: isSending ? 'not-allowed' : 'pointer',
+                      }}
+                    >
+                      {checkInEmailStatus === 'sent' ? 'Re-send Check-in Guide Now' : 'Send Check-in Guide Now 🚀'}
+                    </button>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => handleDispatchAction('balance')}
+                      disabled={isSending}
+                      style={{
+                        background: '#fef3c7',
+                        color: '#92400e',
+                        border: '1px solid #fcd34d',
+                        borderRadius: '6px',
+                        padding: '8px 14px',
+                        fontSize: '12px',
+                        fontWeight: 600,
+                        cursor: isSending ? 'not-allowed' : 'pointer',
+                      }}
+                    >
+                      {balanceReminderStatus === 'sent' ? 'Re-send Balance Reminder' : 'Send 14-Day Balance Reminder Now ✉️'}
+                    </button>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -46,6 +46,55 @@ export interface DepositRequestEmailData extends BookingEmailData {
   contactPhone?: string;
 }
 
+export interface CheckInGuideEmailData {
+  propertyTitle: string;
+  propertyId?: 'plas-hafod' | 'bryn-bugeiliaid-bach';
+  guestName: string;
+  guestEmail: string;
+  guestPhone?: string;
+  checkIn: string;
+  checkOut: string;
+  totalNights: number;
+  adults?: number;
+  children?: number;
+  pets?: number;
+  keySafeCode: string;
+  wifiSsid?: string;
+  wifiPassword?: string;
+  directions?: string;
+  wasteInstructions?: string;
+  checkInTime?: string;
+  checkOutTime?: string;
+  emergencyPhone?: string;
+  hostNames?: string;
+  inquiryId?: string;
+}
+
+export interface BalanceReminderEmailData {
+  propertyTitle: string;
+  propertyId?: 'plas-hafod' | 'bryn-bugeiliaid-bach';
+  guestName: string;
+  guestEmail: string;
+  guestPhone?: string;
+  checkIn: string;
+  checkOut: string;
+  totalNights: number;
+  totalPrice: number;
+  depositPaid: number;
+  balanceDue: number;
+  paymentReference: string;
+  bankAccountName: string;
+  bankName: string;
+  bankSortCode: string;
+  bankAccountNumber: string;
+  bankIban?: string;
+  bankBic?: string;
+  dueDate?: string;
+  emergencyPhone?: string;
+  hostNames?: string;
+  inquiryId?: string;
+}
+
 // Hosted on global CDN for instant, reliable loading across all email clients (Gmail, Outlook, Apple Mail)
 export const LOGO_COLOR_URL =
   'https://cdn.sanity.io/images/iji5mij0/production/e869c435303f83aea95717dda5de5b822310fb00-821x523.png';
@@ -796,5 +845,427 @@ ${address} • Eryri / Snowdonia National Park
 Website: https://plashafodcottage.co.uk
 Email: info@plashafodcottage.co.uk`;
 }
+
+/**
+ * 6. Guest Check-in Guide & Key Safe Instructions (Sent 14 Days Prior to Stay)
+ */
+export function generateCheckInGuideHtml(
+  data: CheckInGuideEmailData,
+  settings?: Partial<SiteSettings>,
+  isCymraeg: boolean = false
+): string {
+  const hosts = data.hostNames || settings?.hostNames || 'Siwsan & Neil';
+  const phone = data.emergencyPhone || settings?.emergencyHostPhone || settings?.phone || '+44 (0) 1286 880620';
+  const siteTitle = settings?.siteTitle || 'Plas Hafod Cottage & Bryn Bugeiliaid Bach';
+  const checkInTime = data.checkInTime || settings?.checkInTime || '4:00 PM';
+  const checkOutTime = data.checkOutTime || settings?.checkOutTime || '10:00 AM';
+  const address =
+    (isCymraeg && settings?.addressCy ? settings.addressCy : settings?.address) ||
+    'Plas Hafod Cottage, Nebo, Penygroes, Caernarfon, Gwynedd, LL54 6EB';
+
+  const isBBB = data.propertyId === 'bryn-bugeiliaid-bach';
+  const defaultKeySafe = isBBB ? (settings?.bbbKeySafe || 'BBB-7193') : (settings?.plasHafodKeySafe || 'PH-4821');
+  const keySafeCode = data.keySafeCode || defaultKeySafe;
+  const wifiSsid = data.wifiSsid || (isBBB ? settings?.bbbWifiSsid || 'BrynBugeiliaid_Guest' : settings?.plasHafodWifiSsid || 'PlasHafod_Guest_5G');
+  const wifiPass = data.wifiPassword || (isBBB ? settings?.bbbWifiPassword || 'nantlle-ridge-views' : settings?.plasHafodWifiPassword || 'eryri-mountain-peace');
+
+  const directions = data.directions || (isCymraeg ? settings?.checkInDirectionsCy : settings?.checkInDirectionsEn) ||
+    'From the A487 at Penygroes roundabout, take the exit signposted Nebo (B4418). Ascend through the village of Nebo following signs for Plas Hafod. Turn left onto the private gated lane directly opposite the stone chapel.';
+
+  const wasteInfo = data.wasteInstructions || (isCymraeg ? settings?.wasteBinInstructionsCy : settings?.wasteBinInstructionsEn) ||
+    'General refuse (black bin) and mixed recycling (blue/green caddies) are located beside the timber woodshed. Collection is early Wednesday morning.';
+
+  const badgeText = isCymraeg ? 'CYFARWYDDIADAU CYRRAEDD A CHLUDWR ALLWEDD' : 'ARRIVAL GUIDE & KEY SAFE INSTRUCTIONS';
+  const bannerHeading = isCymraeg ? 'Eich Canllaw Cyrraedd a Chôd y Blwch Allweddi' : 'Your Arrival Guide & Key Safe Code';
+
+  return `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="light dark">
+  <meta name="supported-color-schemes" content="light dark">
+  <title>${bannerHeading} – ${data.propertyTitle}</title>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #f7f6f4; color: #2d3748; margin: 0; padding: 24px 12px; }
+    .card { max-width: 620px; margin: 0 auto; background: #ffffff; border-radius: 16px; overflow: hidden; border: 1px solid #e2e8f0; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.06); }
+    .header { background: #323149; padding: 32px 24px 24px; text-align: center; border-bottom: 3px solid #efda07; }
+    .status-badge { display: inline-block; background: #efda07; color: #1e1b2e; font-weight: 800; font-size: 11px; padding: 6px 14px; border-radius: 9999px; text-transform: uppercase; letter-spacing: 1.2px; margin-bottom: 14px; }
+    .content { padding: 30px 24px; }
+    .keysafe-card { background: #fefce8; border: 2px solid #facc15; border-radius: 12px; padding: 22px; margin: 22px 0; text-align: center; }
+    .key-badge { display: inline-block; background: #1e1b2e; color: #efda07; padding: 10px 24px; border-radius: 8px; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-size: 26px; font-weight: 800; letter-spacing: 3px; margin: 10px 0; }
+    .info-card { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 18px 20px; margin: 18px 0; }
+    .table { width: 100%; border-collapse: collapse; margin: 16px 0; }
+    .table th, .table td { padding: 10px 12px; text-align: left; border-bottom: 1px solid #edf2f7; font-size: 14px; }
+    .table th { background: #fbfbfd; color: #64748b; font-weight: 600; width: 38%; }
+    .footer { padding: 24px 20px; text-align: center; font-size: 12px; color: #94a3b8; background: #fafaf9; border-top: 1px solid #f1f5f9; line-height: 1.6; }
+
+    @media (prefers-color-scheme: dark) {
+      body { background-color: #121019 !important; color: #e2e8f0 !important; }
+      .card { background-color: #1c1829 !important; border-color: #2e2842 !important; color: #f1f5f9 !important; }
+      .header { background-color: #241f35 !important; }
+      .content { color: #e2e8f0 !important; }
+      .keysafe-card { background-color: #262038 !important; border-color: #efda07 !important; color: #f1f5f9 !important; }
+      .info-card { background-color: #201a30 !important; border-color: #3b3252 !important; color: #f1f5f9 !important; }
+      .table th { background-color: #262038 !important; color: #cbd5e1 !important; border-color: #383152 !important; }
+      .table td { border-color: #2e2842 !important; color: #e2e8f0 !important; }
+      .footer { background-color: #151221 !important; border-color: #2e2842 !important; color: #64748b !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="header">
+      <div style="margin-bottom: 14px;">
+        <img src="${LOGO_WHITE_URL}" alt="Plas Hafod Cottage" width="165" style="display: inline-block; max-width: 165px; height: auto;" border="0" />
+      </div>
+      <span class="status-badge">${badgeText}</span>
+      <h1 style="margin: 0; font-size: 22px; font-weight: 700; color: #ffffff;">${bannerHeading}</h1>
+      <p style="margin: 6px 0 0; font-size: 14px; color: #cbbaff;">${data.propertyTitle}</p>
+    </div>
+
+    <div class="content">
+      <p style="font-size: 16px; margin-top: 0; color: #1e293b;">
+        ${isCymraeg ? 'Annwyl' : 'Dear'} <strong>${data.guestName}</strong>,
+      </p>
+
+      <p style="font-size: 14px; line-height: 1.6; color: #475569;">
+        ${isCymraeg
+          ? `Mae eich arhosiad ar ddod ymhen pythefnos! Rydym yn edrych ymlaen yn fawr at eich croesawu i <strong>${data.propertyTitle}</strong> o <strong>${formatDateUK(data.checkIn)}</strong> i <strong>${formatDateUK(data.checkOut)}</strong>.`
+          : `Your stay is coming up in two weeks! We are delighted to confirm that your final balance has been received and everything is prepared for your arrival at <strong>${data.propertyTitle}</strong> from <strong>${formatDateUK(data.checkIn)}</strong> to <strong>${formatDateUK(data.checkOut)}</strong>.`}
+      </p>
+
+      <!-- Key Safe Code Callout -->
+      <div class="keysafe-card">
+        <div style="font-size: 12px; text-transform: uppercase; letter-spacing: 1.2px; color: #854d0e; font-weight: 700;">
+          🔑 ${isCymraeg ? 'CÔD Y BLWCH ALLWEDDI' : 'YOUR KEY SAFE CODE'}
+        </div>
+        <div class="key-badge">${keySafeCode}</div>
+        <div style="font-size: 13px; color: #713f12; line-height: 1.5;">
+          ${isCymraeg
+            ? 'Mae\'r blwch allweddi wedi\'i leoli wrth ymyl y prif ddrws derw o dan y porth. Pwyswch y botymau a thynnwch y clo i lawr.'
+            : 'The key safe is located beside the main oak entrance door under the porch canopy. Enter the code and slide the catch down to release the keys.'}
+        </div>
+      </div>
+
+      <!-- Stay Times Summary -->
+      <table class="table">
+        <tr><th>${isCymraeg ? 'Eiddo' : 'Property'}</th><td><strong>${data.propertyTitle}</strong></td></tr>
+        <tr><th>${isCymraeg ? 'Dyddiad Cyrraedd' : 'Check-in'}</th><td><strong>${formatDateUK(data.checkIn)}</strong> (${isCymraeg ? 'o' : 'from'} ${checkInTime})</td></tr>
+        <tr><th>${isCymraeg ? 'Dyddiad Gadael' : 'Check-out'}</th><td><strong>${formatDateUK(data.checkOut)}</strong> (${isCymraeg ? 'erbyn' : 'strictly by'} ${checkOutTime})</td></tr>
+        <tr><th>${isCymraeg ? 'Hyd yr Arhosiad' : 'Duration'}</th><td>${data.totalNights} ${isCymraeg ? 'Noson' : 'Nights'}</td></tr>
+        <tr><th>${isCymraeg ? 'Cyfeiriad' : 'Address'}</th><td>${address}</td></tr>
+      </table>
+
+      <!-- WiFi Info Card -->
+      <div class="info-card">
+        <div style="display: flex; align-items: center; margin-bottom: 8px;">
+          <strong style="font-size: 15px; color: #0f172a;">📶 ${isCymraeg ? 'Rhyngrwyd Di-wifr (WiFi)' : 'Complimentary High-Speed WiFi'}</strong>
+        </div>
+        <p style="margin: 4px 0 2px; font-size: 13px; color: #475569;">
+          <strong>Network (SSID):</strong> <code style="background: #e2e8f0; padding: 2px 6px; border-radius: 4px; font-family: monospace;">${wifiSsid}</code>
+        </p>
+        <p style="margin: 2px 0 0; font-size: 13px; color: #475569;">
+          <strong>Password:</strong> <code style="background: #e2e8f0; padding: 2px 6px; border-radius: 4px; font-family: monospace;">${wifiPass}</code>
+        </p>
+      </div>
+
+      <!-- Directions & Parking -->
+      <div class="info-card">
+        <strong style="font-size: 15px; color: #0f172a; display: block; margin-bottom: 6px;">
+          🚗 ${isCymraeg ? 'Cyfarwyddiadau Cyrraedd a Pharcio' : 'Driving Directions & Parking'}
+        </strong>
+        <p style="font-size: 13px; line-height: 1.6; color: #475569; margin: 0 0 10px;">
+          ${directions}
+        </p>
+        <p style="font-size: 12px; color: #64748b; line-height: 1.5; margin: 0;">
+          💡 <em>${isCymraeg ? 'Nodyn Llywio:' : 'Sat Nav Tip:'} ${isCymraeg ? 'Defnyddiwch god post LL54 6EB. Mae parcio preifat di-dâl ar gyfer hyd at 3 char ar y dreif darmac.' : 'Use postcode LL54 6EB. Free private off-road parking is directly on the tarmac courtyard outside your cottage.'}</em>
+        </p>
+      </div>
+
+      <!-- Bins & Care Info -->
+      <div class="info-card">
+        <strong style="font-size: 14px; color: #0f172a; display: block; margin-bottom: 4px;">
+          ♻️ ${isCymraeg ? 'Ailgylchu a Sbwriel' : 'Waste & Recycling'}
+        </strong>
+        <p style="font-size: 13px; line-height: 1.55; color: #475569; margin: 0;">
+          ${wasteInfo}
+        </p>
+      </div>
+
+      <p style="font-size: 13px; color: #64748b; line-height: 1.6; margin-top: 24px;">
+        ${isCymraeg
+          ? `Os oes gennych unrhyw gwestiynau ar eich ffordd yma, foniwch ni ar <strong>${phone}</strong>.`
+          : `If you have any questions before setting off or need assistance on arrival day, please call or text us on <strong>${phone}</strong>.`}
+      </p>
+
+      <div style="margin-top: 28px; padding-top: 20px; border-top: 1px solid #edf2f7;">
+        <p style="font-size: 14px; margin: 0 0 4px; color: #1e293b;">
+          ${isCymraeg ? 'Cofion cynhyrfoc,' : 'Warmest regards,'}<br>
+          <strong>${hosts}</strong><br>
+          <span style="color: #64748b; font-size: 13px;">${siteTitle}</span>
+        </p>
+        <span style="font-size: 12px; color: #64748b;">${address} • Eryri / Snowdonia National Park</span>
+      </div>
+    </div>
+
+    <div class="footer">
+      ${siteTitle}<br>
+      Website: <a href="https://plashafodcottage.co.uk" style="color: #4f46e5; text-decoration: none;">plashafodcottage.co.uk</a> • Tel: ${phone}
+    </div>
+  </div>
+</body>
+</html>
+`;
+}
+
+/**
+ * Plain Text Alternative: Guest Check-in Guide
+ */
+export function generateCheckInGuideText(
+  data: CheckInGuideEmailData,
+  settings?: Partial<SiteSettings>,
+  isCymraeg: boolean = false
+): string {
+  const hosts = data.hostNames || settings?.hostNames || 'Siwsan & Neil';
+  const phone = data.emergencyPhone || settings?.emergencyHostPhone || settings?.phone || '+44 (0) 1286 880620';
+  const siteTitle = settings?.siteTitle || 'Plas Hafod Cottage & Bryn Bugeiliaid Bach';
+  const checkInTime = data.checkInTime || settings?.checkInTime || '4:00 PM';
+  const checkOutTime = data.checkOutTime || settings?.checkOutTime || '10:00 AM';
+  const address =
+    (isCymraeg && settings?.addressCy ? settings.addressCy : settings?.address) ||
+    'Plas Hafod Cottage, Nebo, Penygroes, Caernarfon, Gwynedd, LL54 6EB';
+
+  const isBBB = data.propertyId === 'bryn-bugeiliaid-bach';
+  const defaultKeySafe = isBBB ? (settings?.bbbKeySafe || 'BBB-7193') : (settings?.plasHafodKeySafe || 'PH-4821');
+  const keySafeCode = data.keySafeCode || defaultKeySafe;
+  const wifiSsid = data.wifiSsid || (isBBB ? settings?.bbbWifiSsid || 'BrynBugeiliaid_Guest' : settings?.plasHafodWifiSsid || 'PlasHafod_Guest_5G');
+  const wifiPass = data.wifiPassword || (isBBB ? settings?.bbbWifiPassword || 'nantlle-ridge-views' : settings?.plasHafodWifiPassword || 'eryri-mountain-peace');
+
+  const directions = data.directions || (isCymraeg ? settings?.checkInDirectionsCy : settings?.checkInDirectionsEn) ||
+    'From the A487 at Penygroes roundabout, take the exit signposted Nebo (B4418). Ascend through the village of Nebo following signs for Plas Hafod. Turn left onto the private gated lane directly opposite the stone chapel.';
+
+  return `CHECK-IN INSTRUCTIONS & KEY SAFE CODE: ${data.propertyTitle}
+
+Dear ${data.guestName},
+
+Your stay is coming up in two weeks! We are pleased to confirm your final balance has been received.
+
+KEY SAFE CODE:
+>>> ${keySafeCode} <<<
+The key safe is located beside the main entrance oak door under the porch. Enter the code and slide the catch down.
+
+STAY DETAILS:
+- Property: ${data.propertyTitle}
+- Check-in: ${formatDateUK(data.checkIn)} (from ${checkInTime})
+- Check-out: ${formatDateUK(data.checkOut)} (strictly by ${checkOutTime})
+- Duration: ${data.totalNights} Nights
+- Address: ${address}
+
+WIFI DETAILS:
+- Network (SSID): ${wifiSsid}
+- Password: ${wifiPass}
+
+DRIVING DIRECTIONS & PARKING:
+${directions}
+Postcode for Sat Nav: LL54 6EB. Free private parking is available outside your cottage.
+
+If you have any questions or need assistance on the day, call or text us on ${phone}.
+
+Warmest regards,
+${hosts}
+${siteTitle}
+Website: https://plashafodcottage.co.uk`;
+}
+
+/**
+ * 7. 14-Day Balance Reminder (Sent when balance unpaid 14 days before arrival)
+ */
+export function generateBalanceReminderHtml(
+  data: BalanceReminderEmailData,
+  settings?: Partial<SiteSettings>,
+  isCymraeg: boolean = false
+): string {
+  const hosts = data.hostNames || settings?.hostNames || 'Siwsan & Neil';
+  const phone = data.emergencyPhone || settings?.emergencyHostPhone || settings?.phone || '+44 (0) 1286 880620';
+  const siteTitle = settings?.siteTitle || 'Plas Hafod Cottage & Bryn Bugeiliaid Bach';
+  const address = settings?.address || 'Plas Hafod Cottage, Nebo, Penygroes, Caernarfon, Gwynedd, LL54 6EB';
+
+  const badgeText = isCymraeg ? 'ATGOFFA: GWEITHREDU ANGENRHEIDIOL' : 'REMINDER: BALANCE PAYMENT DUE';
+  const headingText = isCymraeg ? 'Taliad Gweddill Dyledus – Eich Arhosiad yn Eryri' : 'Remaining Balance Due – Secure Your Arrival Details';
+
+  return `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="light dark">
+  <meta name="supported-color-schemes" content="light dark">
+  <title>${headingText} – ${data.propertyTitle}</title>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #f7f6f4; color: #2d3748; margin: 0; padding: 24px 12px; }
+    .card { max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 16px; overflow: hidden; border: 1px solid #e2e8f0; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.06); }
+    .header { background: #323149; padding: 32px 24px 24px; text-align: center; border-bottom: 3px solid #efda07; }
+    .status-badge { display: inline-block; background: #efda07; color: #1e1b2e; font-weight: 800; font-size: 11px; padding: 6px 14px; border-radius: 9999px; text-transform: uppercase; letter-spacing: 1.2px; margin-bottom: 14px; }
+    .content { padding: 30px 24px; }
+    .hero-callout { background: #fefce8; border: 2px solid #facc15; border-radius: 12px; padding: 20px; margin: 20px 0; text-align: center; }
+    .bank-box { background: #f8fafc; border: 2px solid #cbd5e1; border-radius: 12px; padding: 20px; margin: 24px 0; }
+    .bank-table { width: 100%; border-collapse: collapse; margin-top: 12px; }
+    .bank-table td { padding: 8px 6px; font-size: 14px; border-bottom: 1px solid #e2e8f0; }
+    .bank-table td.label { width: 40%; color: #64748b; font-weight: 600; }
+    .bank-table td.value { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-weight: 700; color: #0f172a; font-size: 15px; }
+    .ref-badge { display: inline-block; background: #323149; color: #efda07; padding: 5px 12px; border-radius: 6px; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-size: 16px; font-weight: 800; letter-spacing: 1px; }
+    .footer { padding: 24px 20px; text-align: center; font-size: 12px; color: #94a3b8; background: #fafaf9; border-top: 1px solid #f1f5f9; line-height: 1.6; }
+
+    @media (prefers-color-scheme: dark) {
+      body { background-color: #121019 !important; color: #e2e8f0 !important; }
+      .card { background-color: #1c1829 !important; border-color: #2e2842 !important; color: #f1f5f9 !important; }
+      .header { background-color: #241f35 !important; }
+      .content { color: #e2e8f0 !important; }
+      .hero-callout { background-color: #262038 !important; border-color: #efda07 !important; color: #f1f5f9 !important; }
+      .bank-box { background-color: #201a30 !important; border-color: #3b3252 !important; color: #f1f5f9 !important; }
+      .bank-table td { border-color: #2e2842 !important; }
+      .bank-table td.label { color: #94a3b8 !important; }
+      .bank-table td.value { color: #f1f5f9 !important; }
+      .footer { background-color: #151221 !important; border-color: #2e2842 !important; color: #64748b !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="header">
+      <div style="margin-bottom: 14px;">
+        <img src="${LOGO_WHITE_URL}" alt="Plas Hafod Cottage" width="165" style="display: inline-block; max-width: 165px; height: auto;" border="0" />
+      </div>
+      <span class="status-badge">${badgeText}</span>
+      <h1 style="margin: 0; font-size: 22px; font-weight: 700; color: #ffffff;">${headingText}</h1>
+      <p style="margin: 6px 0 0; font-size: 14px; color: #cbbaff;">${data.propertyTitle}</p>
+    </div>
+
+    <div class="content">
+      <p style="font-size: 16px; margin-top: 0; color: #1e293b;">
+        ${isCymraeg ? 'Annwyl' : 'Dear'} <strong>${data.guestName}</strong>,
+      </p>
+
+      <p style="font-size: 14px; line-height: 1.6; color: #475569;">
+        ${isCymraeg
+          ? `Mae eich arhosiad yn <strong>${data.propertyTitle}</strong> yn dechrau ymhen pythefnos ar <strong>${formatDateUK(data.checkIn)}</strong>. Dyma nodyn cyfeillgar bod y taliad gweddill bellach yn ddyledus.`
+          : `Your upcoming stay at <strong>${data.propertyTitle}</strong> begins in two weeks on <strong>${formatDateUK(data.checkIn)}</strong>. This is a friendly reminder that the remaining balance is now due.`}
+      </p>
+
+      <!-- Balance Callout -->
+      <div class="hero-callout">
+        <div style="font-size: 13px; text-transform: uppercase; letter-spacing: 1px; color: #854d0e; font-weight: 700;">
+          ${isCymraeg ? 'Gweddill Dyledus' : 'Remaining Balance Due'}
+        </div>
+        <div style="font-size: 32px; font-weight: 800; color: #1e1b2e; margin: 6px 0;">£${data.balanceDue}</div>
+        <div style="font-size: 13px; color: #713f12; line-height: 1.5;">
+          ${isCymraeg
+            ? 'Cyfanswm arhosiad: £' + data.totalPrice + ' · Blaendal a dalwyd eisoes: £' + data.depositPaid
+            : 'Total stay price: £' + data.totalPrice + ' · Deposit already credited: £' + data.depositPaid}
+        </div>
+      </div>
+
+      <!-- Bank Transfer Details -->
+      <div class="bank-box">
+        <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px;">
+          <strong style="font-size: 15px; color: #0f172a;">🏦 ${isCymraeg ? 'Manylion Trosglwyddo Banc (BACS)' : 'Bank Transfer (BACS) Details'}</strong>
+          <span style="font-size: 11px; background: #e2e8f0; padding: 3px 8px; border-radius: 12px; font-weight: 600; color: #475569;">UK Bank Transfer</span>
+        </div>
+
+        <table class="bank-table">
+          <tr><td class="label">Bank Name</td><td class="value">${data.bankName}</td></tr>
+          <tr><td class="label">Account Name</td><td class="value">${data.bankAccountName}</td></tr>
+          <tr><td class="label">Sort Code</td><td class="value">${data.bankSortCode}</td></tr>
+          <tr><td class="label">Account Number</td><td class="value">${data.bankAccountNumber}</td></tr>
+          ${data.bankIban ? `<tr><td class="label">IBAN</td><td class="value">${data.bankIban}</td></tr>` : ''}
+          ${data.bankBic ? `<tr><td class="label">BIC / SWIFT</td><td class="value">${data.bankBic}</td></tr>` : ''}
+          <tr>
+            <td class="label" style="vertical-align: middle;">Payment Reference</td>
+            <td class="value" style="padding-top: 10px; padding-bottom: 10px;">
+              <span class="ref-badge">${data.paymentReference}</span>
+            </td>
+          </tr>
+        </table>
+
+        <div style="margin-top: 14px; font-size: 12px; color: #64748b; line-height: 1.5;">
+          ⚠️ <strong>Crucial:</strong> Please quote reference <strong style="color: #0f172a;">${data.paymentReference}</strong> with your transfer so we can instantly match your payment.
+        </div>
+      </div>
+
+      <!-- What happens after payment -->
+      <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px; padding: 16px 18px; margin: 20px 0; font-size: 13px; line-height: 1.6; color: #166534;">
+        <strong>${isCymraeg ? 'Beth sy\'n digwydd ar ôl i chi dalu?' : 'What happens once payment is received?'}</strong><br>
+        ${isCymraeg
+          ? 'Cyn gynted ag y bydd eich trosglwyddiad banc yn cyrraedd, bydd eich Canllaw Cyrraedd swyddogol a’ch Côd y Blwch Allweddi yn cael eu rhyddhau’n awtomatig i’ch e-bost.'
+          : 'As soon as your transfer clears, your comprehensive Arrival Guide, driving directions, and secret Key Safe Code will be immediately dispatched to your email.'}
+      </div>
+
+      <p style="font-size: 13px; color: #64748b; line-height: 1.6;">
+        If you have already arranged this transfer or have any queries, please reply directly to this email or call us on <strong>${phone}</strong>.
+      </p>
+
+      <div style="margin-top: 28px; padding-top: 20px; border-top: 1px solid #edf2f7;">
+        <p style="font-size: 14px; margin: 0 0 4px; color: #1e293b;">
+          Warmest regards,<br>
+          <strong>${hosts}</strong><br>
+          <span style="color: #64748b; font-size: 13px;">${siteTitle}</span>
+        </p>
+        <span style="font-size: 12px; color: #64748b;">${address} • Eryri / Snowdonia National Park</span>
+      </div>
+    </div>
+
+    <div class="footer">
+      ${siteTitle}<br>
+      Website: <a href="https://plashafodcottage.co.uk" style="color: #4f46e5; text-decoration: none;">plashafodcottage.co.uk</a> • Tel: ${phone}
+    </div>
+  </div>
+</body>
+</html>
+`;
+}
+
+/**
+ * Plain Text Alternative: Balance Reminder
+ */
+export function generateBalanceReminderText(
+  data: BalanceReminderEmailData,
+  settings?: Partial<SiteSettings>,
+  isCymraeg: boolean = false
+): string {
+  const hosts = data.hostNames || settings?.hostNames || 'Siwsan & Neil';
+  const phone = data.emergencyPhone || settings?.emergencyHostPhone || settings?.phone || '+44 (0) 1286 880620';
+  const siteTitle = settings?.siteTitle || 'Plas Hafod Cottage & Bryn Bugeiliaid Bach';
+
+  return `REMAINING BALANCE DUE: ${data.propertyTitle}
+
+Dear ${data.guestName},
+
+This is a friendly reminder that the remaining balance of £${data.balanceDue} for your stay at ${data.propertyTitle} (${formatDateUK(data.checkIn)} to ${formatDateUK(data.checkOut)}) is now due.
+
+REMAINING BALANCE TO PAY:
+Amount: £${data.balanceDue} (Total Stay: £${data.totalPrice}, Deposit Paid: £${data.depositPaid})
+
+BANK TRANSFER (BACS) DETAILS:
+- Bank Name: ${data.bankName}
+- Account Name: ${data.bankAccountName}
+- Sort Code: ${data.bankSortCode}
+- Account Number: ${data.bankAccountNumber}
+${data.bankIban ? `- IBAN: ${data.bankIban}\n` : ''}${data.bankBic ? `- BIC/SWIFT: ${data.bankBic}\n` : ''}- PAYMENT REFERENCE: ${data.paymentReference}
+
+IMPORTANT: Please quote reference "${data.paymentReference}" on your transfer so we can instantly identify your payment.
+
+Once your balance has cleared, your arrival directions and Key Safe Code will be released immediately to your email.
+
+If you have any questions, reply to this email or call ${phone}.
+
+Warmest regards,
+${hosts}
+${siteTitle}
+Website: https://plashafodcottage.co.uk`;
+}
+
 
 

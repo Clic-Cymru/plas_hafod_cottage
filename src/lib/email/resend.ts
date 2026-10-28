@@ -5,6 +5,8 @@ import {
   BookingEmailData,
   ContactEmailData,
   DepositRequestEmailData,
+  CheckInGuideEmailData,
+  BalanceReminderEmailData,
   generateOwnerBookingAlertHtml,
   generateGuestConfirmationHtml,
   generateOwnerContactAlertHtml,
@@ -15,6 +17,10 @@ import {
   generateVisitorContactAutoReplyText,
   generateDepositRequestHtml,
   generateDepositRequestText,
+  generateCheckInGuideHtml,
+  generateCheckInGuideText,
+  generateBalanceReminderHtml,
+  generateBalanceReminderText,
 } from './templates';
 
 export function getResendClient() {
@@ -205,6 +211,100 @@ export async function sendDepositRequestEmail(data: DepositRequestEmailData) {
     return { success: true, guestRes };
   } catch (error) {
     console.error('Failed to send deposit request email via Resend:', error);
+    return { success: false, error };
+  }
+}
+
+export async function sendCheckInGuideEmail(data: CheckInGuideEmailData, isCymraeg: boolean = false) {
+  const client = getResendClient();
+  const { fromEmail, ownerEmail, publicReplyEmail } = getEmailConfig();
+
+  if (!client) {
+    const errMsg = 'RESEND_API_KEY environment variable is missing on server. Check-in guide simulated.';
+    console.warn('[Resend Simulation]', errMsg, { to: data.guestEmail, property: data.propertyTitle });
+    return { success: true, simulated: true };
+  }
+
+  const siteSettings = await cmsClient.getSiteSettings(isCymraeg);
+  const customRecipients = siteSettings.notificationRecipients
+    ? siteSettings.notificationRecipients.split(',').map((s) => s.trim()).filter(Boolean)
+    : [];
+  const targetBccRecipients = customRecipients.length > 0 ? customRecipients : ownerEmail;
+
+  try {
+    const refHeader = data.inquiryId ? `checkin-${data.inquiryId}` : `checkin-${Date.now()}`;
+    const subject = isCymraeg
+      ? `Canllaw Cyrraedd a Chôd Blwch Allweddi – ${data.propertyTitle} (${formatDateUK(data.checkIn)})`
+      : `Arrival Guide & Key Safe Instructions – ${data.propertyTitle} (${formatDateUK(data.checkIn)})`;
+
+    const guestRes = await client.emails.send({
+      from: fromEmail,
+      to: data.guestEmail,
+      bcc: targetBccRecipients,
+      replyTo: publicReplyEmail,
+      subject,
+      html: generateCheckInGuideHtml(data, siteSettings, isCymraeg),
+      text: generateCheckInGuideText(data, siteSettings, isCymraeg),
+      headers: {
+        'X-Entity-Ref-ID': refHeader,
+      },
+    });
+
+    if (guestRes.error) {
+      console.error('Resend error sending check-in guide:', guestRes.error);
+      return { success: false, error: guestRes.error };
+    }
+
+    return { success: true, guestRes };
+  } catch (error) {
+    console.error('Failed to send check-in guide email via Resend:', error);
+    return { success: false, error };
+  }
+}
+
+export async function sendBalanceReminderEmail(data: BalanceReminderEmailData, isCymraeg: boolean = false) {
+  const client = getResendClient();
+  const { fromEmail, ownerEmail, publicReplyEmail } = getEmailConfig();
+
+  if (!client) {
+    const errMsg = 'RESEND_API_KEY environment variable is missing on server. Balance reminder simulated.';
+    console.warn('[Resend Simulation]', errMsg, { to: data.guestEmail, property: data.propertyTitle });
+    return { success: true, simulated: true };
+  }
+
+  const siteSettings = await cmsClient.getSiteSettings(isCymraeg);
+  const customRecipients = siteSettings.notificationRecipients
+    ? siteSettings.notificationRecipients.split(',').map((s) => s.trim()).filter(Boolean)
+    : [];
+  const targetBccRecipients = customRecipients.length > 0 ? customRecipients : ownerEmail;
+
+  try {
+    const refHeader = data.paymentReference ? `bal-${data.paymentReference}` : `bal-${Date.now()}`;
+    const subject = isCymraeg
+      ? `Atgoffa Taliad Gweddill – ${data.propertyTitle} (${formatDateUK(data.checkIn)})`
+      : `Reminder: Remaining Balance Due – ${data.propertyTitle} (${formatDateUK(data.checkIn)})`;
+
+    const guestRes = await client.emails.send({
+      from: fromEmail,
+      to: data.guestEmail,
+      bcc: targetBccRecipients,
+      replyTo: publicReplyEmail,
+      subject,
+      html: generateBalanceReminderHtml(data, siteSettings, isCymraeg),
+      text: generateBalanceReminderText(data, siteSettings, isCymraeg),
+      headers: {
+        'X-Entity-Ref-ID': refHeader,
+      },
+    });
+
+    if (guestRes.error) {
+      console.error('Resend error sending balance reminder:', guestRes.error);
+      return { success: false, error: guestRes.error };
+    }
+
+    return { success: true, guestRes };
+  } catch (error) {
+    console.error('Failed to send balance reminder email via Resend:', error);
     return { success: false, error };
   }
 }

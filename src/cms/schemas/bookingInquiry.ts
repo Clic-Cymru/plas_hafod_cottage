@@ -207,6 +207,79 @@ export const bookingInquirySchema = {
       type: 'text',
       rows: 2,
     },
+    // Final Balance & Automated Check-in Workflow
+    {
+      name: 'finalBalancePaid',
+      title: 'Final Balance Paid in Full',
+      type: 'boolean',
+      description: 'Mark as Yes once the guest has paid their remaining balance. Arrival instructions and key safe codes will only be sent when this is checked.',
+      initialValue: false,
+    },
+    {
+      name: 'finalBalancePaidAt',
+      title: 'Final Balance Paid At',
+      type: 'datetime',
+      options: {
+        dateFormat: 'DD/MM/YYYY',
+        timeFormat: 'HH:mm',
+      },
+      readOnly: true,
+      hidden: ({ parent }: any) => !parent?.finalBalancePaid,
+    },
+    {
+      name: 'keySafeCodeOverride',
+      title: 'Custom Key Safe Code (Optional)',
+      type: 'string',
+      description: 'Leave blank to use the default cottage key safe code configured in Site Settings.',
+    },
+    {
+      name: 'checkInEmailStatus',
+      title: 'Check-in Guide & Key Safe Email Status',
+      type: 'string',
+      options: {
+        list: [
+          { title: 'Not Sent', value: 'not_sent' },
+          { title: 'Sent to Guest', value: 'sent' },
+          { title: 'Send Failed', value: 'failed' },
+        ],
+        layout: 'radio',
+      },
+      initialValue: 'not_sent',
+    },
+    {
+      name: 'checkInEmailSentAt',
+      title: 'Check-in Guide Sent At',
+      type: 'datetime',
+      options: {
+        dateFormat: 'DD/MM/YYYY',
+        timeFormat: 'HH:mm',
+      },
+      readOnly: true,
+    },
+    {
+      name: 'balanceReminderStatus',
+      title: '14-Day Balance Reminder Email Status',
+      type: 'string',
+      options: {
+        list: [
+          { title: 'Not Sent', value: 'not_sent' },
+          { title: 'Sent to Guest', value: 'sent' },
+          { title: 'Send Failed', value: 'failed' },
+        ],
+        layout: 'radio',
+      },
+      initialValue: 'not_sent',
+    },
+    {
+      name: 'balanceReminderSentAt',
+      title: 'Balance Reminder Sent At',
+      type: 'datetime',
+      options: {
+        dateFormat: 'DD/MM/YYYY',
+        timeFormat: 'HH:mm',
+      },
+      readOnly: true,
+    },
     {
       name: 'id',
       title: 'Inquiry Reference ID',
@@ -246,22 +319,28 @@ export const bookingInquirySchema = {
       status: 'status',
       propertyId: 'propertyId',
       paymentReference: 'paymentReference',
+      finalBalancePaid: 'finalBalancePaid',
+      checkInEmailStatus: 'checkInEmailStatus',
     },
-    prepare({ guestName, checkIn, checkOut, total, status, propertyId, paymentReference }: any) {
+    prepare({ guestName, checkIn, checkOut, total, status, propertyId, paymentReference, finalBalancePaid, checkInEmailStatus }: any) {
       const formatUk = (d: string) => {
         if (!d) return '';
         const m = String(d).match(/^(\d{4})-(\d{2})-(\d{2})/);
         return m ? `${m[3]}/${m[2]}/${m[1]}` : d;
       };
       const propBadge = propertyId === 'bryn-bugeiliaid-bach' ? '[BBB]' : '[Plas Hafod]';
-      const statusLabel =
-        status === 'deposit_requested'
-          ? 'DEPOSIT SENT'
-          : status === 'confirmed'
-          ? 'PAID & CONFIRMED'
-          : status === 'declined'
-          ? 'DECLINED'
-          : 'NEW INQUIRY';
+      let statusLabel = 'NEW INQUIRY';
+      if (status === 'deposit_requested') {
+        statusLabel = 'DEPOSIT SENT';
+      } else if (status === 'confirmed') {
+        if (finalBalancePaid) {
+          statusLabel = checkInEmailStatus === 'sent' ? 'BALANCE PAID · KEY SENT' : 'BALANCE PAID';
+        } else {
+          statusLabel = 'CONFIRMED · BAL DUE';
+        }
+      } else if (status === 'declined') {
+        statusLabel = 'DECLINED';
+      }
       const refSuffix = paymentReference ? ` • Ref: ${paymentReference}` : '';
       return {
         title: `${propBadge} ${guestName} (${statusLabel})`,
