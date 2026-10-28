@@ -7,7 +7,9 @@ import { cmsClient } from '@/cms/client';
 import { Compass, ExternalLink, Mountain, ShieldAlert, MapPin } from 'lucide-react';
 
 
-import { generateBreadcrumbJsonLd, SITE_URL } from '@/lib/seo/jsonld';
+import { generateBreadcrumbJsonLd, generateFaqJsonLd, SITE_URL } from '@/lib/seo/jsonld';
+import { FaqSection } from '@/components/common/FaqSection';
+import { defaultFaqsCy } from '@/data/faqs';
 
 export const metadata: Metadata = {
   title: 'Ardal Leol a Chanllaw Eryri | Atyniadau ger Nebo a Phen-y-groes',
@@ -102,11 +104,17 @@ export default async function WelshLocalAreaPage() {
     { name: 'Ardal Leol', url: `${SITE_URL}/cy/local-area` },
   ]);
 
+  const faqJsonLd = generateFaqJsonLd(defaultFaqsCy);
+
   return (
     <div className="min-h-screen bg-[#fbfbfd] text-[#333333] flex flex-col font-sans selection:bg-[#efda07]/30 selection:text-stone-900">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbsJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
       />
       <LiveSiteNavbar currentPath="/cy/local-area" isCymraeg={true} siteSettings={siteSettings} />
 
@@ -253,6 +261,9 @@ export default async function WelshLocalAreaPage() {
             </div>
           </div>
         </section>
+
+        {/* Local Area & Stay FAQ Section (GEO Optimized) */}
+        <FaqSection isCymraeg={true} />
 
         {/* Footer */}
         <LiveSiteFooter isCymraeg={true} />

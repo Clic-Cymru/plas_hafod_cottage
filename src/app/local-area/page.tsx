@@ -8,7 +8,9 @@ import { cmsClient } from '@/cms/client';
 import { Compass, ExternalLink, Mountain, ShieldAlert, MapPin } from 'lucide-react';
 
 
-import { generateBreadcrumbJsonLd, SITE_URL } from '@/lib/seo/jsonld';
+import { generateBreadcrumbJsonLd, generateFaqJsonLd, SITE_URL } from '@/lib/seo/jsonld';
+import { FaqSection } from '@/components/common/FaqSection';
+import { defaultFaqsEn } from '@/data/faqs';
 
 export const metadata: Metadata = {
   title: 'Local Area & Snowdonia Guide | Things To Do Near Nebo & Penygroes',
@@ -59,11 +61,17 @@ export default async function LocalAreaPage() {
     { name: 'Local Area Guide', url: `${SITE_URL}/local-area` },
   ]);
 
+  const faqJsonLd = generateFaqJsonLd(defaultFaqsEn);
+
   return (
     <div className="min-h-screen bg-[#fbfbfd] text-[#333333] flex flex-col font-sans selection:bg-[#efda07]/30 selection:text-stone-900">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbsJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
       />
       <LiveSiteNavbar currentPath="/local-area" isCymraeg={false} siteSettings={siteSettings} />
 
@@ -210,6 +218,9 @@ export default async function LocalAreaPage() {
             </div>
           </div>
         </section>
+
+        {/* Local Area & Stay FAQ Section (GEO Optimized) */}
+        <FaqSection isCymraeg={false} />
 
         {/* Footer */}
         <LiveSiteFooter isCymraeg={false} />
