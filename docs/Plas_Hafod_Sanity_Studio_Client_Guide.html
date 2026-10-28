@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Welcome to Your Website Management Portal: A Guide for Siwsan & Neil</title>
+  <style>
+    @page {
+      size: A4 portrait;
+      margin: 18mm 16mm 18mm 16mm;
+      @bottom-right {
+        content: counter(page) " / " counter(pages);
+      }
+    }
+    *, *:before, *:after { box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      color: #1e293b;
+      line-height: 1.55;
+      font-size: 13.5px;
+      margin: 0;
+      padding: 0;
+      background: #ffffff;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+    .header-banner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 3px solid #efda07;
+      padding-bottom: 16px;
+      margin-bottom: 24px;
+    }
+    .logo-container {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .logo-img {
+      height: 48px;
+      width: auto;
+    }
+    .brand-title {
+      font-size: 16px;
+      font-weight: 800;
+      color: #1e1b2e;
+      letter-spacing: -0.2px;
+      margin: 0;
+    }
+    .brand-sub {
+      font-size: 12px;
+      color: #64748b;
+      margin: 2px 0 0;
+    }
+    .meta-box {
+      text-align: right;
+      font-size: 11px;
+      color: #64748b;
+    }
+    .meta-badge {
+      display: inline-block;
+      background: #323149;
+      color: #efda07;
+      font-weight: 700;
+      font-size: 10px;
+      padding: 3px 8px;
+      border-radius: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      margin-bottom: 4px;
+    }
+    h1 {
+      font-size: 24px;
+      font-weight: 800;
+      color: #0f172a;
+      letter-spacing: -0.4px;
+      margin: 0 0 6px;
+      line-height: 1.25;
+    }
+    .doc-subtitle {
+      font-size: 14px;
+      color: #475569;
+      margin: 0 0 20px;
+      line-height: 1.45;
+    }
+    h2 {
+      font-size: 16px;
+      font-weight: 700;
+      color: #1e1b2e;
+      margin: 26px 0 10px;
+      padding-bottom: 6px;
+      border-bottom: 1.5px solid #e2e8f0;
+      page-break-after: avoid;
+    }
+    h3 {
+      font-size: 14px;
+      font-weight: 700;
+      color: #334155;
+      margin: 18px 0 6px;
+      page-break-after: avoid;
+    }
+    p {
+      margin: 0 0 12px;
+    }
+    ul, ol {
+      margin: 0 0 14px;
+      padding-left: 22px;
+    }
+    li {
+      margin-bottom: 6px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 16px 0 22px;
+      font-size: 12.5px;
+      page-break-inside: auto;
+    }
+    tr {
+      page-break-inside: avoid;
+      page-break-after: auto;
+    }
+    th {
+      background: #323149;
+      color: #ffffff;
+      font-weight: 700;
+      text-align: left;
+      padding: 8px 10px;
+      border: 1px solid #323149;
+      font-size: 12px;
+    }
+    td {
+      padding: 8px 10px;
+      border: 1px solid #cbd5e1;
+      vertical-align: top;
+    }
+    tbody tr:nth-child(even) {
+      background-color: #f8fafc;
+    }
+    code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      background: #f1f5f9;
+      padding: 2px 5px;
+      border-radius: 4px;
+      font-size: 12px;
+      color: #0f172a;
+    }
+    pre {
+      background: #1e1b2e;
+      color: #f8fafc;
+      padding: 12px 14px;
+      border-radius: 8px;
+      overflow-x: auto;
+      font-size: 12px;
+      page-break-inside: avoid;
+      margin: 14px 0;
+    }
+    pre code {
+      background: transparent;
+      color: inherit;
+      padding: 0;
+    }
+    a {
+      color: #2563eb;
+      text-decoration: none;
+    }
+    .doc-footer {
+      margin-top: 36px;
+      padding-top: 14px;
+      border-top: 1px solid #e2e8f0;
+      font-size: 11px;
+      color: #94a3b8;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      page-break-inside: avoid;
+    }
+  </style>
+</head>
+<body>
+  <div class="header-banner">
+    <div class="logo-container">
+      <img src="https://cdn.sanity.io/images/iji5mij0/production/e869c435303f83aea95717dda5de5b822310fb00-821x523.png" alt="Plas Hafod Logo" class="logo-img" />
+      <div>
+        <div class="brand-title">Plas Hafod &amp; Bryn Bugeiliaid Bach</div>
+        <div class="brand-sub">Nebo, Penygroes, Gwynedd &bull; Parc Cenedlaethol Eryri (Snowdonia)</div>
+      </div>
+    </div>
+    <div class="meta-box">
+      <div class="meta-badge">Official Release</div>
+      <div>Date: 28 October 2026</div>
+      <div>Prepared by: Clic-Cymru</div>
+    </div>
+  </div>
+
+  <div class="content">
+    <h1>Welcome to Your Website Management Portal</h1>
+<h2>A Guide for Siwsan &amp; Neil &bull; Plas Hafod &amp; Bryn Bugeiliaid Bach</h2>
+<p>Welcome to your new custom website dashboard! This management system (powered by Sanity Studio) allows you to effortlessly manage your guest inquiries, BACS payments, cottage tariffs, blocked calendar dates, key safe codes, and website content in one clean, straightforward interface.</p>
+<hr>
+<h2>1. Accessing Your Dashboard</h2>
+<h3>How to Log In</h3>
+<ol>
+<li>Open your web browser (Chrome, Safari, Edge, or Firefox).</li>
+<li>Visit your dashboard link:<ul>
+<li><strong>Live Link</strong>: <code>https://plashafodcottage.co.uk/studio</code></li>
+<li><em>(During pre-launch testing: <code>https://plas-hafod-cottage.bob-83d.workers.dev/studio</code>)</em></li>
+</ul>
+</li>
+<li>Click <strong>Log in with Google</strong> (using your preferred Google/Gmail account) or log in with your email address.</li>
+<li>Once authenticated, you will see your sidebar with three clear, organized folders: <strong>Pages</strong>, <strong>Booking Engine</strong>, and <strong>Site Settings</strong>.</li>
+</ol>
+
+        <div style="background-color: #ecfdf5; border-left: 4px solid #10b981; padding: 14px 18px; margin: 18px 0; border-radius: 0 8px 8px 0; page-break-inside: avoid;">
+          <div style="font-weight: 700; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; color: #047857; margin-bottom: 6px;">
+            💡 TIP
+          </div>
+          <div style="font-size: 13px; line-height: 1.6; color: #334155;">
+            
+<strong>Bookmark this link</strong>: We recommend bookmarking <code>plashafodcottage.co.uk/studio</code> in your browser bar on both your desktop computer and tablet/phone for easy daily access.
+          </div>
+        </div>
+      
+<hr>
+<h2>2. Navigating Your Dashboard</h2>
+<p>Your dashboard is organized into three intuitive areas:</p>
+<pre><code>📁 Pages
+   ├── Bryn Bugeiliaid Bach (Annexe copy &amp; photos)
+   ├── Home page (Hero slides &amp; welcoming text)
+   ├── Local Area (Attractions, mountain paths &amp; FAQs)
+   ├── Reviews (Guestbook excerpts &amp; platform reviews)
+   ├── Contact (Visitor messages inbox)
+   └── Terms and Conditions (Booking terms &amp; dog policies)
+
+📁 Booking Engine
+   ├── Cottages
+   │   ├── Plas Hafod
+   │   │   ├── Rates (Base price, deposit %, cleaning fee)
+   │   │   ├── Bookings (All inquiries &amp; reservations for Plas Hafod)
+   │   │   └── Blocked Dates (Maintenance &amp; private holds)
+   │   └── Bryn Bugeiliaid Bach
+   │       ├── Rates (Base price, deposit %, cleaning fee)
+   │       ├── Bookings (All inquiries &amp; reservations for the annexe)
+   │       └── Blocked Dates (Maintenance &amp; private holds)
+   ├── Seasons (Summer Peak, Autumn Gold, Festive Season tariffs)
+   ├── Special offers / discounts (Weekly discounts, 4-for-3 promos)
+   └── E-mail templates (Reviewing or tailoring email copy)
+
+📁 Site Settings
+   └── Site Settings &amp; Branding (Phone, email, address, bank details, key safe codes, WiFi)
+</code></pre>
+<hr>
+<h2>3. Daily Workflow: Managing Inquiries &amp; Payments</h2>
+<p>Here is the simple, step-by-step routine for handling guest reservations from initial inquiry through to check-in:</p>
+
+          <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:18px 22px; margin:22px 0; page-break-inside:avoid;">
+            <div style="font-weight:700; font-size:14px; color:#1e1b2e; margin-bottom:12px; border-bottom:2px solid #efda07; padding-bottom:6px; display:inline-block;">
+              📋 Reservation & Payment Lifecycle Overview
+            </div>
+            <div style="display:flex; flex-direction:column; gap:8px;">
+              <div style="display:flex; align-items:center; gap:12px; background:#fff; padding:10px 14px; border:1px solid #e2e8f0; border-radius:6px;">
+                <span style="background:#323149; color:#efda07; font-weight:800; border-radius:50%; width:24px; height:24px; display:flex; align-items:center; justify-content:center; font-size:12px;">1</span>
+                <span style="font-size:13px; color:#1e293b; font-weight:600;">Guest requests dates on website &rarr; Instant email alert arrives in your inbox.</span>
+              </div>
+              <div style="display:flex; align-items:center; gap:12px; background:#fff; padding:10px 14px; border:1px solid #e2e8f0; border-radius:6px;">
+                <span style="background:#323149; color:#efda07; font-weight:800; border-radius:50%; width:24px; height:24px; display:flex; align-items:center; justify-content:center; font-size:12px;">2</span>
+                <span style="font-size:13px; color:#1e293b; font-weight:600;">Open Sanity Studio &rarr; Click 'Send Deposit Request Email' with 1 click.</span>
+              </div>
+              <div style="display:flex; align-items:center; gap:12px; background:#fff; padding:10px 14px; border:1px solid #e2e8f0; border-radius:6px;">
+                <span style="background:#323149; color:#efda07; font-weight:800; border-radius:50%; width:24px; height:24px; display:flex; align-items:center; justify-content:center; font-size:12px;">3</span>
+                <span style="font-size:13px; color:#1e293b; font-weight:600;">Guest transfers deposit via BACS &rarr; Click 'Mark Paid & Confirmed ✓' (Calendar locks).</span>
+              </div>
+              <div style="display:flex; align-items:center; gap:12px; background:#fff; padding:10px 14px; border:1px solid #e2e8f0; border-radius:6px;">
+                <span style="background:#323149; color:#efda07; font-weight:800; border-radius:50%; width:24px; height:24px; display:flex; align-items:center; justify-content:center; font-size:12px;">4</span>
+                <span style="font-size:13px; color:#1e293b; font-weight:600;">14 days before arrival &rarr; Final balance reminder or key safe arrival pack is dispatched.</span>
+              </div>
+            </div>
+          </div>
+        
+<h3>Step 1: Receiving a New Booking</h3>
+<p>When a guest chooses dates on your website and submits an inquiry:</p>
+<ul>
+<li>You receive an instant email notification summarizing the guest&#39;s name, phone, email, dates, party size, dogs, and total price.</li>
+<li>The inquiry appears under <strong>Booking Engine $\rightarrow$ Cottages $\rightarrow$ [Plas Hafod or Bryn Bugeiliaid Bach] $\rightarrow$ Bookings</strong>.</li>
+<li>The status badge will show: <code>NEW INQUIRY</code>.</li>
+</ul>
+<h3>Step 2: Reviewing the Inquiry</h3>
+<ol>
+<li>Click on the guest&#39;s booking record to open it.</li>
+<li>Review their dates, number of guests, and any personal notes in the <strong>Guest Notes &amp; Special Requests</strong> field.</li>
+</ol>
+<h3>Step 3: Sending the Deposit Request (1-Click Dispatch)</h3>
+<p>Right inside the booking card, you will see the <strong>Deposit Request &amp; BACS Payment Dispatcher</strong>:</p>
+<ol>
+<li><em>(Optional)</em> Add a personal greeting in the <strong>Personal Host Message</strong> box (e.g., <em>&quot;We&#39;d be delighted to welcome you and your spaniel to Nebo!&quot;</em>).</li>
+<li>Click the dark button: <strong>📧 Send Deposit Request Email</strong>.</li>
+<li>The system instantly delivers a professional, branded payment email to the guest with:<ul>
+<li>Your bank name, sort code, and account number.</li>
+<li>Their exact 25% deposit amount.</li>
+<li>Their unique payment reference (e.g., <code>PH-2611-JONES</code>).</li>
+<li>A 48-hour provisional hold notice.</li>
+</ul>
+</li>
+<li>The inquiry status updates to: <code>DEPOSIT SENT</code>.</li>
+</ol>
+<h3>Step 4: Confirming the Booking (Locking the Calendar)</h3>
+<p>Once the guest&#39;s deposit transfer clears in your bank account:</p>
+<ol>
+<li>Open the booking in Sanity.</li>
+<li>Click the green button: <strong>Mark Paid &amp; Confirmed ✓</strong>.</li>
+<li><strong>What happens automatically</strong>:<ul>
+<li>The status updates to <code>PAID &amp; CONFIRMED</code>.</li>
+<li>The booking dates are <strong>instantly blocked on the website calendar</strong>, so no other guest can book those nights.</li>
+</ul>
+</li>
+</ol>
+<h3>Step 5: Handling the Final Balance &amp; Check-in Guide</h3>
+<p>Two weeks (14 days) before the guest&#39;s check-in date, the automated system evaluates the booking:</p>
+<h4>If the Guest Has Transferred Their Remaining Balance:</h4>
+<ol>
+<li>In the booking card, click: <strong>✓ Mark Final Balance as Paid (BACS Received)</strong>.</li>
+<li>The status updates to <code>BALANCE PAID · KEY SENT</code>.</li>
+<li>The automated system (or your 1-click <strong>Send Check-in Guide Now 🚀</strong> button) emails the guest their complete arrival pack:<ul>
+<li><strong>Key safe code</strong> for their cottage.</li>
+<li><strong>WiFi network name and password</strong>.</li>
+<li>Step-by-step <strong>driving directions</strong> from Penygroes to Nebo.</li>
+<li>Check-in (4:00 PM) and check-out (10:00 AM) times.</li>
+<li>Bin day / recycling instructions.</li>
+</ul>
+</li>
+</ol>
+<h4>If the Remaining Balance Is Still Unpaid:</h4>
+<ul>
+<li>The system will <strong>withhold the key safe code</strong> for safety.</li>
+<li>It will automatically email the guest a friendly <strong>14-Day Balance Due Reminder</strong> with your BACS details and payment reference.</li>
+</ul>
+<hr>
+<h2>4. Managing Availability &amp; Blocking Dates</h2>
+<p>If you need to close dates for maintenance (e.g., chimney sweeping, re-painting), private family visits, or telephone bookings taken outside the website:</p>
+<ol>
+<li>In the sidebar, navigate to <strong>Booking Engine $\rightarrow$ Cottages $\rightarrow$ [Plas Hafod or Bryn Bugeiliaid Bach] $\rightarrow$ Blocked Dates</strong>.</li>
+<li>Click <strong>+ Create</strong> in the top right.</li>
+<li>Fill in:<ul>
+<li><strong>Start Date</strong>: The first date of closure.</li>
+<li><strong>End Date</strong>: The date the property becomes available again.</li>
+<li><strong>Reason</strong>: Select <em>Booked</em>, <em>Maintenance</em>, <em>Owner Stay</em>, or <em>Other</em>.</li>
+<li><strong>Internal Notes</strong>: A quick reminder for yourselves (e.g., <em>&quot;Annual chimney sweep &amp; spring deep clean&quot;</em>).</li>
+</ul>
+</li>
+<li>Click the green <strong>Publish</strong> button at the bottom right.</li>
+<li>Those dates will immediately display as blocked and unavailable on the website calendar.</li>
+</ol>
+
+        <div style="background-color: #eff6ff; border-left: 4px solid #3b82f6; padding: 14px 18px; margin: 18px 0; border-radius: 0 8px 8px 0; page-break-inside: avoid;">
+          <div style="font-weight: 700; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; color: #1d4ed8; margin-bottom: 6px;">
+            ℹ️ NOTE
+          </div>
+          <div style="font-size: 13px; line-height: 1.6; color: #334155;">
+            
+<strong>To remove a block</strong>: Simply open the blocked date entry, click the three dots (<code>...</code>) in the bottom right, and select <strong>Delete</strong>.
+          </div>
+        </div>
+      
+<hr>
+<h2>5. Adjusting Pricing &amp; Tariffs</h2>
+<h3>Standard Base Nightly Rates</h3>
+<ol>
+<li>In the sidebar, go to <strong>Booking Engine $\rightarrow$ Cottages $\rightarrow$ [Plas Hafod or Bryn Bugeiliaid Bach] $\rightarrow$ Rates</strong>.</li>
+<li>Here you can adjust:<ul>
+<li><strong>Base Rate</strong>: Standard nightly price outside of special seasons.</li>
+<li><strong>Deposit Percentage</strong>: Default is 25%.</li>
+<li><strong>Cleaning Fee</strong>: Default is £45 for Plas Hafod / £35 for Bryn Bugeiliaid Bach.</li>
+</ul>
+</li>
+<li>Click <strong>Publish</strong>.</li>
+</ol>
+<h3>Seasonal Tariffs (Peak Summer, Autumn Gold, Festive Season)</h3>
+<ol>
+<li>Go to <strong>Booking Engine $\rightarrow$ Seasons</strong>.</li>
+<li>Click on any season to edit its dates or nightly rate:<ul>
+<li><strong>Summer Peak (Haf)</strong>: e.g., £245/night, 3-night minimum.</li>
+<li><strong>Autumn Gold (Hydref)</strong>: e.g., £195/night, 2-night minimum.</li>
+<li><strong>Festive Season (Nadolig a Blwyddyn Newydd)</strong>: e.g., £285/night, 4-night minimum.</li>
+</ul>
+</li>
+<li>Click <strong>Publish</strong>. The website automatically calculates stays that cross across multiple seasons.</li>
+</ol>
+<h3>Special Offers &amp; Discounts</h3>
+<ol>
+<li>Go to <strong>Booking Engine $\rightarrow$ Special offers / discounts</strong>.</li>
+<li>You have pre-configured discounts:<ul>
+<li><strong>7+ Night Full Week Retreat</strong>: 12% off.</li>
+<li><strong>14+ Night Fortnight Stay</strong>: 20% off.</li>
+<li><strong>Autumn 4-for-3 Special</strong>: Book 3 nights, get 4th free.</li>
+</ul>
+</li>
+<li>You can adjust the percentage, minimum nights, or toggle offers on/off with the <strong>Active</strong> switch.</li>
+</ol>
+<hr>
+<h2>6. Updating Key Safe Codes, WiFi &amp; Bank Details</h2>
+<p>Whenever you change physical key safe codes or update bank details, you can update them in one place:</p>
+<ol>
+<li>In the sidebar, click <strong>Site Settings $\rightarrow$ Site Settings &amp; Branding</strong>.</li>
+<li>Scroll to the relevant section:<ul>
+<li><strong>🏦 Bank Transfer &amp; Deposit Details</strong>: Update your Account Name, Bank Name, Sort Code, or Account Number.</li>
+<li><strong>🔑 Check-in, Key Safe &amp; WiFi Automation</strong>:<ul>
+<li><em>Plas Hafod Cottage</em>: Key safe code, WiFi name, WiFi password.</li>
+<li><em>Bryn Bugeiliaid Bach</em>: Key safe code, WiFi name, WiFi password.</li>
+<li><em>Arrival Directions</em>: Text instructions for driving up to Nebo.</li>
+<li><em>Waste Guidance</em>: Recycling and bin day information.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Click the green <strong>Publish</strong> button.</li>
+<li>All future automated check-in emails will immediately use your updated codes and instructions.</li>
+</ol>
+<hr>
+<h2>7. Managing Special Offer Banners &amp; Popups</h2>
+<p>To highlight an offer or seasonal deal on your website:</p>
+<ol>
+<li>Open <strong>Site Settings $\rightarrow$ Site Settings &amp; Branding</strong>.</li>
+<li>Open the <strong>🎁 Special Offers &amp; Announcements</strong> section:<ul>
+<li><strong>Offer Presentation Style</strong>: Choose <em>Top Announcement Banner</em>, <em>Special Offer Popup Modal</em>, <em>Both</em>, or <em>Disabled / None</em>.</li>
+<li><strong>Banner Text</strong>: Edit the text that appears across the top of the screen (e.g. <em>&quot;BOOK DIRECT &amp; SAVE 10% — BEST PRICE GUARANTEED&quot;</em>).</li>
+<li><strong>Popup Details</strong>: Edit the heading, terms, and promo badge.</li>
+</ul>
+</li>
+<li>Click <strong>Publish</strong>. The changes take effect on the live website within seconds.</li>
+</ol>
+<hr>
+<h2>8. Essential Best Practices &amp; Tips</h2>
+<ul>
+<li><strong>Always click the green &quot;Publish&quot; button</strong>: When you make an edit to any page, date, or setting, your change is saved as a draft. Click the green <strong>Publish</strong> button in the bottom right corner to push it live to visitors.</li>
+<li><strong>Previewing vs. Live</strong>: Yellow marks mean you have uncommitted draft changes. Once published, the status badge turns green.</li>
+<li><strong>Need help?</strong>: If you ever have a technical question or need assistance with custom tariffs, contact your webmaster at <strong>Bob Morris / Clic-Cymru</strong> (<code>bob@clic.cymru</code>).</li>
+</ul>
+
+  </div>
+
+  <div class="doc-footer">
+    <div>Plas Hafod Cottage &amp; Bryn Bugeiliaid Bach &bull; Website Launch Documentation</div>
+    <div>plashafodcottage.co.uk &bull; Siwsan &amp; Neil</div>
+  </div>
+</body>
+</html>

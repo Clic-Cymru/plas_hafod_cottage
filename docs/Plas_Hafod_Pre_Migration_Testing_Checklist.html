@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plas Hafod & Bryn Bugeiliaid Bach: Pre-Migration Testing Checklist</title>
+  <style>
+    @page {
+      size: A4 portrait;
+      margin: 18mm 16mm 18mm 16mm;
+      @bottom-right {
+        content: counter(page) " / " counter(pages);
+      }
+    }
+    *, *:before, *:after { box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      color: #1e293b;
+      line-height: 1.55;
+      font-size: 13.5px;
+      margin: 0;
+      padding: 0;
+      background: #ffffff;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+    .header-banner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 3px solid #efda07;
+      padding-bottom: 16px;
+      margin-bottom: 24px;
+    }
+    .logo-container {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .logo-img {
+      height: 48px;
+      width: auto;
+    }
+    .brand-title {
+      font-size: 16px;
+      font-weight: 800;
+      color: #1e1b2e;
+      letter-spacing: -0.2px;
+      margin: 0;
+    }
+    .brand-sub {
+      font-size: 12px;
+      color: #64748b;
+      margin: 2px 0 0;
+    }
+    .meta-box {
+      text-align: right;
+      font-size: 11px;
+      color: #64748b;
+    }
+    .meta-badge {
+      display: inline-block;
+      background: #323149;
+      color: #efda07;
+      font-weight: 700;
+      font-size: 10px;
+      padding: 3px 8px;
+      border-radius: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      margin-bottom: 4px;
+    }
+    h1 {
+      font-size: 24px;
+      font-weight: 800;
+      color: #0f172a;
+      letter-spacing: -0.4px;
+      margin: 0 0 6px;
+      line-height: 1.25;
+    }
+    .doc-subtitle {
+      font-size: 14px;
+      color: #475569;
+      margin: 0 0 20px;
+      line-height: 1.45;
+    }
+    h2 {
+      font-size: 16px;
+      font-weight: 700;
+      color: #1e1b2e;
+      margin: 26px 0 10px;
+      padding-bottom: 6px;
+      border-bottom: 1.5px solid #e2e8f0;
+      page-break-after: avoid;
+    }
+    h3 {
+      font-size: 14px;
+      font-weight: 700;
+      color: #334155;
+      margin: 18px 0 6px;
+      page-break-after: avoid;
+    }
+    p {
+      margin: 0 0 12px;
+    }
+    ul, ol {
+      margin: 0 0 14px;
+      padding-left: 22px;
+    }
+    li {
+      margin-bottom: 6px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 16px 0 22px;
+      font-size: 12.5px;
+      page-break-inside: auto;
+    }
+    tr {
+      page-break-inside: avoid;
+      page-break-after: auto;
+    }
+    th {
+      background: #323149;
+      color: #ffffff;
+      font-weight: 700;
+      text-align: left;
+      padding: 8px 10px;
+      border: 1px solid #323149;
+      font-size: 12px;
+    }
+    td {
+      padding: 8px 10px;
+      border: 1px solid #cbd5e1;
+      vertical-align: top;
+    }
+    tbody tr:nth-child(even) {
+      background-color: #f8fafc;
+    }
+    code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      background: #f1f5f9;
+      padding: 2px 5px;
+      border-radius: 4px;
+      font-size: 12px;
+      color: #0f172a;
+    }
+    pre {
+      background: #1e1b2e;
+      color: #f8fafc;
+      padding: 12px 14px;
+      border-radius: 8px;
+      overflow-x: auto;
+      font-size: 12px;
+      page-break-inside: avoid;
+      margin: 14px 0;
+    }
+    pre code {
+      background: transparent;
+      color: inherit;
+      padding: 0;
+    }
+    a {
+      color: #2563eb;
+      text-decoration: none;
+    }
+    .doc-footer {
+      margin-top: 36px;
+      padding-top: 14px;
+      border-top: 1px solid #e2e8f0;
+      font-size: 11px;
+      color: #94a3b8;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      page-break-inside: avoid;
+    }
+  </style>
+</head>
+<body>
+  <div class="header-banner">
+    <div class="logo-container">
+      <img src="https://cdn.sanity.io/images/iji5mij0/production/e869c435303f83aea95717dda5de5b822310fb00-821x523.png" alt="Plas Hafod Logo" class="logo-img" />
+      <div>
+        <div class="brand-title">Plas Hafod &amp; Bryn Bugeiliaid Bach</div>
+        <div class="brand-sub">Nebo, Penygroes, Gwynedd &bull; Parc Cenedlaethol Eryri (Snowdonia)</div>
+      </div>
+    </div>
+    <div class="meta-box">
+      <div class="meta-badge">Official Release</div>
+      <div>Date: 28 October 2026</div>
+      <div>Prepared by: Clic-Cymru</div>
+    </div>
+  </div>
+
+  <div class="content">
+    <h1>Plas Hafod &amp; Bryn Bugeiliaid Bach: Pre-Migration Testing Checklist</h1>
+<p>This checklist covers all technical configurations, functional features, automated workflows, and front-end validations required before switching live DNS from LiteSpeed/WordPress to the new Cloudflare Worker architecture.</p>
+<hr>
+<h2>1. Remaining Infrastructure &amp; Environment Configuration</h2>
+<p>Before performing final live tests and repointing DNS, confirm these credentials and settings in your service dashboards:</p>
+<table>
+<thead>
+<tr>
+<th align="left">Item</th>
+<th align="left">Service / Dashboard</th>
+<th align="center">Status</th>
+<th align="left">Description / Action Required</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>Resend API Key</strong></td>
+<td align="left">Cloudflare Workers &bull; Variables</td>
+<td align="center"><code><span style="display:inline-block; width:15px; height:15px; border:2px solid #64748b; border-radius:3px; vertical-align:middle; margin-right:6px; background:#fff;"></span></code></td>
+<td align="left">Ensure <code>RESEND_API_KEY</code> is configured as an encrypted environment variable in Cloudflare Worker settings so live emails can dispatch without simulation mode.</td>
+</tr>
+<tr>
+<td align="left"><strong>Sanity Write Token</strong></td>
+<td align="left">Cloudflare Workers &bull; Variables</td>
+<td align="center"><code><span style="display:inline-block; width:15px; height:15px; border:2px solid #64748b; border-radius:3px; vertical-align:middle; margin-right:6px; background:#fff;"></span></code></td>
+<td align="left">Verify <code>SANITY_API_WRITE_TOKEN</code> is present in Cloudflare Worker settings with Editor/Write permissions to allow status mutations (<code>status: &#39;confirmed&#39;</code>, <code>depositSentAt</code>, <code>finalBalancePaid</code>).</td>
+</tr>
+<tr>
+<td align="left"><strong>CRON Secret</strong></td>
+<td align="left">Cloudflare Workers &bull; Variables</td>
+<td align="center"><code><span style="display:inline-block; width:15px; height:15px; border:2px solid #64748b; border-radius:3px; vertical-align:middle; margin-right:6px; background:#fff;"></span></code></td>
+<td align="left">Ensure <code>CRON_SECRET</code> matches the key configured in <a href="file:///c:/Users/Bob/.gemini/antigravity/scratch/PlasHafod/wrangler.jsonc"><code>wrangler.jsonc</code></a> (<code>plas-hafod-cron-2026</code>).</td>
+</tr>
+<tr>
+<td align="left"><strong>Notification Recipient</strong></td>
+<td align="left">Cloudflare Workers &bull; Variables</td>
+<td align="center"><code><span style="display:inline-block; width:15px; height:15px; border:2px solid #64748b; border-radius:3px; vertical-align:middle; margin-right:6px; background:#fff;"></span></code></td>
+<td align="left">Confirm <code>NOTIFICATION_EMAIL</code> is set to <code>bob@clic.cymru</code> (or host email) to receive instant booking and contact alerts.</td>
+</tr>
+<tr>
+<td align="left"><strong>Resend Domain Verification</strong></td>
+<td align="left">Resend Dashboard &bull; Domains</td>
+<td align="center"><code><span style="display:inline-block; width:15px; height:15px; border:2px solid #64748b; border-radius:3px; vertical-align:middle; margin-right:6px; background:#fff;"></span></code></td>
+<td align="left">Verify <code>plashafodcottage.co.uk</code> has green DKIM, SPF, and DMARC status in Resend so outgoing emails (<code>info@plashafodcottage.co.uk</code>) avoid spam filters.</td>
+</tr>
+<tr>
+<td align="left"><strong>Sanity CORS Origins</strong></td>
+<td align="left">Sanity.io Management &bull; API</td>
+<td align="center"><code><span style="display:inline-block; width:15px; height:15px; border:2px solid #64748b; border-radius:3px; vertical-align:middle; margin-right:6px; background:#fff;"></span></code></td>
+<td align="left">Add <code>https://plashafodcottage.co.uk</code> (with credentials allowed) to allowed CORS origins so the Studio operates properly once the live domain is connected.</td>
+</tr>
+</tbody></table>
+<hr>
+<h2>2. Booking Engine &amp; Pricing Calculation Testing</h2>
+<p>Test the interactive booking calendar on both cottage pages:</p>
+<ul>
+<li><p><strong>Plas Hafod Cottage</strong>: <a href="https://plas-hafod-cottage.bob-83d.workers.dev/#book">Main Cottage Booking Form</a></p>
+</li>
+<li><p><strong>Bryn Bugeiliaid Bach</strong>: <a href="https://plas-hafod-cottage.bob-83d.workers.dev/bryn-bugeiliaid-bach#book">Annexe Booking Form</a></p>
+</li>
+<li><p><input disabled="" type="checkbox"> <strong>Blocked Dates Prevention</strong>:</p>
+<ul>
+<li>Click on dates known to be blocked (e.g., past reservations or maintenance dates).</li>
+<li>Verify blocked dates are greyed out, strike-through, and cannot be selected as check-in or check-out.</li>
+</ul>
+</li>
+<li><p><input disabled="" type="checkbox"> <strong>Minimum Stay Enforcement</strong>:</p>
+<ul>
+<li>Attempt to book 1 night during a period with a 2 or 3-night minimum stay.</li>
+<li>Verify the system prompts the guest that the minimum stay has not been reached.</li>
+</ul>
+</li>
+<li><p><input disabled="" type="checkbox"> <strong>Seasonal Pricing Calculation</strong>:</p>
+<ul>
+<li>Test dates during standard periods (e.g. November 2026 at standard base rate).</li>
+<li>Test dates during peak festive periods (e.g. Christmas 2026 / New Year 2027).</li>
+<li>Verify nightly pricing in the stay summary breakdown reflects the correct seasonal rate configured in Sanity.</li>
+</ul>
+</li>
+<li><p><input disabled="" type="checkbox"> <strong>Discount Rules</strong>:</p>
+<ul>
+<li>Select 7+ nights and verify the weekly discount (10–12%) automatically applies and appears in the breakdown.</li>
+<li>Select 14+ nights and verify the fortnightly discount (18–20%) applies.</li>
+</ul>
+</li>
+<li><p><input disabled="" type="checkbox"> <strong>Deposit Calculation</strong>:</p>
+<ul>
+<li>Verify that the deposit required calculates to exactly <strong>25%</strong> of the stay total and the balance shows the remaining <strong>75%</strong>.</li>
+</ul>
+</li>
+<li><p><input disabled="" type="checkbox"> <strong>Form Submission &amp; Feedback</strong>:</p>
+<ul>
+<li>Fill in test guest name, email, phone number, and special notes.</li>
+<li>Click <strong>Request Reservation</strong>.</li>
+<li>Verify the loading spinner appears, followed by a green success confirmation screen displaying the booking reference.</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2>3. End-to-End Email Lifecycle Testing</h2>
+<p>Conduct a complete dry-run of a reservation to verify all 5 stages of communication:</p>
+<h3>Step A: Initial Inquiry Dispatch</h3>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Host Alert</strong>: Check <code>NOTIFICATION_EMAIL</code> inbox (<code>bob@clic.cymru</code>). Confirm receipt of the dark-themed dashboard alert with complete booking breakdown, guest notes, and direct link to Sanity Studio.</li>
+<li><input disabled="" type="checkbox"> <strong>Guest Receipt</strong>: Check the test guest&#39;s email inbox. Confirm receipt of the branded <em>Croeso / Welcome</em> confirmation email with booking summary and host details.</li>
+</ul>
+<h3>Step B: Deposit Request from Sanity Studio</h3>
+<ul>
+<li><input disabled="" type="checkbox"> Open <a href="https://plas-hafod-cottage.bob-83d.workers.dev/studio">Sanity Studio</a>.</li>
+<li><input disabled="" type="checkbox"> Navigate to <strong>Booking Engine $\rightarrow$ Cottages $\rightarrow$ Bookings</strong>.</li>
+<li><input disabled="" type="checkbox"> Open the test booking inquiry.</li>
+<li><input disabled="" type="checkbox"> Click <strong>Send Deposit Request Email</strong>.</li>
+<li><input disabled="" type="checkbox"> Verify that the guest receives the BACS transfer email with:<ul>
+<li>Deposit amount (25%)</li>
+<li>Sort Code, Account Number, and Bank Name</li>
+<li>Unique Payment Reference (e.g. <code>PH-2611-TEST</code>)</li>
+<li>Correct cottage address in Nebo, Penygroes (<code>LL54 6EB</code>)</li>
+</ul>
+</li>
+</ul>
+<h3>Step C: Confirming Booking &amp; Dates Blocking</h3>
+<ul>
+<li><input disabled="" type="checkbox"> In Sanity Studio, click <strong>Mark Paid &amp; Confirmed ✓</strong>.</li>
+<li><input disabled="" type="checkbox"> Refresh the website calendar on the frontend and confirm the dates are now blocked out to prevent double-booking.</li>
+</ul>
+<h3>Step D: Final Balance &amp; 14-Day Automation</h3>
+<ul>
+<li><input disabled="" type="checkbox"> In the booking card in Sanity Studio, review the <strong>Check-in &amp; Final Balance Automation Box</strong>.</li>
+<li><input disabled="" type="checkbox"> Test <strong>Unpaid Balance Scenario</strong>:<ul>
+<li>Leave <em>Final Balance Paid</em> unchecked.</li>
+<li>Click <strong>Send 14-Day Balance Reminder Now ✉️</strong>.</li>
+<li>Verify the guest receives the Balance Due Reminder with remaining balance amount, BACS details, and notice that the key code will follow once paid.</li>
+</ul>
+</li>
+<li><input disabled="" type="checkbox"> Test <strong>Paid Balance &amp; Check-in Guide Scenario</strong>:<ul>
+<li>Click <strong>✓ Mark Final Balance as Paid (BACS Received)</strong>.</li>
+<li>Click <strong>Send Check-in Guide Now 🚀</strong>.</li>
+<li>Verify the guest receives the Arrival Guide email containing:<ul>
+<li>Key safe code (e.g., <code>PH-4821</code> or custom override)</li>
+<li>High-speed WiFi SSID and password</li>
+<li>Driving directions via Penygroes and Nebo</li>
+<li>Check-in (4:00 PM) &amp; check-out (10:00 AM) times</li>
+<li>Waste and recycling bin locations</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h3>Step E: Automated Cloudflare Cron Trigger</h3>
+<ul>
+<li><input disabled="" type="checkbox"> Test the cron endpoint via browser or curl:<pre><code class="language-bash">curl -s &quot;https://plas-hafod-cottage.bob-83d.workers.dev/api/cron/automated-emails?dryRun=true&amp;secret=plas-hafod-cron-2026&quot;
+</code></pre>
+</li>
+<li><input disabled="" type="checkbox"> Verify HTTP 200 response with JSON summary:<ul>
+<li><code>success: true</code></li>
+<li><code>totalEvaluated: [count of active bookings]</code></li>
+<li><code>actionsDispatched: 0</code> (or list of actions if bookings are within 14 days)</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2>4. Website Contact Form Testing</h2>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>English Contact Page (<a href="https://plas-hafod-cottage.bob-83d.workers.dev/contact"><code>/contact</code></a>)</strong>:<ul>
+<li>Submit a test inquiry with name, email, phone, and inquiry message.</li>
+<li>Verify submission success toast appears.</li>
+<li>Verify host alert email arrives in <code>bob@clic.cymru</code> inbox.</li>
+<li>Verify visitor auto-reply email arrives in the sender&#39;s inbox.</li>
+<li>Open Sanity Studio $\rightarrow$ <strong>Pages $\rightarrow$ Contact</strong> and confirm the message is recorded under the Contact inbox.</li>
+</ul>
+</li>
+<li><input disabled="" type="checkbox"> <strong>Welsh Contact Page (<a href="https://plas-hafod-cottage.bob-83d.workers.dev/cy/contact"><code>/cy/contact</code></a>)</strong>:<ul>
+<li>Repeat the test in Welsh.</li>
+<li>Verify the auto-reply is delivered in idiomatic Welsh (<em>Diolch am Gysylltu</em>).</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2>5. Content, Navigation &amp; Bilingual Integrity</h2>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Language Toggle (Bilingual Mirroring)</strong>:<ul>
+<li>Test the English $\leftrightarrow$ Welsh switcher on all 6 core URL pairs:<ul>
+<li><code>/</code> $\leftrightarrow$ <code>/cy</code></li>
+<li><code>/bryn-bugeiliaid-bach</code> $\leftrightarrow$ <code>/cy/bryn-bugeiliaid-bach</code></li>
+<li><code>/local-area</code> $\leftrightarrow$ <code>/cy/local-area</code></li>
+<li><code>/reviews</code> $\leftrightarrow$ <code>/cy/reviews</code></li>
+<li><code>/contact</code> $\leftrightarrow$ <code>/cy/contact</code></li>
+<li><code>/terms</code> $\leftrightarrow$ <code>/cy/terms</code></li>
+</ul>
+</li>
+<li>Verify the page switches without 404 errors and keeps the user on the matching view.</li>
+</ul>
+</li>
+<li><input disabled="" type="checkbox"> <strong>Local Area Guide &amp; FAQ Section (<a href="https://plas-hafod-cottage.bob-83d.workers.dev/local-area"><code>/local-area</code></a>)</strong>:<ul>
+<li>Test interactive accordion toggles on all 7 FAQ items (Location in Nebo, amenities in Penygroes, Nantlle Ridge walking, Yr Wyddfa distances, cottage differences, dog policy, parking).</li>
+<li>Check Welsh accordion (<a href="https://plas-hafod-cottage.bob-83d.workers.dev/cy/local-area"><code>/cy/local-area</code></a>) for Welsh copy.</li>
+</ul>
+</li>
+<li><input disabled="" type="checkbox"> <strong>Guestbook &amp; Reviews (<a href="https://plas-hafod-cottage.bob-83d.workers.dev/reviews"><code>/reviews</code></a>)</strong>:<ul>
+<li>Confirm authentic guestbook excerpts and platform badges (Airbnb, Vrbo, Google) display cleanly.</li>
+<li>Test the cottage filter tab (<code>All Reviews</code>, <code>Plas Hafod</code>, <code>Bryn Bugeiliaid Bach</code>).</li>
+</ul>
+</li>
+<li><input disabled="" type="checkbox"> <strong>Footer &amp; Contact Details</strong>:<ul>
+<li>Check that the phone number is <code>01286 880620</code> (clickable <code>tel:</code> link).</li>
+<li>Check mobile <code>07917 843187</code>.</li>
+<li>Check address shows: <code>Plas Hafod, Nebo, Penygroes, Caernarfon, Gwynedd, LL54 6EB</code>.</li>
+<li>Ensure zero residual references to <em>Llanrug</em>, <em>Betws-y-Coed</em>, or <em>Conwy</em>.</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2>6. Technical SEO, GEO &amp; Performance Verification</h2>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>XML Sitemap (<a href="https://plas-hafod-cottage.bob-83d.workers.dev/sitemap.xml"><code>/sitemap.xml</code></a>)</strong>:<ul>
+<li>Verify XML output containing all 12 localized URLs with <code>xhtml:link rel=&quot;alternate&quot;</code> tags for both <code>en-GB</code> and <code>cy-GB</code>.</li>
+</ul>
+</li>
+<li><input disabled="" type="checkbox"> <strong>Robots Rules (<a href="https://plas-hafod-cottage.bob-83d.workers.dev/robots.txt"><code>/robots.txt</code></a>)</strong>:<ul>
+<li>Verify public pages are allowed, <code>/studio/</code> is disallowed, and sitemap URL is listed.</li>
+</ul>
+</li>
+<li><input disabled="" type="checkbox"> <strong>Structured Data (Google Rich Results)</strong>:<ul>
+<li>Test home page in <a href="https://search.google.com/test/rich-results">Google Rich Results Test</a>:<ul>
+<li>Verify <code>LodgingBusiness</code> with both <code>Plas Hafod Cottage</code> and <code>Bryn Bugeiliaid Bach</code> under <code>containsPlace</code>.</li>
+<li>Coordinates: Lat <code>53.0335</code>, Long <code>-4.2618</code>.</li>
+</ul>
+</li>
+<li>Test <code>/local-area</code>: Verify <code>FAQPage</code> schema is recognized with question/answer pairs.</li>
+</ul>
+</li>
+<li><input disabled="" type="checkbox"> <strong>Responsive / Mobile Audit</strong>:<ul>
+<li>Test on iOS (Safari) and Android (Chrome).</li>
+<li>Verify hamburger navigation opens smoothly.</li>
+<li>Verify date picker displays properly without horizontal scroll overflow.</li>
+<li>Verify image carousels swipe smoothly.</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2>7. Live DNS Migration Execution Plan</h2>
+<p>Once all items above are checked off:</p>
+<ol>
+<li><strong>Log in to Cloudflare DNS Dashboard</strong> for zone <code>plashafodcottage.co.uk</code>.</li>
+<li><strong>Review Existing DNS Records</strong>:<ul>
+<li>Note the old LiteSpeed server IP (<code>185.151.30.138</code>).</li>
+</ul>
+</li>
+<li><strong>Configure Worker Custom Domain</strong>:<ul>
+<li>In Cloudflare Dashboard $\rightarrow$ <strong>Workers &amp; Pages</strong> $\rightarrow$ <code>plas-hafod-cottage</code> $\rightarrow$ <strong>Settings</strong> $\rightarrow$ <strong>Domains &amp; Routes</strong>.</li>
+<li>Click <strong>Add Custom Domain</strong> $\rightarrow$ enter <code>plashafodcottage.co.uk</code>.</li>
+<li>Add second custom domain $\rightarrow$ <code>www.plashafodcottage.co.uk</code>.</li>
+<li>Cloudflare will automatically route incoming traffic from the edge to the Worker with SSL auto-provisioned.</li>
+</ul>
+</li>
+<li><strong>Purge Cache &amp; Verify</strong>:<ul>
+<li>Open browser incognito window $\rightarrow$ browse to <code>https://plashafodcottage.co.uk</code>.</li>
+<li>Verify immediate 200 OK response from the Cloudflare Worker.</li>
+<li>Verify <code>/studio</code> loads and allows login.</li>
+<li>Verify email dispatch from the live domain.</li>
+</ul>
+</li>
+</ol>
+
+  </div>
+
+  <div class="doc-footer">
+    <div>Plas Hafod Cottage &amp; Bryn Bugeiliaid Bach &bull; Website Launch Documentation</div>
+    <div>plashafodcottage.co.uk &bull; Siwsan &amp; Neil</div>
+  </div>
+</body>
+</html>
