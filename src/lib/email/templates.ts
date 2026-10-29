@@ -102,6 +102,58 @@ export const LOGO_WHITE_URL =
   'https://cdn.sanity.io/images/iji5mij0/production/20a5069ce3f84e0a7f886cd753993227028c0945-810x523.png';
 
 /**
+ * Self-contained, universally email-client-safe HTML icon badge (no external image dependencies).
+ */
+function renderEmailIconBadge(
+  type: 'house' | 'map' | 'calendar' | 'clock' | 'card' | 'check',
+  variant: 'navy' | 'gold' | 'green' = 'navy'
+): string {
+  const symbols: Record<typeof type, string> = {
+    house: '🏡',
+    map: '📍',
+    calendar: '📅',
+    clock: '🕒',
+    card: '💳',
+    check: '✅',
+  };
+
+  const styles: Record<typeof variant, { bg: string; border: string; color: string }> = {
+    navy: { bg: '#323149', border: '#241f35', color: '#efda07' },
+    gold: { bg: '#fef08a', border: '#facc15', color: '#854d0e' },
+    green: { bg: '#dcfce7', border: '#86efac', color: '#166534' },
+  };
+
+  const s = styles[variant];
+  return `<table cellpadding="0" cellspacing="0" border="0" role="presentation" style="border-collapse: separate;">
+    <tr>
+      <td width="40" height="40" align="center" valign="middle" style="width: 40px; height: 40px; background-color: ${s.bg}; border: 1px solid ${s.border}; border-radius: 10px; font-size: 19px; line-height: 40px; text-align: center; color: ${s.color};">
+        ${symbols[type]}
+      </td>
+    </tr>
+  </table>`;
+}
+
+const EMAIL_MOBILE_RESPONSIVE_CSS = `
+    * { box-sizing: border-box; }
+    img { max-width: 100%; height: auto; }
+    table { border-collapse: collapse; }
+    @media only screen and (max-width: 520px) {
+      body { padding: 10px 6px !important; }
+      .card { border-radius: 12px !important; }
+      .header { padding: 22px 16px 18px !important; }
+      .header h1, .header h2 { font-size: 19px !important; }
+      .content { padding: 20px 14px !important; }
+      .summary-card, .price-card, .bank-box, .info-card, .keysafe-card, .hero-callout { padding: 14px 12px !important; margin: 12px 0 !important; }
+      .stack-col { display: block !important; width: 100% !important; padding-left: 0 !important; padding-right: 0 !important; border-left: none !important; }
+      .stack-col + .stack-col { margin-top: 12px !important; padding-top: 12px !important; border-top: 1px solid #e2e8f0 !important; }
+      .bank-table td, .table th, .table td { padding: 8px 6px !important; font-size: 13px !important; word-break: break-word !important; }
+      .bank-table td.label, .table th { width: 42% !important; }
+      .ref-badge { font-size: 13px !important; padding: 4px 8px !important; word-break: break-all !important; }
+      .key-badge { font-size: 18px !important; padding: 8px 16px !important; }
+    }
+`;
+
+/**
  * 1. Owner Alert: Dark Theme / Dashboard Style with White Logo
  */
 export function generateOwnerBookingAlertHtml(data: BookingEmailData, settings?: Partial<SiteSettings>): string {
@@ -128,6 +180,7 @@ export function generateOwnerBookingAlertHtml(data: BookingEmailData, settings?:
     .total-row { font-weight: bold; background: #f1f5f9; }
     .btn { display: inline-block; background: #323149; color: #ffffff !important; padding: 14px 28px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 14px; text-align: center; margin-top: 16px; letter-spacing: 0.3px; }
     .footer { padding: 20px; text-align: center; font-size: 12px; color: #94a3b8; background: #f8fafc; border-top: 1px solid #e2e8f0; }
+    ${EMAIL_MOBILE_RESPONSIVE_CSS}
   </style>
 </head>
 <body>
@@ -204,12 +257,6 @@ export function generateGuestConfirmationHtml(
   const whatNextHeading = isCymraeg ? 'Beth sy’n digwydd nesaf?' : 'What happens next?';
   const summaryHeading = isCymraeg ? 'Crynodeb o’ch Archeb' : 'Your Booking Summary';
 
-  const houseIconUrl = 'https://d15k2d11r6t6rl.cloudfront.net/public/users/Integrators/BeeProAgency/803819_787671/House.png';
-  const mapIconUrl = 'https://d15k2d11r6t6rl.cloudfront.net/public/users/Integrators/BeeProAgency/803819_787671/Map.png';
-  const calendarIconUrl = 'https://d15k2d11r6t6rl.cloudfront.net/public/users/Integrators/BeeProAgency/803819_787671/Calendar.png';
-  const markerIconUrl = 'https://d15k2d11r6t6rl.cloudfront.net/public/users/Integrators/BeeProAgency/803819_787671/Calendar_with_marker.png';
-  const cardIconUrl = 'https://d15k2d11r6t6rl.cloudfront.net/public/users/Integrators/BeeProAgency/803819_787671/Credit%20Card.png';
-
   return `
 <!DOCTYPE html>
 <html>
@@ -242,6 +289,7 @@ export function generateGuestConfirmationHtml(
       .highlight-box { background-color: #241f35 !important; color: #e2e8f0 !important; }
       .footer { background-color: #151221 !important; border-color: #2e2842 !important; color: #64748b !important; }
     }
+    ${EMAIL_MOBILE_RESPONSIVE_CSS}
   </style>
 </head>
 <body>
@@ -263,38 +311,38 @@ export function generateGuestConfirmationHtml(
       <!-- Visual Summary Rows matching original Pending Reservation template -->
       <table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="border-top: 1px solid #e5e5e5; border-bottom: 1px solid #e5e5e5; margin: 20px 0;">
         <tr>
-          <td width="68" style="padding: 14px 12px 14px 0; vertical-align: middle; text-align: center;">
-            <img src="${houseIconUrl}" alt="Cottage" width="48" style="display: inline-block; height: auto; border: 0;" />
+          <td width="54" style="padding: 14px 12px 14px 0; vertical-align: middle;">
+            ${renderEmailIconBadge('house', 'navy')}
           </td>
           <td style="padding: 14px 0; vertical-align: middle;">
-            <div style="font-size: 13px; font-weight: 800; color: #0f172a; text-transform: uppercase;">${isCymraeg ? 'BWTHYN A ARCHEBWYD' : 'COTTAGE BOOKED'}</div>
+            <div style="font-size: 12px; font-weight: 800; color: #0f172a; text-transform: uppercase; letter-spacing: 0.5px;">${isCymraeg ? 'BWTHYN A ARCHEBWYD' : 'COTTAGE BOOKED'}</div>
             <div style="font-size: 14px; color: #334155; margin-top: 3px; font-weight: 600;">${data.propertyTitle}</div>
           </td>
         </tr>
         <tr><td colspan="2" style="border-top: 1px solid #e5e5e5; padding: 0;"></td></tr>
         <tr>
-          <td width="68" style="padding: 14px 12px 14px 0; vertical-align: middle; text-align: center;">
-            <img src="${mapIconUrl}" alt="Address" width="38" style="display: inline-block; height: auto; border: 0;" />
+          <td width="54" style="padding: 14px 12px 14px 0; vertical-align: middle;">
+            ${renderEmailIconBadge('map', 'navy')}
           </td>
           <td style="padding: 14px 0; vertical-align: middle;">
-            <div style="font-size: 13px; font-weight: 800; color: #0f172a; text-transform: uppercase;">${isCymraeg ? 'CYFEIRIAD' : 'ADDRESS'}</div>
+            <div style="font-size: 12px; font-weight: 800; color: #0f172a; text-transform: uppercase; letter-spacing: 0.5px;">${isCymraeg ? 'CYFEIRIAD' : 'ADDRESS'}</div>
             <div style="font-size: 14px; color: #334155; margin-top: 3px;">${address}</div>
           </td>
         </tr>
         <tr><td colspan="2" style="border-top: 1px solid #e5e5e5; padding: 0;"></td></tr>
         <tr>
-          <td width="68" style="padding: 14px 12px 14px 0; vertical-align: middle; text-align: center;">
-            <img src="${calendarIconUrl}" alt="Dates" width="46" style="display: inline-block; height: auto; border: 0;" />
+          <td width="54" style="padding: 14px 12px 14px 0; vertical-align: middle;">
+            ${renderEmailIconBadge('calendar', 'navy')}
           </td>
           <td style="padding: 14px 0; vertical-align: middle;">
             <table width="100%" cellpadding="0" cellspacing="0" role="presentation">
               <tr>
-                <td width="50%">
-                  <div style="font-size: 13px; font-weight: 800; color: #0f172a; text-transform: uppercase;">${isCymraeg ? 'CYRRAEDD' : 'ARRIVAL'}</div>
+                <td width="50%" class="stack-col" style="vertical-align: top; padding-right: 8px;">
+                  <div style="font-size: 12px; font-weight: 800; color: #0f172a; text-transform: uppercase; letter-spacing: 0.5px;">${isCymraeg ? 'CYRRAEDD' : 'ARRIVAL'}</div>
                   <div style="font-size: 14px; color: #475569; margin-top: 3px; font-style: italic;">${formatDateUK(data.checkIn)}</div>
                 </td>
-                <td width="50%">
-                  <div style="font-size: 13px; font-weight: 800; color: #0f172a; text-transform: uppercase;">${isCymraeg ? 'GADAEL' : 'DEPARTURE'}</div>
+                <td width="50%" class="stack-col" style="vertical-align: top;">
+                  <div style="font-size: 12px; font-weight: 800; color: #0f172a; text-transform: uppercase; letter-spacing: 0.5px;">${isCymraeg ? 'GADAEL' : 'DEPARTURE'}</div>
                   <div style="font-size: 14px; color: #475569; margin-top: 3px; font-style: italic;">${formatDateUK(data.checkOut)}</div>
                 </td>
               </tr>
@@ -303,19 +351,19 @@ export function generateGuestConfirmationHtml(
         </tr>
         <tr><td colspan="2" style="border-top: 1px solid #e5e5e5; padding: 0;"></td></tr>
         <tr>
-          <td width="68" style="padding: 14px 12px 14px 0; vertical-align: middle; text-align: center;">
-            <img src="${markerIconUrl}" alt="Times" width="42" style="display: inline-block; height: auto; border: 0;" />
+          <td width="54" style="padding: 14px 12px 14px 0; vertical-align: middle;">
+            ${renderEmailIconBadge('clock', 'navy')}
           </td>
           <td style="padding: 14px 0; vertical-align: middle;">
             <table width="100%" cellpadding="0" cellspacing="0" role="presentation">
               <tr>
-                <td width="50%">
-                  <div style="font-size: 13px; font-weight: 800; color: #0f172a; text-transform: uppercase;">CHECK-IN</div>
-                  <div style="font-size: 14px; color: #475569; margin-top: 3px; font-style: italic;">15:00 (${checkInTime})</div>
+                <td width="50%" class="stack-col" style="vertical-align: top; padding-right: 8px;">
+                  <div style="font-size: 12px; font-weight: 800; color: #0f172a; text-transform: uppercase; letter-spacing: 0.5px;">CHECK-IN</div>
+                  <div style="font-size: 14px; color: #475569; margin-top: 3px; font-style: italic;">${checkInTime}</div>
                 </td>
-                <td width="50%">
-                  <div style="font-size: 13px; font-weight: 800; color: #0f172a; text-transform: uppercase;">CHECK-OUT</div>
-                  <div style="font-size: 14px; color: #475569; margin-top: 3px; font-style: italic;">10:00 (${checkOutTime})</div>
+                <td width="50%" class="stack-col" style="vertical-align: top;">
+                  <div style="font-size: 12px; font-weight: 800; color: #0f172a; text-transform: uppercase; letter-spacing: 0.5px;">CHECK-OUT</div>
+                  <div style="font-size: 14px; color: #475569; margin-top: 3px; font-style: italic;">${checkOutTime}</div>
                 </td>
               </tr>
             </table>
@@ -323,11 +371,11 @@ export function generateGuestConfirmationHtml(
         </tr>
         <tr><td colspan="2" style="border-top: 1px solid #e5e5e5; padding: 0;"></td></tr>
         <tr>
-          <td width="68" style="padding: 14px 12px 14px 0; vertical-align: middle; text-align: center;">
-            <img src="${cardIconUrl}" alt="Price" width="32" style="display: inline-block; height: auto; border: 0;" />
+          <td width="54" style="padding: 14px 12px 14px 0; vertical-align: middle;">
+            ${renderEmailIconBadge('card', 'gold')}
           </td>
           <td style="padding: 14px 0; vertical-align: middle;">
-            <div style="font-size: 13px; font-weight: 800; color: #0f172a; text-transform: uppercase;">${isCymraeg ? 'PRIS' : 'PRICE'}</div>
+            <div style="font-size: 12px; font-weight: 800; color: #0f172a; text-transform: uppercase; letter-spacing: 0.5px;">${isCymraeg ? 'PRIS' : 'PRICE'}</div>
             <div style="font-size: 15px; color: #0f172a; margin-top: 3px; font-weight: 700; font-style: italic;">£${data.totalPrice} (${data.totalNights} ${isCymraeg ? 'Noson' : 'Nights'})</div>
           </td>
         </tr>
@@ -384,6 +432,7 @@ export function generateOwnerContactAlertHtml(
     .message-box { background: #f8fafc; border: 1px solid #e2e8f0; border-left: 4px solid #efda07; border-radius: 6px; padding: 18px; margin: 18px 0; font-size: 14px; line-height: 1.6; white-space: pre-wrap; color: #1e293b; }
     .btn { display: inline-block; background: #323149; color: #ffffff !important; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 13px; text-align: center; margin-top: 14px; }
     .footer { padding: 18px; text-align: center; font-size: 12px; color: #94a3b8; background: #f8fafc; border-top: 1px solid #e2e8f0; }
+    ${EMAIL_MOBILE_RESPONSIVE_CSS}
   </style>
 </head>
 <body>
@@ -468,6 +517,7 @@ export function generateVisitorContactAutoReplyHtml(
       .content { color: #e2e8f0 !important; }
       .footer { background-color: #151221 !important; border-color: #2e2842 !important; color: #64748b !important; }
     }
+    ${EMAIL_MOBILE_RESPONSIVE_CSS}
   </style>
 </head>
 <body>
@@ -682,10 +732,6 @@ export function generateDepositRequestHtml(
   const depositPct = settings?.depositPercentage || 25;
   const address = settings?.address || 'Bwthyn Plas Hafod, Nebo, Gwynedd, LL54 6EB';
 
-  const houseIconUrl = 'https://d15k2d11r6t6rl.cloudfront.net/public/users/Integrators/BeeProAgency/803819_787671/House.png';
-  const calendarIconUrl = 'https://d15k2d11r6t6rl.cloudfront.net/public/users/Integrators/BeeProAgency/803819_787671/Calendar.png';
-  const creditCardIconUrl = 'https://d15k2d11r6t6rl.cloudfront.net/public/users/Integrators/BeeProAgency/803819_787671/Credit%20Card.png';
-
   return `
 <!DOCTYPE html>
 <html>
@@ -721,6 +767,7 @@ export function generateDepositRequestHtml(
       .bank-table td.label { color: #cbd5e1 !important; }
       .bank-table td.value { color: #f1f5f9 !important; }
     }
+    ${EMAIL_MOBILE_RESPONSIVE_CSS}
   </style>
 </head>
 <body>
@@ -750,14 +797,14 @@ export function generateDepositRequestHtml(
 
       <!-- Cottage Booked -->
       <div class="summary-card">
-        <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <table width="100%" cellpadding="0" cellspacing="0" border="0" role="presentation">
           <tr>
-            <td width="52" valign="top" style="padding-right: 14px;">
-              <img src="${houseIconUrl}" width="42" height="42" alt="Cottage" style="display: block;" />
+            <td width="52" valign="middle" style="padding-right: 12px;">
+              ${renderEmailIconBadge('house', 'navy')}
             </td>
             <td valign="middle">
-              <div style="font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: #323149;">COTTAGE BOOKED</div>
-              <div style="font-size: 16px; font-weight: 700; color: #0f172a; margin-top: 4px;">${data.propertyTitle}</div>
+              <div style="font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px; color: #323149;">COTTAGE BOOKED</div>
+              <div style="font-size: 16px; font-weight: 700; color: #0f172a; margin-top: 3px;">${data.propertyTitle}</div>
               <div style="font-size: 13px; color: #64748b; margin-top: 2px;">${data.adults} Adults, ${data.children} Children, ${data.pets} Pets • ${data.totalNights} Nights</div>
             </td>
           </tr>
@@ -766,30 +813,21 @@ export function generateDepositRequestHtml(
 
       <!-- Arrival & Departure -->
       <div class="summary-card">
-        <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <table width="100%" cellpadding="0" cellspacing="0" border="0" role="presentation">
           <tr>
-            <td width="50%" valign="top" style="padding-right: 10px;">
-              <table width="100%" cellpadding="0" cellspacing="0" border="0">
+            <td width="52" valign="middle" style="padding-right: 12px;">
+              ${renderEmailIconBadge('calendar', 'navy')}
+            </td>
+            <td valign="middle">
+              <table width="100%" cellpadding="0" cellspacing="0" border="0" role="presentation">
                 <tr>
-                  <td width="46" valign="top" style="padding-right: 10px;">
-                    <img src="${calendarIconUrl}" width="38" height="38" alt="Arrival" style="display: block;" />
-                  </td>
-                  <td valign="middle">
-                    <div style="font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: #323149;">ARRIVAL</div>
+                  <td width="50%" class="stack-col" valign="top" style="padding-right: 10px;">
+                    <div style="font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px; color: #323149;">ARRIVAL</div>
                     <div style="font-size: 15px; font-weight: 700; color: #0f172a; margin-top: 2px;">${formatDateUK(data.checkIn)}</div>
                     <div style="font-size: 12px; color: #64748b;">Check-in: ${checkInTime}</div>
                   </td>
-                </tr>
-              </table>
-            </td>
-            <td width="50%" valign="top" style="padding-left: 10px; border-left: 1px solid #e2e8f0;">
-              <table width="100%" cellpadding="0" cellspacing="0" border="0">
-                <tr>
-                  <td width="46" valign="top" style="padding-right: 10px;">
-                    <img src="${calendarIconUrl}" width="38" height="38" alt="Departure" style="display: block;" />
-                  </td>
-                  <td valign="middle">
-                    <div style="font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: #323149;">DEPARTURE</div>
+                  <td width="50%" class="stack-col" valign="top" style="padding-left: 12px; border-left: 1px solid #e2e8f0;">
+                    <div style="font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px; color: #323149;">DEPARTURE</div>
                     <div style="font-size: 15px; font-weight: 700; color: #0f172a; margin-top: 2px;">${formatDateUK(data.checkOut)}</div>
                     <div style="font-size: 12px; color: #64748b;">Check-out: ${checkOutTime}</div>
                   </td>
@@ -802,13 +840,13 @@ export function generateDepositRequestHtml(
 
       <!-- Cost Breakdown & Bank Details -->
       <div class="bank-box">
-        <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom: 12px;">
+        <table width="100%" cellpadding="0" cellspacing="0" border="0" role="presentation" style="margin-bottom: 12px;">
           <tr>
-            <td width="52" valign="top" style="padding-right: 14px;">
-              <img src="${creditCardIconUrl}" width="42" height="42" alt="Cost Breakdown" style="display: block;" />
+            <td width="52" valign="top" style="padding-right: 12px;">
+              ${renderEmailIconBadge('card', 'gold')}
             </td>
             <td valign="middle">
-              <div style="font-size: 14px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: #1e1b2e;">COST BREAKDOWN</div>
+              <div style="font-size: 14px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px; color: #1e1b2e;">COST BREAKDOWN</div>
               <div style="font-size: 14px; color: #334155; margin-top: 6px; line-height: 1.7;">
                 ${data.appliedDiscountName ? `<div>Special Offer: <strong style="color: #15803d;">${data.appliedDiscountName} (-£${data.discountAmount})</strong></div>` : ''}
                 <div>Total Price - <strong>£${data.totalPrice}</strong></div>
@@ -983,7 +1021,6 @@ export function generateCheckInGuideHtml(
   const badgeText = isCymraeg ? 'CYFARWYDDIADAU CYRRAEDD A CHROESO' : 'DIRECTIONS & ARRIVAL GUIDE';
   const bannerHeading = isCymraeg ? 'Eich Gwyliau yn Eryri – Cyfarwyddiadau Cyrraedd' : 'Your Holiday in Eryri / Snowdonia – Directions & Arrival Guide';
 
-  const mapImageUrl = 'https://d15k2d11r6t6rl.cloudfront.net/public/users/Integrators/BeeProAgency/803819_787671/editor_images/90999d9e-03a6-48a4-bbcb-925672f38dcc.png';
   const googleMapsUrl = "https://www.google.com/maps/place/53%C2%B001'20.7%22N+4%C2%B016'05.2%22W/@53.0224173,-4.2681046,925m/data=!3m2!1e3!4b1!4m5!3m4!1s0x0:0xd26a6eeb24eac6fd!8m2!3d53.0224173!4d-4.2681046?hl=en";
 
   return `
@@ -1020,6 +1057,7 @@ export function generateCheckInGuideHtml(
       .table td { border-color: #2e2842 !important; color: #e2e8f0 !important; }
       .footer { background-color: #151221 !important; border-color: #2e2842 !important; color: #64748b !important; }
     }
+    ${EMAIL_MOBILE_RESPONSIVE_CSS}
   </style>
 </head>
 <body>
@@ -1081,17 +1119,15 @@ export function generateCheckInGuideHtml(
 
       <!-- Map & Directions -->
       <div class="info-card">
-        <strong style="font-size: 15px; color: #0f172a; display: block; margin-bottom: 8px;">
+        <strong style="font-size: 15px; color: #0f172a; display: block; margin-bottom: 10px;">
           🚗 ${isCymraeg ? 'Cyfarwyddiadau Cyrraedd (o’r A487)' : 'Directions (Easiest Route from the A487)'}
         </strong>
-        <p style="font-size: 12px; color: #64748b; margin: 0 0 12px;">
-          ${isCymraeg
-            ? 'Cliciwch ar y map isod i’w agor yn Google Maps:'
-            : 'Click on the map image below to open in Google Maps:'}
-        </p>
-        <div style="text-align: center; margin-bottom: 14px;">
-          <a href="${googleMapsUrl}" target="_blank" rel="noopener">
-            <img src="${mapImageUrl}" alt="Map to Plas Hafod Cottage" style="display: block; width: 100%; max-width: 540px; height: auto; border-radius: 8px; border: 1px solid #cbd5e1; margin: 0 auto;" />
+        <div style="background: #323149; border-radius: 10px; padding: 14px 16px; margin-bottom: 14px; text-align: center;">
+          <div style="font-size: 12px; color: #cbd5e1; margin-bottom: 8px;">
+            📍 <strong>53°01'20.7"N 4°16'05.2"W</strong> • What3Words: <code style="color: #efda07;">///perfume.punctuate.ready</code>
+          </div>
+          <a href="${googleMapsUrl}" target="_blank" rel="noopener" style="display: inline-block; background: #efda07; color: #1e1b2e !important; font-weight: 800; font-size: 13px; padding: 9px 18px; border-radius: 6px; text-decoration: none; letter-spacing: 0.3px;">
+            🗺️ ${isCymraeg ? 'Agor y Lleoliad yn Google Maps →' : 'Open Exact Pin in Google Maps →'}
           </a>
         </div>
         ${directionsHtml}
@@ -1224,10 +1260,6 @@ export function generateBalanceReminderHtml(
   const badgeText = isCymraeg ? 'ATGOFFA: GWEDDILL DYLEDUS' : 'PAYMENT REQUEST: OUTSTANDING BALANCE';
   const headingText = isCymraeg ? 'Taliad Gweddill Dyledus – Eich Arhosiad yn Eryri' : 'Outstanding Balance Due – Your Upcoming Stay';
 
-  const houseIconUrl = 'https://d15k2d11r6t6rl.cloudfront.net/public/users/Integrators/BeeProAgency/803819_787671/House.png';
-  const calendarIconUrl = 'https://d15k2d11r6t6rl.cloudfront.net/public/users/Integrators/BeeProAgency/803819_787671/Calendar.png';
-  const cardIconUrl = 'https://d15k2d11r6t6rl.cloudfront.net/public/users/Integrators/BeeProAgency/803819_787671/Credit%20Card.png';
-
   return `
 <!DOCTYPE html>
 <html>
@@ -1265,6 +1297,7 @@ export function generateBalanceReminderHtml(
       .bank-table td.value { color: #f1f5f9 !important; }
       .footer { background-color: #151221 !important; border-color: #2e2842 !important; color: #64748b !important; }
     }
+    ${EMAIL_MOBILE_RESPONSIVE_CSS}
   </style>
 </head>
 <body>
@@ -1292,11 +1325,11 @@ export function generateBalanceReminderHtml(
       <!-- Cottage & Dates Visual Summary (Matching Original Template Layout) -->
       <table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="border-top: 1px solid #e5e5e5; border-bottom: 1px solid #e5e5e5; margin: 20px 0;">
         <tr>
-          <td width="72" style="padding: 16px 12px 16px 0; vertical-align: middle; text-align: center;">
-            <img src="${houseIconUrl}" alt="Cottage" width="52" style="display: inline-block; height: auto; border: 0;" />
+          <td width="54" style="padding: 16px 12px 16px 0; vertical-align: middle;">
+            ${renderEmailIconBadge('house', 'navy')}
           </td>
           <td style="padding: 16px 0; vertical-align: middle;">
-            <div style="font-size: 13px; font-weight: 800; color: #0f172a; text-transform: uppercase; letter-spacing: 0.5px;">
+            <div style="font-size: 12px; font-weight: 800; color: #0f172a; text-transform: uppercase; letter-spacing: 0.5px;">
               ${isCymraeg ? 'BWTHYN A ARCHEIRWYD' : 'COTTAGE BOOKED'}
             </div>
             <div style="font-size: 15px; color: #334155; margin-top: 4px; font-weight: 600;">
@@ -1308,22 +1341,22 @@ export function generateBalanceReminderHtml(
           <td colspan="2" style="border-top: 1px solid #e5e5e5; padding: 0;"></td>
         </tr>
         <tr>
-          <td width="72" style="padding: 16px 12px 16px 0; vertical-align: middle; text-align: center;">
-            <img src="${calendarIconUrl}" alt="Calendar" width="48" style="display: inline-block; height: auto; border: 0;" />
+          <td width="54" style="padding: 16px 12px 16px 0; vertical-align: middle;">
+            ${renderEmailIconBadge('calendar', 'navy')}
           </td>
           <td style="padding: 16px 0; vertical-align: middle;">
             <table width="100%" cellpadding="0" cellspacing="0" role="presentation">
               <tr>
-                <td width="50%" style="vertical-align: top; padding-right: 10px;">
-                  <div style="font-size: 13px; font-weight: 800; color: #0f172a; text-transform: uppercase;">
+                <td width="50%" class="stack-col" style="vertical-align: top; padding-right: 10px;">
+                  <div style="font-size: 12px; font-weight: 800; color: #0f172a; text-transform: uppercase; letter-spacing: 0.5px;">
                     ${isCymraeg ? 'CYRRAEDD' : 'ARRIVAL'}
                   </div>
                   <div style="font-size: 14px; color: #475569; margin-top: 4px; font-style: italic;">
                     ${formatDateUK(data.checkIn)}
                   </div>
                 </td>
-                <td width="50%" style="vertical-align: top;">
-                  <div style="font-size: 13px; font-weight: 800; color: #0f172a; text-transform: uppercase;">
+                <td width="50%" class="stack-col" style="vertical-align: top;">
+                  <div style="font-size: 12px; font-weight: 800; color: #0f172a; text-transform: uppercase; letter-spacing: 0.5px;">
                     ${isCymraeg ? 'GADAEL' : 'DEPARTURE'}
                   </div>
                   <div style="font-size: 14px; color: #475569; margin-top: 4px; font-style: italic;">
@@ -1338,11 +1371,8 @@ export function generateBalanceReminderHtml(
 
       <!-- Cost Breakdown Callout -->
       <div class="hero-callout">
-        <div style="display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 6px;">
-          <img src="${cardIconUrl}" alt="" width="24" style="display: inline-block; height: auto; vertical-align: middle;" />
-          <span style="font-size: 14px; text-transform: uppercase; letter-spacing: 1px; color: #854d0e; font-weight: 800;">
-            ${isCymraeg ? 'GWEDDILL DYLEDUS' : 'OUTSTANDING BALANCE'}
-          </span>
+        <div style="margin-bottom: 6px; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; color: #854d0e; font-weight: 800;">
+          💳 ${isCymraeg ? 'GWEDDILL DYLEDUS' : 'OUTSTANDING BALANCE'}
         </div>
         <div style="font-size: 32px; font-weight: 800; color: #1e1b2e; margin: 6px 0;">£${data.balanceDue}</div>
         <div style="font-size: 14px; color: #475569; line-height: 1.7; margin-top: 8px;">
@@ -1464,12 +1494,6 @@ export function generateDepositReceiptHtml(
     (isCymraeg && settings?.addressCy ? settings.addressCy : settings?.address) ||
     'Bwthyn Plas Hafod, Nebo, Gwynedd, LL54 6EB';
 
-  const houseIconUrl = 'https://d15k2d11r6t6rl.cloudfront.net/public/users/Integrators/BeeProAgency/803819_787671/House.png';
-  const mapIconUrl = 'https://d15k2d11r6t6rl.cloudfront.net/public/users/Integrators/BeeProAgency/803819_787671/Map.png';
-  const calendarIconUrl = 'https://d15k2d11r6t6rl.cloudfront.net/public/users/Integrators/BeeProAgency/803819_787671/Calendar.png';
-  const calendarMarkerIconUrl = 'https://d15k2d11r6t6rl.cloudfront.net/public/users/Integrators/BeeProAgency/803819_787671/Calendar_with_marker.png';
-  const creditCardIconUrl = 'https://d15k2d11r6t6rl.cloudfront.net/public/users/Integrators/BeeProAgency/803819_787671/Credit%20Card.png';
-
   return `
 <!DOCTYPE html>
 <html>
@@ -1497,6 +1521,7 @@ export function generateDepositReceiptHtml(
       .summary-card { background-color: #201a30 !important; border-color: #3b3252 !important; color: #f1f5f9 !important; }
       .price-card { background-color: #14291e !important; border-color: #22c55e !important; color: #f1f5f9 !important; }
     }
+    ${EMAIL_MOBILE_RESPONSIVE_CSS}
   </style>
 </head>
 <body>
@@ -1537,14 +1562,14 @@ export function generateDepositReceiptHtml(
 
       <!-- Cottage Booked -->
       <div class="summary-card">
-        <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <table width="100%" cellpadding="0" cellspacing="0" border="0" role="presentation">
           <tr>
-            <td width="52" valign="top" style="padding-right: 14px;">
-              <img src="${houseIconUrl}" width="42" height="42" alt="Cottage" style="display: block;" />
+            <td width="52" valign="middle" style="padding-right: 12px;">
+              ${renderEmailIconBadge('house', 'navy')}
             </td>
             <td valign="middle">
-              <div style="font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: #323149;">${isCymraeg ? 'BWTHYN A ARCHEBWYD' : 'COTTAGE BOOKED'}</div>
-              <div style="font-size: 16px; font-weight: 700; color: #0f172a; margin-top: 4px;">${data.propertyTitle}</div>
+              <div style="font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px; color: #323149;">${isCymraeg ? 'BWTHYN A ARCHEBWYD' : 'COTTAGE BOOKED'}</div>
+              <div style="font-size: 16px; font-weight: 700; color: #0f172a; margin-top: 3px;">${data.propertyTitle}</div>
               <div style="font-size: 13px; color: #64748b; margin-top: 2px;">${data.adults} Adults, ${data.children} Children, ${data.pets} Pets • ${data.totalNights} Nights</div>
             </td>
           </tr>
@@ -1553,14 +1578,14 @@ export function generateDepositReceiptHtml(
 
       <!-- Address -->
       <div class="summary-card">
-        <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <table width="100%" cellpadding="0" cellspacing="0" border="0" role="presentation">
           <tr>
-            <td width="52" valign="top" style="padding-right: 14px;">
-              <img src="${mapIconUrl}" width="42" height="42" alt="Address" style="display: block;" />
+            <td width="52" valign="middle" style="padding-right: 12px;">
+              ${renderEmailIconBadge('map', 'navy')}
             </td>
             <td valign="middle">
-              <div style="font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: #323149;">${isCymraeg ? 'CYFEIRIAD' : 'ADDRESS'}</div>
-              <div style="font-size: 15px; font-weight: 600; color: #0f172a; margin-top: 4px;">${address}</div>
+              <div style="font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px; color: #323149;">${isCymraeg ? 'CYFEIRIAD' : 'ADDRESS'}</div>
+              <div style="font-size: 15px; font-weight: 600; color: #0f172a; margin-top: 3px;">${address}</div>
             </td>
           </tr>
         </table>
@@ -1568,29 +1593,20 @@ export function generateDepositReceiptHtml(
 
       <!-- Arrival & Departure -->
       <div class="summary-card">
-        <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <table width="100%" cellpadding="0" cellspacing="0" border="0" role="presentation">
           <tr>
-            <td width="50%" valign="top" style="padding-right: 10px;">
-              <table width="100%" cellpadding="0" cellspacing="0" border="0">
+            <td width="52" valign="middle" style="padding-right: 12px;">
+              ${renderEmailIconBadge('calendar', 'navy')}
+            </td>
+            <td valign="middle">
+              <table width="100%" cellpadding="0" cellspacing="0" border="0" role="presentation">
                 <tr>
-                  <td width="46" valign="top" style="padding-right: 10px;">
-                    <img src="${calendarIconUrl}" width="38" height="38" alt="Arrival" style="display: block;" />
-                  </td>
-                  <td valign="middle">
-                    <div style="font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: #323149;">${isCymraeg ? 'CYRRAEDD' : 'ARRIVAL'}</div>
+                  <td width="50%" class="stack-col" valign="top" style="padding-right: 10px;">
+                    <div style="font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px; color: #323149;">${isCymraeg ? 'CYRRAEDD' : 'ARRIVAL'}</div>
                     <div style="font-size: 15px; font-weight: 700; color: #0f172a; margin-top: 2px;">${formatDateUK(data.checkIn)}</div>
                   </td>
-                </tr>
-              </table>
-            </td>
-            <td width="50%" valign="top" style="padding-left: 10px; border-left: 1px solid #e2e8f0;">
-              <table width="100%" cellpadding="0" cellspacing="0" border="0">
-                <tr>
-                  <td width="46" valign="top" style="padding-right: 10px;">
-                    <img src="${calendarIconUrl}" width="38" height="38" alt="Departure" style="display: block;" />
-                  </td>
-                  <td valign="middle">
-                    <div style="font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: #323149;">${isCymraeg ? 'GADAEL' : 'DEPARTURE'}</div>
+                  <td width="50%" class="stack-col" valign="top" style="padding-left: 12px; border-left: 1px solid #e2e8f0;">
+                    <div style="font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px; color: #323149;">${isCymraeg ? 'GADAEL' : 'DEPARTURE'}</div>
                     <div style="font-size: 15px; font-weight: 700; color: #0f172a; margin-top: 2px;">${formatDateUK(data.checkOut)}</div>
                   </td>
                 </tr>
@@ -1602,29 +1618,20 @@ export function generateDepositReceiptHtml(
 
       <!-- Check-in & Check-out -->
       <div class="summary-card">
-        <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <table width="100%" cellpadding="0" cellspacing="0" border="0" role="presentation">
           <tr>
-            <td width="50%" valign="top" style="padding-right: 10px;">
-              <table width="100%" cellpadding="0" cellspacing="0" border="0">
+            <td width="52" valign="middle" style="padding-right: 12px;">
+              ${renderEmailIconBadge('clock', 'navy')}
+            </td>
+            <td valign="middle">
+              <table width="100%" cellpadding="0" cellspacing="0" border="0" role="presentation">
                 <tr>
-                  <td width="46" valign="top" style="padding-right: 10px;">
-                    <img src="${calendarMarkerIconUrl}" width="38" height="38" alt="Check-in" style="display: block;" />
-                  </td>
-                  <td valign="middle">
-                    <div style="font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: #323149;">CHECK-IN</div>
+                  <td width="50%" class="stack-col" valign="top" style="padding-right: 10px;">
+                    <div style="font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px; color: #323149;">CHECK-IN</div>
                     <div style="font-size: 15px; font-weight: 700; color: #0f172a; margin-top: 2px;">${checkInTime}</div>
                   </td>
-                </tr>
-              </table>
-            </td>
-            <td width="50%" valign="top" style="padding-left: 10px; border-left: 1px solid #e2e8f0;">
-              <table width="100%" cellpadding="0" cellspacing="0" border="0">
-                <tr>
-                  <td width="46" valign="top" style="padding-right: 10px;">
-                    <img src="${calendarMarkerIconUrl}" width="38" height="38" alt="Check-out" style="display: block;" />
-                  </td>
-                  <td valign="middle">
-                    <div style="font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: #323149;">CHECK-OUT</div>
+                  <td width="50%" class="stack-col" valign="top" style="padding-left: 12px; border-left: 1px solid #e2e8f0;">
+                    <div style="font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px; color: #323149;">CHECK-OUT</div>
                     <div style="font-size: 15px; font-weight: 700; color: #0f172a; margin-top: 2px;">${checkOutTime}</div>
                   </td>
                 </tr>
@@ -1636,13 +1643,13 @@ export function generateDepositReceiptHtml(
 
       <!-- Price & Deposit Summary -->
       <div class="price-card">
-        <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <table width="100%" cellpadding="0" cellspacing="0" border="0" role="presentation">
           <tr>
-            <td width="52" valign="top" style="padding-right: 14px;">
-              <img src="${creditCardIconUrl}" width="42" height="42" alt="Price" style="display: block;" />
+            <td width="52" valign="middle" style="padding-right: 12px;">
+              ${renderEmailIconBadge('check', 'green')}
             </td>
             <td valign="middle">
-              <div style="font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: #166534;">${isCymraeg ? 'PRIS A BLAENDAL' : 'PRICE & DEPOSIT PAID'}</div>
+              <div style="font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px; color: #166534;">${isCymraeg ? 'PRIS A BLAENDAL' : 'PRICE & DEPOSIT PAID'}</div>
               <div style="font-size: 20px; font-weight: 800; color: #14532d; margin-top: 4px;">£${data.totalPrice} <span style="font-size: 13px; font-weight: 600; color: #15803d;">(£${data.depositAmount} ${isCymraeg ? 'wedi’i dalu' : 'deposit paid'})</span></div>
               <div style="font-size: 13px; color: #334155; margin-top: 4px;">
                 ${isCymraeg
@@ -1735,12 +1742,6 @@ export function generateFullPaymentReceiptHtml(
     (isCymraeg && settings?.addressCy ? settings.addressCy : settings?.address) ||
     'Bwthyn Plas Hafod, Nebo, Gwynedd, LL54 6EB';
 
-  const houseIconUrl = 'https://d15k2d11r6t6rl.cloudfront.net/public/users/Integrators/BeeProAgency/803819_787671/House.png';
-  const mapIconUrl = 'https://d15k2d11r6t6rl.cloudfront.net/public/users/Integrators/BeeProAgency/803819_787671/Map.png';
-  const calendarIconUrl = 'https://d15k2d11r6t6rl.cloudfront.net/public/users/Integrators/BeeProAgency/803819_787671/Calendar.png';
-  const calendarMarkerIconUrl = 'https://d15k2d11r6t6rl.cloudfront.net/public/users/Integrators/BeeProAgency/803819_787671/Calendar_with_marker.png';
-  const creditCardIconUrl = 'https://d15k2d11r6t6rl.cloudfront.net/public/users/Integrators/BeeProAgency/803819_787671/Credit%20Card.png';
-
   return `
 <!DOCTYPE html>
 <html>
@@ -1768,6 +1769,7 @@ export function generateFullPaymentReceiptHtml(
       .summary-card { background-color: #201a30 !important; border-color: #3b3252 !important; color: #f1f5f9 !important; }
       .price-card { background-color: #14291e !important; border-color: #22c55e !important; color: #f1f5f9 !important; }
     }
+    ${EMAIL_MOBILE_RESPONSIVE_CSS}
   </style>
 </head>
 <body>
@@ -1808,14 +1810,14 @@ export function generateFullPaymentReceiptHtml(
 
       <!-- Cottage Booked -->
       <div class="summary-card">
-        <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <table width="100%" cellpadding="0" cellspacing="0" border="0" role="presentation">
           <tr>
-            <td width="52" valign="top" style="padding-right: 14px;">
-              <img src="${houseIconUrl}" width="42" height="42" alt="Cottage" style="display: block;" />
+            <td width="52" valign="middle" style="padding-right: 12px;">
+              ${renderEmailIconBadge('house', 'navy')}
             </td>
             <td valign="middle">
-              <div style="font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: #323149;">${isCymraeg ? 'BWTHYN A ARCHEBWYD' : 'COTTAGE BOOKED'}</div>
-              <div style="font-size: 16px; font-weight: 700; color: #0f172a; margin-top: 4px;">${data.propertyTitle}</div>
+              <div style="font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px; color: #323149;">${isCymraeg ? 'BWTHYN A ARCHEBWYD' : 'COTTAGE BOOKED'}</div>
+              <div style="font-size: 16px; font-weight: 700; color: #0f172a; margin-top: 3px;">${data.propertyTitle}</div>
               <div style="font-size: 13px; color: #64748b; margin-top: 2px;">${data.adults} Adults, ${data.children} Children, ${data.pets} Pets • ${data.totalNights} Nights</div>
             </td>
           </tr>
@@ -1824,14 +1826,14 @@ export function generateFullPaymentReceiptHtml(
 
       <!-- Address -->
       <div class="summary-card">
-        <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <table width="100%" cellpadding="0" cellspacing="0" border="0" role="presentation">
           <tr>
-            <td width="52" valign="top" style="padding-right: 14px;">
-              <img src="${mapIconUrl}" width="42" height="42" alt="Address" style="display: block;" />
+            <td width="52" valign="middle" style="padding-right: 12px;">
+              ${renderEmailIconBadge('map', 'navy')}
             </td>
             <td valign="middle">
-              <div style="font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: #323149;">${isCymraeg ? 'CYFEIRIAD' : 'ADDRESS'}</div>
-              <div style="font-size: 15px; font-weight: 600; color: #0f172a; margin-top: 4px;">${address}</div>
+              <div style="font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px; color: #323149;">${isCymraeg ? 'CYFEIRIAD' : 'ADDRESS'}</div>
+              <div style="font-size: 15px; font-weight: 600; color: #0f172a; margin-top: 3px;">${address}</div>
             </td>
           </tr>
         </table>
@@ -1839,29 +1841,20 @@ export function generateFullPaymentReceiptHtml(
 
       <!-- Arrival & Departure -->
       <div class="summary-card">
-        <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <table width="100%" cellpadding="0" cellspacing="0" border="0" role="presentation">
           <tr>
-            <td width="50%" valign="top" style="padding-right: 10px;">
-              <table width="100%" cellpadding="0" cellspacing="0" border="0">
+            <td width="52" valign="middle" style="padding-right: 12px;">
+              ${renderEmailIconBadge('calendar', 'navy')}
+            </td>
+            <td valign="middle">
+              <table width="100%" cellpadding="0" cellspacing="0" border="0" role="presentation">
                 <tr>
-                  <td width="46" valign="top" style="padding-right: 10px;">
-                    <img src="${calendarIconUrl}" width="38" height="38" alt="Arrival" style="display: block;" />
-                  </td>
-                  <td valign="middle">
-                    <div style="font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: #323149;">${isCymraeg ? 'CYRRAEDD' : 'ARRIVAL'}</div>
+                  <td width="50%" class="stack-col" valign="top" style="padding-right: 10px;">
+                    <div style="font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px; color: #323149;">${isCymraeg ? 'CYRRAEDD' : 'ARRIVAL'}</div>
                     <div style="font-size: 15px; font-weight: 700; color: #0f172a; margin-top: 2px;">${formatDateUK(data.checkIn)}</div>
                   </td>
-                </tr>
-              </table>
-            </td>
-            <td width="50%" valign="top" style="padding-left: 10px; border-left: 1px solid #e2e8f0;">
-              <table width="100%" cellpadding="0" cellspacing="0" border="0">
-                <tr>
-                  <td width="46" valign="top" style="padding-right: 10px;">
-                    <img src="${calendarIconUrl}" width="38" height="38" alt="Departure" style="display: block;" />
-                  </td>
-                  <td valign="middle">
-                    <div style="font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: #323149;">${isCymraeg ? 'GADAEL' : 'DEPARTURE'}</div>
+                  <td width="50%" class="stack-col" valign="top" style="padding-left: 12px; border-left: 1px solid #e2e8f0;">
+                    <div style="font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px; color: #323149;">${isCymraeg ? 'GADAEL' : 'DEPARTURE'}</div>
                     <div style="font-size: 15px; font-weight: 700; color: #0f172a; margin-top: 2px;">${formatDateUK(data.checkOut)}</div>
                   </td>
                 </tr>
@@ -1873,29 +1866,20 @@ export function generateFullPaymentReceiptHtml(
 
       <!-- Check-in & Check-out -->
       <div class="summary-card">
-        <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <table width="100%" cellpadding="0" cellspacing="0" border="0" role="presentation">
           <tr>
-            <td width="50%" valign="top" style="padding-right: 10px;">
-              <table width="100%" cellpadding="0" cellspacing="0" border="0">
+            <td width="52" valign="middle" style="padding-right: 12px;">
+              ${renderEmailIconBadge('clock', 'navy')}
+            </td>
+            <td valign="middle">
+              <table width="100%" cellpadding="0" cellspacing="0" border="0" role="presentation">
                 <tr>
-                  <td width="46" valign="top" style="padding-right: 10px;">
-                    <img src="${calendarMarkerIconUrl}" width="38" height="38" alt="Check-in" style="display: block;" />
-                  </td>
-                  <td valign="middle">
-                    <div style="font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: #323149;">CHECK-IN</div>
+                  <td width="50%" class="stack-col" valign="top" style="padding-right: 10px;">
+                    <div style="font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px; color: #323149;">CHECK-IN</div>
                     <div style="font-size: 15px; font-weight: 700; color: #0f172a; margin-top: 2px;">${checkInTime}</div>
                   </td>
-                </tr>
-              </table>
-            </td>
-            <td width="50%" valign="top" style="padding-left: 10px; border-left: 1px solid #e2e8f0;">
-              <table width="100%" cellpadding="0" cellspacing="0" border="0">
-                <tr>
-                  <td width="46" valign="top" style="padding-right: 10px;">
-                    <img src="${calendarMarkerIconUrl}" width="38" height="38" alt="Check-out" style="display: block;" />
-                  </td>
-                  <td valign="middle">
-                    <div style="font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: #323149;">CHECK-OUT</div>
+                  <td width="50%" class="stack-col" valign="top" style="padding-left: 12px; border-left: 1px solid #e2e8f0;">
+                    <div style="font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px; color: #323149;">CHECK-OUT</div>
                     <div style="font-size: 15px; font-weight: 700; color: #0f172a; margin-top: 2px;">${checkOutTime}</div>
                   </td>
                 </tr>
@@ -1907,13 +1891,13 @@ export function generateFullPaymentReceiptHtml(
 
       <!-- Price Summary -->
       <div class="price-card">
-        <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <table width="100%" cellpadding="0" cellspacing="0" border="0" role="presentation">
           <tr>
-            <td width="52" valign="top" style="padding-right: 14px;">
-              <img src="${creditCardIconUrl}" width="42" height="42" alt="Price" style="display: block;" />
+            <td width="52" valign="middle" style="padding-right: 12px;">
+              ${renderEmailIconBadge('check', 'green')}
             </td>
             <td valign="middle">
-              <div style="font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: #166534;">${isCymraeg ? 'PRIS (WEDI’I DALU’N LLAWN)' : 'PRICE (PAID IN FULL)'}</div>
+              <div style="font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px; color: #166534;">${isCymraeg ? 'PRIS (WEDI’I DALU’N LLAWN)' : 'PRICE (PAID IN FULL)'}</div>
               <div style="font-size: 20px; font-weight: 800; color: #14532d; margin-top: 4px;">£${data.totalPrice} <span style="font-size: 13px; font-weight: 600; color: #15803d;">(£${data.balanceDue} ${isCymraeg ? 'taliad terfynol wedi’i dderbyn' : 'final payment received'})</span></div>
             </td>
           </tr>
