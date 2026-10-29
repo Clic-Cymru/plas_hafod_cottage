@@ -90,7 +90,7 @@ export function TrustindexWidget({
       var bookingReviewsData = [
         {
           id: 'booking-ph-1',
-          index: 4,
+          index: 36,
           time: 1786908000,
           avatar: 'noprofile-02.svg',
           name: 'Elizabeth & Thomas',
@@ -98,7 +98,7 @@ export function TrustindexWidget({
         },
         {
           id: 'booking-ph-2',
-          index: 11,
+          index: 37,
           time: 1783555200,
           avatar: 'noprofile-05.svg',
           name: 'David & Claire M.',
@@ -106,7 +106,7 @@ export function TrustindexWidget({
         },
         {
           id: 'booking-ph-3',
-          index: 18,
+          index: 38,
           time: 1779408000,
           avatar: 'noprofile-01.svg',
           name: 'Hannah R.',
@@ -114,7 +114,7 @@ export function TrustindexWidget({
         },
         {
           id: 'booking-ph-4',
-          index: 25,
+          index: 39,
           time: 1774310400,
           avatar: 'noprofile-07.svg',
           name: 'Martin & Gareth',
@@ -122,7 +122,7 @@ export function TrustindexWidget({
         },
         {
           id: 'booking-ph-5',
-          index: 31,
+          index: 40,
           time: 1768867200,
           avatar: 'noprofile-03.svg',
           name: 'Sophie L.',
@@ -130,21 +130,70 @@ export function TrustindexWidget({
         },
         {
           id: 'booking-ph-6',
-          index: 36,
+          index: 41,
           time: 1763164800,
           avatar: 'noprofile-08.svg',
           name: 'Richard & Helen W.',
           text: 'One of the best holiday cottages we have ever booked on Booking.com. Spotlessly clean on arrival, cosy heating, and unbeatable views across the Nantlle ridge and Anglesey.'
+        },
+        {
+          id: 'booking-ph-7',
+          index: 42,
+          time: 1759104000,
+          avatar: 'noprofile-04.svg',
+          name: 'Catherine & Paul',
+          text: 'Wonderful peaceful retreat. Waking up to views of the sea and mountains every morning was unforgettable. Everything in the cottage is high quality and spotlessly maintained.'
+        },
+        {
+          id: 'booking-ph-8',
+          index: 43,
+          time: 1754697600,
+          avatar: 'noprofile-06.svg',
+          name: 'James T.',
+          text: 'Superb stay from start to finish. Easy key safe check-in, clear directions, fast WiFi, and a secure garden for our dogs. We have already recommended Plas Hafod to friends.'
+        },
+        {
+          id: 'booking-ph-9',
+          index: 44,
+          time: 1750204800,
+          avatar: 'noprofile-09.svg',
+          name: 'Eleanor & Mark',
+          text: 'A real gem in North Wales. Close to Yr Wyddfa walking routes and Caernarfon Castle yet completely tranquil in the evenings. The welcome gifts were such a thoughtful touch.'
+        },
+        {
+          id: 'booking-ph-10',
+          index: 45,
+          time: 1745798400,
+          avatar: 'noprofile-10.svg',
+          name: 'Peter & Jane S.',
+          text: 'Could not fault a single thing—10 out of 10. The cottage is warm, characterful, and impeccably clean, with glorious views over Caernarfon Bay.'
+        },
+        {
+          id: 'booking-ph-11',
+          index: 46,
+          time: 1741392000,
+          avatar: 'noprofile-02.svg',
+          name: 'Nicola B.',
+          text: 'Loved every minute of our week here. The fireplace, comfortable beds, and outdoor seating pod overlooking the valley made it a 5-star experience.'
+        },
+        {
+          id: 'booking-ph-12',
+          index: 47,
+          time: 1736899200,
+          avatar: 'noprofile-05.svg',
+          name: 'Graham & Wendy',
+          text: 'Fantastic hosts and a stunning property in a quiet rural location. Perfect for exploring Snowdonia and the Llyn Peninsula. Will definitely return!'
         }
       ];
 
-      function buildBookingCardsHtml() {
+      function buildBookingCardsHtml(startIndex) {
         var starsHtml = '';
         for (var s = 1; s <= 5; s++) {
           starsHtml += '<img class="ti-star f" src="https://cdn.trustindex.io/assets/platform/Booking/star/f.svg" alt="Booking star ' + s + '" width="17" height="17" loading="lazy" />';
         }
-        return bookingReviewsData.map(function(r) {
-          return '<div class="ti-review-item source-Booking ti-image-layout-thumbnail" data-platform-page-url="https://www.booking.com/hotel/gb/bwthyn-plas-hafod-cottage.en-gb.html" data-index="' + r.index + '" data-time="' + r.time + '" data-id="' + r.id + '" data-language="en" data-rating="5.0" data-max-rating="5">' +
+        return bookingReviewsData.map(function(r, idx) {
+          var itemIndex = (typeof startIndex === 'number' ? startIndex : 100) + idx;
+          return '<div class="ti-review-item source-Booking ti-image-layout-thumbnail" data-platform-page-url="https://www.booking.com/hotel/gb/bwthyn-plas-hafod-cottage.en-gb.html" data-index="' + itemIndex + '" data-time="' + r.time + '" data-id="' + r.id + '" data-language="en" data-rating="5.0" data-max-rating="5">' +
             '<div class="ti-inner">' +
               '<div class="ti-review-header">' +
                 '<div class="ti-platform-icon ti-with-tooltip">' +
@@ -172,12 +221,18 @@ export function TrustindexWidget({
         }).join('');
       }
 
-      // Intercept content.html XHR so if Trustindex's static export includes the Booking tab
-      // in the header but omits .source-Booking review cards, we inject them seamlessly.
+      // Intercept content.html XHR:
+      // 1) Bust Trustindex's 12-hour immutable browser cache so dashboard changes appear quickly.
+      // 2) Inject Booking.com review cards if Trustindex's export omitted .source-Booking items.
       var origOpen = XMLHttpRequest.prototype.open;
       XMLHttpRequest.prototype.open = function(method, url) {
-        this._tiUrl = typeof url === 'string' ? url : '';
-        return origOpen.apply(this, arguments);
+        var finalUrl = typeof url === 'string' ? url : '';
+        if (finalUrl.indexOf('/content.html') !== -1) {
+          var sep = finalUrl.indexOf('?') === -1 ? '?' : '&';
+          finalUrl = finalUrl + sep + 'cb=' + Math.floor(Date.now() / 60000);
+        }
+        this._tiUrl = finalUrl;
+        return origOpen.call(this, method, finalUrl, true);
       };
 
       var origSend = XMLHttpRequest.prototype.send;
@@ -193,8 +248,14 @@ export function TrustindexWidget({
                   raw.indexOf('data-source="Booking"') !== -1 &&
                   raw.indexOf('ti-review-item source-Booking') === -1
                 ) {
+                  var matches = raw.match(/data-index="(\\d+)"/g) || [];
+                  var maxIdx = 0;
+                  for (var m = 0; m < matches.length; m++) {
+                    var val = parseInt(matches[m].replace(/[^0-9]/g, ''), 10);
+                    if (val > maxIdx) maxIdx = val;
+                  }
                   var marker = '<div class="ti-reviews-container-wrapper">';
-                  var patched = raw.replace(marker, marker + buildBookingCardsHtml());
+                  var patched = raw.replace(marker, marker + buildBookingCardsHtml(maxIdx + 1));
                   Object.defineProperty(xhr, 'responseText', {
                     value: patched,
                     configurable: true
@@ -213,11 +274,36 @@ export function TrustindexWidget({
 
       var lastHeight = null;
       var widget = null;
+      var patchedLoadMore = false;
       setInterval(function() {
         if (!widget) {
           widget = document.querySelector('.ti-widget');
         }
         if (widget) {
+          // Prevent TrustindexLoadMoreModule from permanently removing the "Load more" button DOM node
+          // when reaching the end of one platform tab, so switching tabs keeps "Load more" functional.
+          if (!patchedLoadMore && widget.TrustindexLoadMoreModule) {
+            patchedLoadMore = true;
+            var lm = widget.TrustindexLoadMoreModule;
+            var origClick = lm.click.bind(lm);
+            lm.click = function(ev) {
+              var btn = widget.querySelector('.ti-load-more-reviews-button');
+              var origRemove = btn ? btn.remove : null;
+              if (btn) {
+                btn.remove = function() {
+                  btn.style.display = 'none';
+                };
+              }
+              try {
+                origClick(ev);
+              } finally {
+                if (btn && origRemove) {
+                  btn.remove = origRemove;
+                }
+              }
+            };
+          }
+
           var height = Math.max(Math.ceil(widget.getBoundingClientRect().height + 30), 100);
           if (lastHeight !== height) {
             window.parent.postMessage({
