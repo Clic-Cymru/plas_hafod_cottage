@@ -31,7 +31,7 @@ export function getResendClient() {
 export function getEmailConfig() {
   return {
     fromEmail: process.env.RESEND_FROM_EMAIL || 'Plas Hafod Cottage <info@plashafodcottage.co.uk>',
-    ownerEmail: process.env.NOTIFICATION_EMAIL || 'info@plashafodcottage.co.uk',
+    ownerEmail: process.env.NOTIFICATION_EMAIL || 'bob@clic.cymru',
     publicReplyEmail: process.env.PUBLIC_REPLY_EMAIL || 'info@plashafodcottage.co.uk',
   };
 }

@@ -950,7 +950,7 @@ export const defaultSiteSettings: SiteSettings = {
     'Nodwch eich cyfeirnod talu unigryw wrth drosglwyddo arian fel y gallwn nodi eich taliad ar unwaith a chadarnhau eich archeb.',
   depositPercentage: 25,
   emergencyHostPhone: 'Siwsan: 07748 635273 / Neil: 07785 522890',
-  notificationRecipients: 'info@plashafodcottage.co.uk',
+  notificationRecipients: 'bob@clic.cymru',
   guestBookingEmailWelcomeEn:
     'Your booking for {property} was successful and is now pending. We will send you a confirmation of the booking within 24-48 hours.',
   guestBookingEmailWelcomeCy:
