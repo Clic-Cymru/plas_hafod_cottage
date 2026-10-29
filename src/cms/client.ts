@@ -181,45 +181,6 @@ export const bbbBlockedDates: BlockedDateRange[] = [
   },
 ];
 
-export const defaultGuestbook: GuestbookEntry[] = [
-  {
-    id: 'gb-1',
-    author: 'Elen & David Williams',
-    location: 'Cardiff',
-    stayDate: 'August 2026',
-    rating: 5,
-    comment: {
-      en: 'Plas Hafod is pure magic. Sitting by the crackling inglenook fire after hiking the ridges of Eryri was sublime. The views across the valley will stay with us forever.',
-      cy: 'Mae Plas Hafod yn hud pur. Roedd eistedd wrth y tân agored ar ôl cerdded cribau Eryri yn fendigedig. Bydd yr olygfeydd dros y cwm yn aros gyda ni am byth.',
-    },
-    imageUrl: '/images/hero.jpg',
-  },
-  {
-    id: 'gb-2',
-    author: 'Sarah & Mark Thornton',
-    location: 'Bristol',
-    stayDate: 'September 2026',
-    rating: 5,
-    comment: {
-      en: 'One of the most authentic, luxurious holiday cottages we have ever stayed in. Spotlessly clean, wonderfully peaceful, and the Welsh welcome hamper was delicious!',
-      cy: 'Un o\'r bythynnod gwyliau mwyaf dilys a moethus rydym erioed wedi aros ynddo. Hynod lân, heddychlon iawn, ac roedd y fasged groeso Gymreig yn flasus!',
-    },
-    imageUrl: '/images/interior.jpg',
-  },
-  {
-    id: 'gb-3',
-    author: 'Geraint & Sioned Evans',
-    location: 'Aberystwyth',
-    stayDate: 'October 2026',
-    rating: 5,
-    comment: {
-      en: 'The perfect romantic getaway. The bed was exceptionally comfortable, the kitchen well-appointed, and gazing at the dark starlit skies was unforgettable.',
-      cy: 'Y dihangfa ramantus berffaith. Roedd y gwely yn hynod gyfforddus, y gegin wedi\'i threfnu\'n wych, a gwylio\'r awyr serog yn fythgofiadwy.',
-    },
-    imageUrl: '/images/bedroom.jpg',
-  },
-];
-
 // In-memory inquiry store for local simulation
 let mockInquiriesStore: BookingInquiry[] = [];
 let mockContactStore: ContactMessage[] = [];

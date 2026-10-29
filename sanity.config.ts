@@ -95,6 +95,14 @@ export default defineConfig({
                           .title('Reviews')
                           .items([
                             S.listItem()
+                              .title('Page Content & SEO')
+                              .child(
+                                S.document()
+                                  .schemaType('pageContent')
+                                  .documentId('page-reviews')
+                                  .title('Reviews Page Content & SEO')
+                              ),
+                            S.listItem()
                               .title('Trustindex Live Reviews Setup')
                               .child(
                                 S.document()
@@ -170,10 +178,26 @@ export default defineConfig({
                     S.listItem()
                       .title('Terms and Conditions')
                       .child(
-                        S.documentList()
+                        S.list()
                           .title('Terms and Conditions')
-                          .filter('_type == "policySection"')
-                          .defaultOrdering([{ field: 'order', direction: 'asc' }])
+                          .items([
+                            S.listItem()
+                              .title('Terms Page Content & SEO')
+                              .child(
+                                S.document()
+                                  .schemaType('pageContent')
+                                  .documentId('page-terms')
+                                  .title('Terms Page Content & SEO')
+                              ),
+                            S.listItem()
+                              .title('Policy Sections')
+                              .child(
+                                S.documentList()
+                                  .title('Terms and Conditions Sections')
+                                  .filter('_type == "policySection"')
+                                  .defaultOrdering([{ field: 'order', direction: 'asc' }])
+                              ),
+                          ])
                       ),
                   ])
               ),

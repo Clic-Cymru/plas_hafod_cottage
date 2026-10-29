@@ -1,4 +1,4 @@
-import { Locale } from '@/lib/i18n';
+export type Locale = 'en' | 'cy';
 
 export interface CottageJsonLdOptions {
   locale: Locale;
