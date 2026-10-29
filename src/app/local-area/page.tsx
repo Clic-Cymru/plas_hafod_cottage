@@ -93,11 +93,11 @@ export default async function LocalAreaPage() {
             <div className="w-16 h-1 bg-[#efda07] mx-auto mt-3" />
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="columns-1 md:columns-2 lg:columns-3 gap-8 space-y-8">
             {attractions.map((attraction) => (
               <div
                 key={attraction.id}
-                className="bg-white rounded-3xl border border-stone-200 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col justify-between group overflow-hidden"
+                className="break-inside-avoid bg-white rounded-3xl border border-stone-200 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col justify-between group overflow-hidden"
               >
                 <div>
                   {/* Card Image Container */}
@@ -136,7 +136,7 @@ export default async function LocalAreaPage() {
                     >
                       {attraction.title}
                     </h3>
-                    <p className="text-stone-600 text-sm leading-relaxed font-sans line-clamp-4">
+                    <p className="text-stone-600 text-sm leading-relaxed font-sans">
                       {attraction.description}
                     </p>
                   </div>
