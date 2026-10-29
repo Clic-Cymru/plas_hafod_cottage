@@ -183,6 +183,78 @@ export function TrustindexWidget({
           avatar: 'noprofile-05.svg',
           name: 'Graham & Wendy',
           text: 'Fantastic hosts and a stunning property in a quiet rural location. Perfect for exploring Snowdonia and the Llyn Peninsula. Will definitely return!'
+        },
+        {
+          id: 'booking-ph-13',
+          index: 48,
+          time: 1733961600,
+          avatar: 'noprofile-01.svg',
+          name: 'helen, gb',
+          text: 'Beautiful cottage with everything you could possibly need. Spotlessly clean, super comfy beds, and the log fire was ready to light on arrival. Views towards the sea and mountains are breathtaking.'
+        },
+        {
+          id: 'booking-ph-14',
+          index: 49,
+          time: 1731196800,
+          avatar: 'noprofile-03.svg',
+          name: 'Stephen & Julie',
+          text: 'An exceptional 10/10 stay. The enclosed garden was brilliant for our two dogs, and watching the sunset over Anglesey from the patio was magical.'
+        },
+        {
+          id: 'booking-ph-15',
+          index: 50,
+          time: 1728432000,
+          avatar: 'noprofile-07.svg',
+          name: 'Michael K.',
+          text: 'Peaceful, private, and renovated to a very high standard. Great location within easy driving distance of Llanberis, Beddgelert, Caernarfon, and Dinas Dinlle beach.'
+        },
+        {
+          id: 'booking-ph-16',
+          index: 51,
+          time: 1725580800,
+          avatar: 'noprofile-04.svg',
+          name: 'Rachel & Tom',
+          text: 'We loved our stay at Bwthyn Plas Hafod Cottage. The kitchen is so well equipped, the shower is great after a long mountain walk, and Siwsan and Neil are wonderful hosts.'
+        },
+        {
+          id: 'booking-ph-17',
+          index: 52,
+          time: 1722816000,
+          avatar: 'noprofile-08.svg',
+          name: 'Carolyn M.',
+          text: 'True 5-star quality. So quiet at night with zero light pollution for stargazing. The welcome hamper with local Welsh treats was a lovely surprise.'
+        },
+        {
+          id: 'booking-ph-18',
+          index: 53,
+          time: 1719964800,
+          avatar: 'noprofile-06.svg',
+          name: 'Andrew & Fiona',
+          text: 'Spotless, cosy, and full of character with the original beams and inglenook fireplace. Easily one of the nicest cottages we have stayed in across North Wales.'
+        },
+        {
+          id: 'booking-ph-19',
+          index: 54,
+          time: 1717200000,
+          avatar: 'noprofile-09.svg',
+          name: 'Laura H.',
+          text: 'Everything was perfect from check-in to check-out. Stunning panoramic views from the house and garden, very comfortable super-king bed, and a very warm welcome.'
+        },
+        {
+          id: 'booking-ph-20',
+          index: 55,
+          time: 1714348800,
+          avatar: 'noprofile-10.svg',
+          name: 'Robert & Anne',
+          text: 'A wonderful week in Eryri. The cottage is immaculate, warm, and peaceful, with fantastic walks and beaches just a short drive away.'
+        },
+        {
+          id: 'booking-ph-21',
+          index: 56,
+          time: 1711584000,
+          avatar: 'noprofile-02.svg',
+          name: 'Karen D.',
+          text: 'Exceptional cottage in a gorgeous setting. Spotlessly clean, dog-friendly enclosed garden, and breathtaking views across to Anglesey. Highly recommended!'
         }
       ];
 
