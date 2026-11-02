@@ -1,7 +1,12 @@
 import { NextResponse } from 'next/server';
 import { cmsClient } from '@/cms/client';
 import { sanityClient, isSanityLive } from '@/cms/sanity.client';
-import { sendCheckInGuideEmail, sendBalanceReminderEmail } from '@/lib/email/resend';
+import {
+  sendCheckInGuideEmail,
+  sendBalanceReminderEmail,
+  sendCheckoutReminderEmail,
+  sendReviewRequestEmail,
+} from '@/lib/email/resend';
 import { BookingInquiry } from '@/cms/types';
 
 export const dynamic = 'force-dynamic';
@@ -93,7 +98,7 @@ async function handleAutomatedEmails(request: Request) {
   const dryRun = searchParams.get('dryRun') === 'true';
   const force = searchParams.get('force') === 'true';
   const targetInquiryId = searchParams.get('inquiryId');
-  const targetAction = searchParams.get('action'); // 'checkin' | 'balance'
+  const targetAction = searchParams.get('action'); // 'checkin' | 'balance' | 'checkout' | 'review'
 
   try {
     const siteSettings = await cmsClient.getSiteSettings(false);
@@ -120,7 +125,7 @@ async function handleAutomatedEmails(request: Request) {
       }
     } else if (isSanityLive && sanityClient) {
       try {
-        const query = `*[_type == "bookingInquiry" && status in ["confirmed", "deposit_requested"] && defined(checkIn)]`;
+        const query = `*[_type == "bookingInquiry" && status in ["confirmed", "deposit_requested", "completed"] && defined(checkIn)]`;
         bookings = await sanityClient.fetch(query);
       } catch (err) {
         console.warn('Could not query active bookings from Sanity, falling back to client:', err);
@@ -140,7 +145,10 @@ async function handleAutomatedEmails(request: Request) {
       const checkInDate = parseDateOnly(booking.checkIn);
       if (!checkInDate) continue;
 
-      const daysUntil = calculateDaysUntil(checkInDate);
+      const checkOutDate = parseDateOnly(booking.checkOut);
+      const daysUntilCheckIn = calculateDaysUntil(checkInDate);
+      const daysUntilCheckOut = checkOutDate ? calculateDaysUntil(checkOutDate) : null;
+      const daysUntil = daysUntilCheckIn;
       const isPlasHafod = booking.propertyId !== 'bryn-bugeiliaid-bach';
       const propertyTitle = isPlasHafod ? 'Plas Hafod Cottage' : 'Bryn Bugeiliaid Bach';
 
@@ -149,9 +157,12 @@ async function handleAutomatedEmails(request: Request) {
         guest: booking.guestName,
         email: booking.guestEmail,
         checkIn: booking.checkIn,
-        daysUntil,
+        checkOut: booking.checkOut,
+        daysUntilCheckIn,
+        daysUntilCheckOut,
         status: booking.status,
         finalBalancePaid: Boolean(booking.finalBalancePaid),
+        haltAutomatedPostStayEmails: Boolean(booking.haltAutomatedPostStayEmails),
       };
 
       evaluated.push(logEntry);
@@ -185,7 +196,7 @@ async function handleAutomatedEmails(request: Request) {
           wifiPassword: isPlasHafod ? siteSettings.plasHafodWifiPassword : siteSettings.bbbWifiPassword,
           directions: siteSettings.checkInDirectionsEn,
           wasteInstructions: siteSettings.wasteBinInstructionsEn,
-          checkInTime: siteSettings.checkInTime || '4:00 PM',
+          checkInTime: siteSettings.checkInTime || '3:00 PM',
           checkOutTime: siteSettings.checkOutTime || '10:00 AM',
           emergencyPhone: siteSettings.emergencyHostPhone || siteSettings.phone,
           hostNames: siteSettings.hostNames || 'Siwsan & Neil',
@@ -293,6 +304,124 @@ async function handleAutomatedEmails(request: Request) {
             balanceDue: emailData.balanceDue,
             daysUntil,
           });
+        }
+        continue;
+      }
+
+      // Check-out Reminder Action (Trigger evening before checkout: daysUntilCheckOut === 1)
+      const shouldTriggerCheckoutReminder =
+        (targetAction === 'checkout' || targetAction === 'checkout_reminder' || (daysUntilCheckOut === 1 && booking.status === 'confirmed')) &&
+        (force || booking.checkoutReminderStatus !== 'sent');
+
+      if (shouldTriggerCheckoutReminder) {
+        const emailData = {
+          propertyTitle,
+          propertyId: booking.propertyId || 'plas-hafod',
+          guestName: booking.guestName,
+          guestEmail: booking.guestEmail,
+          checkOut: booking.checkOut || '',
+          checkOutTime: siteSettings.checkOutTime || '10:00 AM',
+          hostNames: siteSettings.hostNames || 'Siwsan & Neil',
+          emergencyPhone: siteSettings.emergencyHostPhone || siteSettings.phone,
+        };
+
+        if (!dryRun) {
+          const sendResult = await sendCheckoutReminderEmail(emailData, false);
+          if (sendResult.success) {
+            const sentAt = new Date().toISOString();
+            await patchSanityBooking(docId, {
+              checkoutReminderStatus: 'sent',
+              checkoutReminderSentAt: sentAt,
+            });
+            booking.checkoutReminderStatus = 'sent';
+            booking.checkoutReminderSentAt = sentAt;
+            actionsTaken.push({
+              docId,
+              guest: booking.guestName,
+              action: 'CHECKOUT_REMINDER_SENT',
+              checkOut: booking.checkOut,
+              daysUntilCheckOut,
+            });
+          } else {
+            actionsTaken.push({
+              docId,
+              guest: booking.guestName,
+              action: 'CHECKOUT_REMINDER_FAILED',
+              error: sendResult.error,
+            });
+          }
+        } else {
+          actionsTaken.push({
+            docId,
+            guest: booking.guestName,
+            action: 'CHECKOUT_REMINDER_SIMULATED',
+            checkOut: booking.checkOut,
+            daysUntilCheckOut,
+          });
+        }
+        continue;
+      }
+
+      // Review Request Action (Trigger 1 week after stay: daysUntilCheckOut <= -7 && daysUntilCheckOut >= -14)
+      if (booking.haltAutomatedPostStayEmails) {
+        if (targetAction === 'review' || targetAction === 'review_request') {
+          actionsTaken.push({
+            docId,
+            guest: booking.guestName,
+            action: 'REVIEW_REQUEST_HALTED_BY_SANITY',
+            reason: 'haltAutomatedPostStayEmails flag is set to true on booking document.',
+          });
+        }
+      } else {
+        const isWithinReviewWindow = daysUntilCheckOut !== null && daysUntilCheckOut <= -7 && daysUntilCheckOut >= -14;
+        const isEligibleStatus = booking.status === 'confirmed' || booking.status === 'completed';
+        const shouldTriggerReviewRequest =
+          (targetAction === 'review' || targetAction === 'review_request' || (isWithinReviewWindow && isEligibleStatus)) &&
+          (force || booking.reviewRequestStatus !== 'sent');
+
+        if (shouldTriggerReviewRequest) {
+          const emailData = {
+            propertyTitle,
+            propertyId: booking.propertyId || 'plas-hafod',
+            guestName: booking.guestName,
+            guestEmail: booking.guestEmail,
+            checkOut: booking.checkOut || '',
+            hostNames: siteSettings.hostNames || 'Siwsan & Neil',
+            reviewUrl: 'https://g.page/r/CbTWBi9K2SN0EBM/review',
+          };
+
+          if (!dryRun) {
+            const sendResult = await sendReviewRequestEmail(emailData, false);
+            if (sendResult.success) {
+              const sentAt = new Date().toISOString();
+              await patchSanityBooking(docId, {
+                reviewRequestStatus: 'sent',
+                reviewRequestSentAt: sentAt,
+              });
+              booking.reviewRequestStatus = 'sent';
+              booking.reviewRequestSentAt = sentAt;
+              actionsTaken.push({
+                docId,
+                guest: booking.guestName,
+                action: 'REVIEW_REQUEST_SENT',
+                daysSinceCheckout: daysUntilCheckOut ? -daysUntilCheckOut : null,
+              });
+            } else {
+              actionsTaken.push({
+                docId,
+                guest: booking.guestName,
+                action: 'REVIEW_REQUEST_FAILED',
+                error: sendResult.error,
+              });
+            }
+          } else {
+            actionsTaken.push({
+              docId,
+              guest: booking.guestName,
+              action: 'REVIEW_REQUEST_SIMULATED',
+              daysSinceCheckout: daysUntilCheckOut ? -daysUntilCheckOut : null,
+            });
+          }
         }
       }
     }

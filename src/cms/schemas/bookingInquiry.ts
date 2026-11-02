@@ -101,9 +101,10 @@ export const bookingInquirySchema = {
     },
     {
       name: 'pets',
-      title: 'Pets',
+      title: 'Dogs',
       type: 'number',
       initialValue: 0,
+      description: 'Number of dogs staying at Plas Hafod (Bryn Bugeiliaid Bach is strictly dog-free)',
     },
     {
       name: 'subtotal',
@@ -273,6 +274,63 @@ export const bookingInquirySchema = {
     {
       name: 'balanceReminderSentAt',
       title: 'Balance Reminder Sent At',
+      type: 'datetime',
+      options: {
+        dateFormat: 'DD/MM/YYYY',
+        timeFormat: 'HH:mm',
+      },
+      readOnly: true,
+    },
+    {
+      name: 'haltAutomatedPostStayEmails',
+      title: 'Halt Automated Post-Stay Emails (Cancellations / Last-Minute Issues)',
+      type: 'boolean',
+      initialValue: false,
+      description: 'Toggle ON to prevent automated checkout reminders and post-stay Google review requests from sending for this reservation (e.g. if the guest cancelled, had an issue, or departed early).',
+    },
+    {
+      name: 'checkoutReminderStatus',
+      title: 'Night-Before Check-out Reminder Status',
+      type: 'string',
+      options: {
+        list: [
+          { title: 'Not Sent', value: 'not_sent' },
+          { title: 'Sent to Guest', value: 'sent' },
+          { title: 'Send Failed', value: 'failed' },
+          { title: 'Halted', value: 'halted' },
+        ],
+        layout: 'radio',
+      },
+      initialValue: 'not_sent',
+    },
+    {
+      name: 'checkoutReminderSentAt',
+      title: 'Check-out Reminder Sent At',
+      type: 'datetime',
+      options: {
+        dateFormat: 'DD/MM/YYYY',
+        timeFormat: 'HH:mm',
+      },
+      readOnly: true,
+    },
+    {
+      name: 'reviewRequestStatus',
+      title: 'Google Review Request Status (1-Week Post Stay)',
+      type: 'string',
+      options: {
+        list: [
+          { title: 'Not Sent', value: 'not_sent' },
+          { title: 'Sent to Guest', value: 'sent' },
+          { title: 'Send Failed', value: 'failed' },
+          { title: 'Halted', value: 'halted' },
+        ],
+        layout: 'radio',
+      },
+      initialValue: 'not_sent',
+    },
+    {
+      name: 'reviewRequestSentAt',
+      title: 'Google Review Request Sent At',
       type: 'datetime',
       options: {
         dateFormat: 'DD/MM/YYYY',

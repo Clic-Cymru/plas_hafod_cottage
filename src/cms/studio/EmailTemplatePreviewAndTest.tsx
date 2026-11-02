@@ -85,6 +85,22 @@ const TEMPLATES: TemplateOption[] = [
     supportsWelsh: false,
     sampleSubject: '📬 Website Message: Pet facilities inquiry from David Morgan',
   },
+  {
+    id: 'checkout-reminder',
+    name: '10. Check-out Reminder (Evening Prior)',
+    badge: 'Eve of Departure',
+    description: 'Gentle reminder sent the evening before departure with departure checklist and cleaner arrival time.',
+    supportsWelsh: true,
+    sampleSubject: '⏰ Check out Reminder – Plas Hafod Cottage',
+  },
+  {
+    id: 'review-request',
+    name: '11. Google Review Request (7 Days Post Stay)',
+    badge: '7 Days Post Stay',
+    description: 'Automated follow-up sent 7 days after checkout with direct link to Google reviews (haltable per booking in Sanity).',
+    supportsWelsh: true,
+    sampleSubject: '⭐ How was your stay at Plas Hafod Cottage?',
+  },
 ];
 
 const TEMPLATE_KEY_MAP: Record<string, string> = {
@@ -95,6 +111,8 @@ const TEMPLATE_KEY_MAP: Record<string, string> = {
   payment_due_reminder: 'balance-reminder',
   directions_guide: 'checkin-guide',
   full_payment_receipt: 'full-payment-receipt',
+  checkout_reminder: 'checkout-reminder',
+  review_request: 'review-request',
 };
 
 export function EmailTemplatePreviewAndTest() {

@@ -11,6 +11,8 @@ import {
   generateFullPaymentReceiptHtml,
   generateCheckInGuideHtml,
   generateBalanceReminderHtml,
+  generateCheckoutReminderHtml,
+  generateReviewRequestHtml,
   generateOwnerBookingAlertText,
   generateGuestConfirmationText,
   generateOwnerContactAlertText,
@@ -20,11 +22,15 @@ import {
   generateFullPaymentReceiptText,
   generateCheckInGuideText,
   generateBalanceReminderText,
+  generateCheckoutReminderText,
+  generateReviewRequestText,
   BookingEmailData,
   ContactEmailData,
   DepositRequestEmailData,
   CheckInGuideEmailData,
   BalanceReminderEmailData,
+  CheckoutReminderEmailData,
+  ReviewRequestEmailData,
 } from '@/lib/email/templates';
 
 export const dynamic = 'force-dynamic';
@@ -141,6 +147,33 @@ function getMockCheckInData(propertyTitle: string, siteSettings: any): CheckInGu
   };
 }
 
+function getMockCheckoutReminderData(propertyTitle: string, siteSettings: any): CheckoutReminderEmailData {
+  const booking = getMockBookingData(propertyTitle);
+  return {
+    propertyTitle,
+    propertyId: propertyTitle.includes('Bryn') ? 'bryn-bugeiliaid-bach' : 'plas-hafod',
+    guestName: booking.guestName,
+    guestEmail: booking.guestEmail,
+    checkOut: booking.checkOut,
+    checkOutTime: siteSettings.checkOutTime || '10:00 AM',
+    hostNames: siteSettings.hostNames || 'Siwsan & Neil',
+    emergencyPhone: siteSettings.emergencyHostPhone || siteSettings.phone,
+  };
+}
+
+function getMockReviewRequestData(propertyTitle: string, siteSettings: any): ReviewRequestEmailData {
+  const booking = getMockBookingData(propertyTitle);
+  return {
+    propertyTitle,
+    propertyId: propertyTitle.includes('Bryn') ? 'bryn-bugeiliaid-bach' : 'plas-hafod',
+    guestName: booking.guestName,
+    guestEmail: booking.guestEmail,
+    checkOut: booking.checkOut,
+    hostNames: siteSettings.hostNames || 'Siwsan & Neil',
+    reviewUrl: 'https://g.page/r/CbTWBi9K2SN0EBM/review',
+  };
+}
+
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
@@ -178,6 +211,12 @@ export async function GET(request: Request) {
         break;
       case 'checkin-guide':
         html = generateCheckInGuideHtml(getMockCheckInData(propertyTitle, siteSettings), siteSettings, isCymraeg);
+        break;
+      case 'checkout-reminder':
+        html = generateCheckoutReminderHtml(getMockCheckoutReminderData(propertyTitle, siteSettings), siteSettings, isCymraeg);
+        break;
+      case 'review-request':
+        html = generateReviewRequestHtml(getMockReviewRequestData(propertyTitle, siteSettings), siteSettings, isCymraeg);
         break;
       case 'guest-confirmation':
       default:
@@ -300,6 +339,24 @@ export async function POST(request: Request) {
         subject = isCymraeg
           ? `🚗 [PRAWF PREVIEW] Eich Gwyliau yn Eryri – Cyfarwyddiadau i ${propertyTitle}`
           : `🚗 [TEST PREVIEW] Your Holiday in Eryri/Snowdonia – Directions to ${propertyTitle}`;
+        break;
+      }
+      case 'checkout-reminder': {
+        const data = getMockCheckoutReminderData(propertyTitle, siteSettings);
+        html = generateCheckoutReminderHtml(data, siteSettings, isCymraeg);
+        text = generateCheckoutReminderText(data, siteSettings, isCymraeg);
+        subject = isCymraeg
+          ? `⏰ [PRAWF PREVIEW] Nodyn Atgoffa Gadael – ${propertyTitle}`
+          : `⏰ [TEST PREVIEW] Check out Reminder – ${propertyTitle}`;
+        break;
+      }
+      case 'review-request': {
+        const data = getMockReviewRequestData(propertyTitle, siteSettings);
+        html = generateReviewRequestHtml(data, siteSettings, isCymraeg);
+        text = generateReviewRequestText(data, siteSettings, isCymraeg);
+        subject = isCymraeg
+          ? `⭐ [PRAWF PREVIEW] Sut oedd eich arhosiad yn ${propertyTitle}?`
+          : `⭐ [TEST PREVIEW] How was your stay at ${propertyTitle}?`;
         break;
       }
       case 'guest-confirmation':

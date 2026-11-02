@@ -184,7 +184,7 @@ export function ContactForm({ isCymraeg = false }: ContactFormProps) {
               <option value="Plas Hafod Cottage Inquiry">Plas Hafod Cottage (Main House)</option>
               <option value="Bryn Bugeiliaid Bach Inquiry">Bryn Bugeiliaid Bach (Annexe)</option>
               <option value="Availability & Dates Question">Dates & Availability Query</option>
-              <option value="Dog / Pet Policy Question">Dogs & Pet Policy Question</option>
+              <option value="Dog Policy Question">{isCymraeg ? 'Cwestiwn am Bolisi Cŵn' : 'Dog Policy Question'}</option>
               <option value="General Cottage Question">General Inquiry</option>
             </select>
           </div>

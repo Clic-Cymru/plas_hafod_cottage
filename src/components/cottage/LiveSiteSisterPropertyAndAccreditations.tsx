@@ -41,12 +41,21 @@ export function LiveSiteSisterPropertyAndAccreditations({
     .map((a) => ({
       ...a,
       title: isCymraeg ? (a.titleCy || a.title) : a.title,
+      badge: isCymraeg ? (a.badgeCy || a.badge) : a.badge,
       score: isCymraeg ? (a.scoreCy || a.score) : a.score,
       description: isCymraeg ? (a.descriptionCy || a.description) : a.description,
     }));
 
-  const displayAwards =
+  const rawAwards =
     accreditations && accreditations.length > 0 ? accreditations : fallbackAwards;
+
+  const displayAwards = rawAwards.map((a) => ({
+    ...a,
+    title: isCymraeg ? (a.titleCy || a.title) : a.title,
+    badge: isCymraeg ? (a.badgeCy || a.badge) : a.badge,
+    score: isCymraeg ? (a.scoreCy || a.score) : a.score,
+    description: isCymraeg ? (a.descriptionCy || a.description) : a.description,
+  }));
 
   // Auto rotate the sister property slider every 5 seconds
   useEffect(() => {
@@ -201,7 +210,7 @@ export function LiveSiteSisterPropertyAndAccreditations({
               {isBBBPage ? (
                 isCymraeg
                   ? 'Bwthyn traddodiadol moethus 5 seren yn Nyffryn Nantlle gyda lle tân agored, golygfeydd panoramig ac yn croesawu cŵn.'
-                  : 'Our traditional 5-star detached Welsh stone cottage with inglenook fireplace, panoramic mountain & sea views, and pet-friendly garden.'
+                  : 'Our traditional 5-star detached Welsh stone cottage with inglenook fireplace, panoramic mountain & sea views, and dog-friendly garden.'
               ) : (
                 isCymraeg
                   ? 'Llety 2 wely wedi’i adfer yn hyfryd yn edrych dros Ddyffryn Nantlle ac yn swatio ychydig o dan Grib Nantlle drawiadol yn Eryri hardd.'

@@ -28,6 +28,8 @@ export interface BlockedDateRange {
 
 export interface PricingConfig {
   baseRate: number; // default nightly rate in GBP
+  depositType?: 'fixed' | 'percentage';
+  fixedDepositAmount?: number;
   depositPercentage: number; // e.g. 25%
   cleaningFee?: number;
   seasons: Season[];
@@ -55,7 +57,7 @@ export interface BookingInquiry {
   depositAmount: number;
   balanceDue: number;
   notes?: string;
-  status: 'pending' | 'deposit_requested' | 'confirmed' | 'declined';
+  status: 'pending' | 'deposit_requested' | 'confirmed' | 'declined' | 'completed' | 'cancelled';
   createdAt: string;
   paymentReference?: string;
   depositSentAt?: string;
@@ -74,6 +76,12 @@ export interface BookingInquiry {
   checkInEmailSentAt?: string;
   balanceReminderStatus?: 'not_sent' | 'sent' | 'failed';
   balanceReminderSentAt?: string;
+  // Automated Checkout Reminder & Review Emails
+  checkoutReminderStatus?: 'not_sent' | 'sent' | 'failed' | 'halted';
+  checkoutReminderSentAt?: string;
+  reviewRequestStatus?: 'not_sent' | 'sent' | 'failed' | 'halted';
+  reviewRequestSentAt?: string;
+  haltAutomatedPostStayEmails?: boolean;
 }
 
 export interface LocalizedString {
@@ -139,6 +147,7 @@ export interface Accreditation {
   titleCy?: string;
   source: string;
   badge: string;
+  badgeCy?: string;
   badgeColor?: string;
   score?: string;
   scoreCy?: string;
@@ -193,7 +202,9 @@ export interface SiteSettings {
   depositHoldHours?: number;
   depositInstructions?: string;
   depositInstructionsCy?: string;
-  // Email Copy & Notification Settings (Studio Editable)
+  // Deposit Calculation Mode & Settings
+  depositType?: 'fixed' | 'percentage';
+  fixedDepositAmount?: number;
   depositPercentage?: number;
   emergencyHostPhone?: string;
   notificationRecipients?: string;

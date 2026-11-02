@@ -22,6 +22,8 @@ import { defaultAccreditations } from '@/data/defaultAccreditations';
 // Pricing rules for Plas Hafod Cottage
 export const defaultPricingConfig: PricingConfig = {
   baseRate: 175, // £175 per night standard rate
+  depositType: 'fixed',
+  fixedDepositAmount: 200,
   depositPercentage: 25, // 25% deposit to secure booking
   cleaningFee: 45,
   seasons: [
@@ -71,6 +73,8 @@ export const defaultPricingConfig: PricingConfig = {
 // Pricing rules for Bryn Bugeiliaid Bach (Annexe)
 export const bbbPricingConfig: PricingConfig = {
   baseRate: 145, // £145 per night standard rate for annexe
+  depositType: 'fixed',
+  fixedDepositAmount: 200,
   depositPercentage: 25,
   cleaningFee: 35,
   seasons: [
@@ -237,6 +241,8 @@ export const cmsClient = {
 
           return {
             baseRate: data.baseRate,
+            depositType: data.depositType ?? 'fixed',
+            fixedDepositAmount: data.fixedDepositAmount ?? 200,
             depositPercentage: data.depositPercentage ?? 25,
             cleaningFee: data.cleaningFee ?? (propertyId === 'bryn-bugeiliaid-bach' ? 35 : 45),
             seasons,
@@ -529,7 +535,8 @@ export const cmsClient = {
           "id": _id,
           "title": select($isCymraeg => coalesce(titleCy, title), title),
           "source": source,
-          "badge": badge,
+          "badge": select($isCymraeg => coalesce(badgeCy, badge), badge),
+          "badgeCy": badgeCy,
           "badgeColor": badgeColor,
           "score": select($isCymraeg => coalesce(scoreCy, score), score),
           "description": select($isCymraeg => coalesce(descriptionCy, description), description),
@@ -558,6 +565,7 @@ export const cmsClient = {
       return filtered.map((item) => ({
         ...item,
         title: item.titleCy || item.title,
+        badge: item.badgeCy || item.badge,
         score: item.scoreCy || item.score,
         description: item.descriptionCy || item.description,
       }));
@@ -626,6 +634,8 @@ export const cmsClient = {
             depositHoldHours: site.depositHoldHours ?? defaultSiteSettings.depositHoldHours,
             depositInstructions: site.depositInstructions || defaultSiteSettings.depositInstructions,
             depositInstructionsCy: site.depositInstructionsCy || defaultSiteSettings.depositInstructionsCy,
+            depositType: site.depositType || defaultSiteSettings.depositType,
+            fixedDepositAmount: site.fixedDepositAmount ?? defaultSiteSettings.fixedDepositAmount,
             depositPercentage: site.depositPercentage ?? defaultSiteSettings.depositPercentage,
             emergencyHostPhone: site.emergencyHostPhone || defaultSiteSettings.emergencyHostPhone,
             notificationRecipients: site.notificationRecipients || defaultSiteSettings.notificationRecipients,
@@ -948,6 +958,8 @@ export const defaultSiteSettings: SiteSettings = {
     'Please quote your unique payment reference on your bank transfer so we can instantly identify your payment and confirm your reservation.',
   depositInstructionsCy:
     'Nodwch eich cyfeirnod talu unigryw wrth drosglwyddo arian fel y gallwn nodi eich taliad ar unwaith a chadarnhau eich archeb.',
+  depositType: 'fixed',
+  fixedDepositAmount: 200,
   depositPercentage: 25,
   emergencyHostPhone: 'Siwsan: 07748 635273 / Neil: 07785 522890',
   notificationRecipients: 'bob@clic.cymru',
@@ -972,7 +984,7 @@ export const defaultSiteSettings: SiteSettings = {
   bbbWifiSsid: 'BrynBugeiliaid_Guest',
   bbbWifiPassword: 'nantlle-ridge-views',
   checkInDirectionsEn:
-    `From the A55 follow the A487 heading towards Porthmadog. Once past Penygroes look for signs to NEBO. Do not turn towards Nebo. Follow the A487 for another mile. You will see a sign for a left turning ahead. Please indicate left and slow down. The turning is a very narrow lane opposite the entrance to TG Cefn Graianog (Quarry) - signage in cream with red writing.\n\nFollow the lane up the hill to the T-junction by the white farm house. Turn left. Follow the lane up the hill and take the first right turning. Follow the steep lane up around the bend approx. 1 mile. The entrance to Bwthyn Plas Hafod Cottage and Bryn Bugeiliaid will be sign posted on your left. Drive across track in the field and you will have reached your destination! There is a designated parking area for your accommodation.\n\nShould you travel through Porthmadog towards Caernarfon you will pass via the Villages of Bryncir and Pant Glas. Just after Pant Glas the signs for TG Cefn Graianog will be on your left and you need to take the narrow lane opposite on your right. Then follow the directions as above.\n\n(Caernarfon to Nebo = Approx. 11 miles / Porthmadog to Nebo = Approx. 11 miles)\nPostcode: LL54 6EB (Note: Sat Nav will take you via Nebo, so please follow the directions above).\nWhat3Words entrance: ///perfume.punctuate.ready`,
+    `Head for NORTH WALES: CONWY • BANGOR • CAERNARFON • PORTHMADOG\n\nDirections:\nFrom the A55 follow the A487 heading towards Porthmadog. Once past Penygroes the village of Nebo will be signposted on your left - do not take this turning. Carry on for approx half a mile. You will see a sign for a left turning ahead. Please indicate left and slow down. The turning is a very narrow lane opposite the entrance to TG Cefn Graianog (Quarry) - signage in cream with red writing.\n\nFollow the lane up the hill to the T-junction by the white farm house. Turn left. Follow the lane up the hill and take the first right turning. Follow the steep lane up around the bend approx. 1 mile. The entrance to Bwthyn Plas Hafod Cottage and Bryn Bugeiliaid will be sign posted on your left by the double gates with two green wheelie bins.\n\nDrive across track in the field and you will have reached your destination!\n\nThere is a designated parking area for your accommodation - see slate on fencing!\n\nShould you travel through Porthmadog towards Caernarfon you will pass via the Villages of Bryncir and Pant Glas. Just after Pant Glas the signs for TG Cefn Graianog will be on your left and you need to take the narrow lane opposite on your right. Then follow the directions as above...\n\n(Caernarfon to Nebo = Approx. 11 miles / Porthmadog to Nebo = Approx. 11 miles)\n(Post Code of the property is LL54 6EB but this will take you via Nebo so please do follow directions as above)`,
   checkInDirectionsCy:
     `O’r A55 dilynwch yr A487 tuag at Borthmadog. Ar ôl mynd heibio Pen-y-groes edrychwch am arwyddion i NEBO. Peidiwch â throi tuag at Nebo. Dilynwch yr A487 am filltir arall. Fe welwch arwydd am droad i’r chwith o’ch blaen. Mae’r troad yn lôn gul iawn gyferbyn â mynedfa TG Cefn Graianog (Chwarel).\n\nDilynwch y lôn i fyny’r bryn at y gyffordd T wrth y ffermdy gwyn. Trowch i’r chwith. Dilynwch y lôn i fyny’r bryn a chymerwch y troad cyntaf i’r dde. Dilynwch y lôn serth i fyny am oddeutu 1 filltir. Bydd y fynedfa i Fwthyn Plas Hafod a Bryn Bugeiliaid wedi’i harwyddo ar eich chwith.\n\nCod Post: LL54 6EB (Noder: Bydd Sat Nav yn mynd â chi trwy Nebo, felly dilynwch y cyfarwyddiadau uchod).\nWhat3Words: ///perfume.punctuate.ready`,
   wasteBinInstructionsEn:
@@ -1318,23 +1330,24 @@ export const defaultPolicySections: PolicySection[] = [
   },
   {
     id: 'term-3',
-    title: '3. Dogs & Pets Policy',
-    titleCy: '3. Polisi Cŵn ac Anifeiliaid Anwes',
+    title: '3. Dogs Policy',
+    titleCy: '3. Polisi Cŵn',
     icon: 'dog',
     leadParagraphEn:
-      'Plas Hafod and Bryn Bugeiliaid Bach warmly welcome well-behaved dogs. Snowdonia is surrounded by active sheep farming, so specific guidelines must be respected.',
+      'Plas Hafod Cottage warmly welcomes up to 2 well-behaved dogs (Bryn Bugeiliaid Bach remains strictly dog-free). As Snowdonia is surrounded by active sheep farming, specific guidelines must be respected.',
     leadParagraphCy:
-      'Mae Plas Hafod a Bryn Bugeiliaid Bach yn croesawu cŵn sy’n ymddwyn yn dda. Mae ffermio defaid gweithredol o amgylch Eryri, felly rhaid parchu canllawiau.',
+      'Mae Bwthyn Plas Hafod yn croesawu hyd at 2 gi sy’n ymddwyn yn dda (mae Bryn Bugeiliaid Bach yn ddi-gŵn). Gan fod ffermio defaid gweithredol o amgylch Eryri, rhaid parchu canllawiau penodol.',
     bulletsEn: [
-      'Up to 2 well-behaved dogs are welcome by prior arrangement.',
+      'Well-behaved dogs are welcome at Plas Hafod Cottage by prior arrangement (max 2 dogs).',
       'Dogs must not be left unattended in the cottage or garden at any time.',
       'Dogs must be kept on leads outside the enclosed cottage garden boundaries.',
       'Please do not permit dogs on furniture or beds. Bring your dog’s bed and towels.',
     ],
     bulletsCy: [
-      'Croesewir hyd at 2 gi sy’n ymddwyn yn dda trwy drefniant ymlaen llaw.',
+      'Croesewir hyd at 2 gi sy’n ymddwyn yn dda ym Mhlas Hafod trwy drefniant ymlaen llaw.',
       'Ni ddylid gadael cŵn ar eu pennau eu hunain yn y bwthyn na’r ardd ar unrhyw adeg.',
       'Rhaid cadw cŵn ar dennyn y tu allan i derfynau gardd y bwthyn.',
+      'Gofynnir i beidio â gadael cŵn ar ddodrefn na gwelyau. Dewch â gwely a thywelion eich ci.',
     ],
     order: 3,
   },
@@ -1348,12 +1361,12 @@ export const defaultPolicySections: PolicySection[] = [
     leadParagraphCy:
       'Er mwyn caniatáu glanhau trylwyr a pharatoi i safonau moethus 5-seren:',
     bulletsEn: [
-      'Check-in is from 4:00 PM on the day of arrival.',
+      'Check-in is from 3:00 PM on the day of arrival.',
       'Check-out is strictly by 10:00 AM on the day of departure.',
       'Key safe code instructions are emailed 7 days prior to your arrival.',
     ],
     bulletsCy: [
-      'Mae cyrraedd o 4:00 PM ymlaen ar ddiwrnod cyrraedd.',
+      'Mae cyrraedd o 3:00 PM ymlaen ar ddiwrnod cyrraedd.',
       'Rhaid gadael erbyn 10:00 AM ar ddiwrnod gadael.',
     ],
     order: 4,

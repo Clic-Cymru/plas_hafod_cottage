@@ -56,7 +56,7 @@ export const pricingSchema = {
       title: 'Pet Fee (£)',
       type: 'number',
       initialValue: 0,
-      description: 'Optional surcharge per stay for guests bringing dogs/pets.',
+      description: 'Optional surcharge per stay for guests bringing dogs (default: £30 per dog).',
     },
     {
       name: 'seasonalRates',

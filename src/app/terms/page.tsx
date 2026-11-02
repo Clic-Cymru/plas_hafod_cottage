@@ -22,7 +22,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Booking Terms & Conditions | Plas Hafod Cottage & Bryn Bugeiliaid Bach',
     description:
-      'Official booking terms, direct reservation policies, pet guidelines, check-in details, and cancellation rules for Plas Hafod Cottage & Bryn Bugeiliaid Bach.',
+      'Official booking terms, direct reservation policies, dog guidelines, check-in details, and cancellation rules for Plas Hafod Cottage & Bryn Bugeiliaid Bach.',
     url: 'https://plashafodcottage.co.uk/terms',
     siteName: 'Plas Hafod Cottage & Bryn Bugeiliaid Bach',
     images: [

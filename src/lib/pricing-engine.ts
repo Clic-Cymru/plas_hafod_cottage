@@ -18,6 +18,8 @@ export interface CalculationResult {
   appliedDiscountName?: string;
   cleaningFee: number;
   totalPrice: number;
+  depositType?: 'fixed' | 'percentage';
+  fixedDepositAmount?: number;
   depositPercentage: number;
   depositAmount: number;
   balanceDue: number;
@@ -60,6 +62,8 @@ export function calculateStayPrice(
       discountAmount: 0,
       cleaningFee: config.cleaningFee || 0,
       totalPrice: 0,
+      depositType: config.depositType || 'fixed',
+      fixedDepositAmount: config.fixedDepositAmount ?? 200,
       depositPercentage: config.depositPercentage,
       depositAmount: 0,
       balanceDue: 0,
@@ -83,6 +87,8 @@ export function calculateStayPrice(
       discountAmount: 0,
       cleaningFee: config.cleaningFee || 0,
       totalPrice: 0,
+      depositType: config.depositType || 'fixed',
+      fixedDepositAmount: config.fixedDepositAmount ?? 200,
       depositPercentage: config.depositPercentage,
       depositAmount: 0,
       balanceDue: 0,
@@ -189,8 +195,15 @@ export function calculateStayPrice(
 
   const cleaningFee = config.cleaningFee || 0;
   const totalPrice = Math.max(0, subtotal - discountAmount + cleaningFee);
-  const depositAmount = Math.round((totalPrice * config.depositPercentage) / 100);
-  const balanceDue = totalPrice - depositAmount;
+  const depositType = config.depositType || 'fixed';
+  const fixedDepositAmount = typeof config.fixedDepositAmount === 'number' ? config.fixedDepositAmount : 200;
+  let depositAmount = 0;
+  if (depositType === 'fixed') {
+    depositAmount = Math.min(fixedDepositAmount, totalPrice);
+  } else {
+    depositAmount = Math.round((totalPrice * (config.depositPercentage || 25)) / 100);
+  }
+  const balanceDue = Math.max(0, totalPrice - depositAmount);
 
   return {
     isValid: true,
@@ -202,6 +215,8 @@ export function calculateStayPrice(
     appliedDiscountName,
     cleaningFee,
     totalPrice,
+    depositType,
+    fixedDepositAmount,
     depositPercentage: config.depositPercentage,
     depositAmount,
     balanceDue,

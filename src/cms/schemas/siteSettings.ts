@@ -325,12 +325,36 @@ export const siteSettingsSchema = {
       description: 'Comma-separated email addresses to receive new booking alerts and website inquiries (e.g. "info@plashafodcottage.co.uk, host@example.com")',
     },
     {
+      name: 'depositType',
+      title: 'Deposit Calculation Mode',
+      type: 'string',
+      fieldset: 'emailCopy',
+      initialValue: 'fixed',
+      options: {
+        list: [
+          { title: 'Fixed Amount (£) [Default £200]', value: 'fixed' },
+          { title: 'Percentage of Total (%)', value: 'percentage' },
+        ],
+        layout: 'radio',
+      },
+      description: 'Choose whether the booking deposit required to secure dates is a fixed sum (default: £200) or a percentage of the total stay.',
+    },
+    {
+      name: 'fixedDepositAmount',
+      title: 'Fixed Deposit Amount (£)',
+      type: 'number',
+      fieldset: 'emailCopy',
+      initialValue: 200,
+      description: 'The fixed deposit amount in GBP required to secure a reservation (default: £200).',
+      validation: (Rule: any) => Rule.min(0),
+    },
+    {
       name: 'depositPercentage',
       title: 'Standard Deposit Percentage (%)',
       type: 'number',
       fieldset: 'emailCopy',
       initialValue: 25,
-      description: 'Percentage of total stay required as initial booking deposit (default: 25%)',
+      description: 'Percentage of total stay required when Percentage mode is selected (default: 25%)',
       validation: (Rule: any) => Rule.min(10).max(100),
     },
     {

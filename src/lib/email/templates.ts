@@ -95,6 +95,29 @@ export interface BalanceReminderEmailData {
   inquiryId?: string;
 }
 
+export interface CheckoutReminderEmailData {
+  propertyTitle: string;
+  propertyId?: 'plas-hafod' | 'bryn-bugeiliaid-bach' | string;
+  guestName: string;
+  guestEmail: string;
+  checkOut: string;
+  checkOutTime?: string;
+  emergencyPhone?: string;
+  hostNames?: string;
+  inquiryId?: string;
+}
+
+export interface ReviewRequestEmailData {
+  propertyTitle: string;
+  propertyId?: 'plas-hafod' | 'bryn-bugeiliaid-bach' | string;
+  guestName: string;
+  guestEmail: string;
+  checkOut: string;
+  hostNames?: string;
+  reviewUrl?: string;
+  inquiryId?: string;
+}
+
 // Hosted on global CDN for instant, reliable loading across all email clients (Gmail, Outlook, Apple Mail)
 export const LOGO_COLOR_URL =
   'https://cdn.sanity.io/images/iji5mij0/production/e869c435303f83aea95717dda5de5b822310fb00-821x523.png';
@@ -138,18 +161,19 @@ const EMAIL_MOBILE_RESPONSIVE_CSS = `
     img { max-width: 100%; height: auto; }
     table { border-collapse: collapse; }
     @media only screen and (max-width: 520px) {
-      body { padding: 10px 6px !important; }
-      .card { border-radius: 12px !important; }
-      .header { padding: 22px 16px 18px !important; }
-      .header h1, .header h2 { font-size: 19px !important; }
-      .content { padding: 20px 14px !important; }
-      .summary-card, .price-card, .bank-box, .info-card, .keysafe-card, .hero-callout { padding: 14px 12px !important; margin: 12px 0 !important; }
+      body { padding: 8px 4px !important; margin: 0 !important; }
+      .card { border-radius: 12px !important; width: 100% !important; max-width: 100% !important; }
+      .header { padding: 20px 14px 16px !important; }
+      .header h1, .header h2 { font-size: 18px !important; line-height: 1.3 !important; }
+      .content { padding: 16px 12px !important; }
+      .summary-card, .price-card, .bank-box, .info-card, .keysafe-card, .hero-callout { padding: 12px 10px !important; margin: 10px 0 !important; width: 100% !important; box-sizing: border-box !important; }
       .stack-col { display: block !important; width: 100% !important; padding-left: 0 !important; padding-right: 0 !important; border-left: none !important; }
-      .stack-col + .stack-col { margin-top: 12px !important; padding-top: 12px !important; border-top: 1px solid #e2e8f0 !important; }
-      .bank-table td, .table th, .table td { padding: 8px 6px !important; font-size: 13px !important; word-break: break-word !important; }
-      .bank-table td.label, .table th { width: 42% !important; }
-      .ref-badge { font-size: 13px !important; padding: 4px 8px !important; word-break: break-all !important; }
-      .key-badge { font-size: 18px !important; padding: 8px 16px !important; }
+      .stack-col + .stack-col { margin-top: 10px !important; padding-top: 10px !important; border-top: 1px solid #e2e8f0 !important; }
+      .bank-table, .table { width: 100% !important; table-layout: auto !important; }
+      .bank-table td, .table th, .table td { padding: 7px 5px !important; font-size: 12px !important; word-break: break-word !important; }
+      .bank-table td.label, .table th { width: 38% !important; }
+      .ref-badge { font-size: 12px !important; padding: 4px 6px !important; word-break: break-all !important; }
+      .key-badge { font-size: 16px !important; padding: 6px 12px !important; }
     }
 `;
 
@@ -200,7 +224,7 @@ export function generateOwnerBookingAlertHtml(data: BookingEmailData, settings?:
         <tr><th>Email</th><td><a href="mailto:${data.guestEmail}" style="color: #4338ca; text-decoration: none;">${data.guestEmail}</a></td></tr>
         <tr><th>Phone</th><td><a href="tel:${data.guestPhone}" style="color: #4338ca; text-decoration: none;">${data.guestPhone}</a></td></tr>
         <tr><th>Dates</th><td><strong>${formatDateUK(data.checkIn)}</strong> to <strong>${formatDateUK(data.checkOut)}</strong> (${data.totalNights} nights)</td></tr>
-        <tr><th>Party</th><td>${data.adults} Adults, ${data.children} Children, ${data.pets} Pets</td></tr>
+        <tr><th>Party</th><td>${data.adults} Adults, ${data.children} Children, ${data.pets || 0} Dogs</td></tr>
         ${data.appliedDiscountName ? `<tr><th>Discount Applied</th><td><span style="color: #15803d; font-weight: 600;">${data.appliedDiscountName} (-£${data.discountAmount})</span></td></tr>` : ''}
         <tr class="total-row"><th>Total Quote</th><td>£${data.totalPrice}</td></tr>
         <tr><th>Deposit to Collect (${depositPct}%)</th><td><strong style="color: #0f172a;">£${data.depositAmount}</strong></td></tr>
@@ -608,7 +632,7 @@ ${summaryHeading}
 - ARRIVAL: ${formatDateUK(data.checkIn)} (Check-in: ${checkInTime})
 - DEPARTURE: ${formatDateUK(data.checkOut)} (Check-out: ${checkOutTime})
 - Duration: ${data.totalNights} Nights
-- Guests: ${data.adults} Adults, ${data.children} Children, ${data.pets} Pets
+- Guests: ${data.adults} Adults, ${data.children} Children, ${data.pets || 0} Dogs
 ${data.appliedDiscountName ? `- Special Offer: ${data.appliedDiscountName} (-£${data.discountAmount || 0})\n` : ''}- PRICE: £${data.totalPrice}
 - Deposit to Secure (${depositPct}%): £${data.depositAmount}
 - Remaining Balance: £${data.balanceDue}
@@ -645,7 +669,7 @@ Stay Details:
 - Check-in: ${formatDateUK(data.checkIn)}
 - Check-out: ${formatDateUK(data.checkOut)}
 - Duration: ${data.totalNights} Nights
-- Guests: ${data.adults} Adults, ${data.children} Children, ${data.pets} Pets
+- Guests: ${data.adults} Adults, ${data.children} Children, ${data.pets || 0} Dogs
 ${data.appliedDiscountName ? `- Special Offer: ${data.appliedDiscountName} (-£${data.discountAmount || 0})\n` : ''}- Total Price: £${data.totalPrice}
 - Deposit to Collect (${depositPct}%): £${data.depositAmount}
 - Remaining Balance: £${data.balanceDue}
@@ -805,7 +829,7 @@ export function generateDepositRequestHtml(
             <td valign="middle">
               <div style="font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px; color: #323149;">COTTAGE BOOKED</div>
               <div style="font-size: 16px; font-weight: 700; color: #0f172a; margin-top: 3px;">${data.propertyTitle}</div>
-              <div style="font-size: 13px; color: #64748b; margin-top: 2px;">${data.adults} Adults, ${data.children} Children, ${data.pets} Pets • ${data.totalNights} Nights</div>
+              <div style="font-size: 13px; color: #64748b; margin-top: 2px;">${data.adults} Adults, ${data.children} Children, ${data.pets || 0} Dogs • ${data.totalNights} Nights</div>
             </td>
           </tr>
         </table>
@@ -850,7 +874,7 @@ export function generateDepositRequestHtml(
               <div style="font-size: 14px; color: #334155; margin-top: 6px; line-height: 1.7;">
                 ${data.appliedDiscountName ? `<div>Special Offer: <strong style="color: #15803d;">${data.appliedDiscountName} (-£${data.discountAmount})</strong></div>` : ''}
                 <div>Total Price - <strong>£${data.totalPrice}</strong></div>
-                <div>Deposit (${depositPct}%) - <strong style="font-size: 16px; color: #1e1b2e;">£${data.depositAmount}</strong></div>
+                <div>${settings?.depositType === 'percentage' ? `Deposit (${depositPct}%)` : 'Deposit'} - <strong style="font-size: 16px; color: #1e1b2e;">£${data.depositAmount}</strong></div>
                 <div>Remaining Balance - <strong>£${data.balanceDue}</strong> (due 60 days prior to stay)</div>
                 <div>Booking Id - <strong>${data.paymentReference}</strong></div>
               </div>
@@ -954,13 +978,13 @@ Hi ${data.guestName},
 
 Thank you for your interest in ${data.propertyTitle}. Dates you requested are available and to secure your stay a deposit of £${data.depositAmount} is payable within ${holdHours} hours of this e-mail${data.depositDeadline ? ` (by ${data.depositDeadline})` : ''}. Details of the amount and payment method are below.
 
-${data.customHostNote ? `NOTE FROM YOUR HOSTS:\n"${data.customHostNote}"\n\n` : ''}COTTAGE BOOKED: ${data.propertyTitle} (${data.adults} Adults, ${data.children} Children, ${data.pets} Pets • ${data.totalNights} Nights)
+${data.customHostNote ? `NOTE FROM YOUR HOSTS:\n"${data.customHostNote}"\n\n` : ''}COTTAGE BOOKED: ${data.propertyTitle} (${data.adults} Adults, ${data.children} Children, ${data.pets || 0} Dogs • ${data.totalNights} Nights)
 ARRIVAL: ${formatDateUK(data.checkIn)} (Check-in: ${checkInTime})
 DEPARTURE: ${formatDateUK(data.checkOut)} (Check-out: ${checkOutTime})
 
 COST BREAKDOWN:
 ${data.appliedDiscountName ? `Special Offer - ${data.appliedDiscountName} (-£${data.discountAmount})\n` : ''}Total Price - £${data.totalPrice}
-Deposit (${depositPct}%) - £${data.depositAmount}
+${settings?.depositType === 'percentage' ? `Deposit (${depositPct}%)` : 'Deposit'} - £${data.depositAmount}
 Remaining Balance - £${data.balanceDue}
 Booking Id - ${data.paymentReference}
 
@@ -1001,14 +1025,26 @@ export function generateCheckInGuideHtml(
     'Plas Hafod Cottage, Nebo, Penygroes, Caernarfon, Gwynedd, LL54 6EB';
 
   const isBBB = data.propertyId === 'bryn-bugeiliaid-bach';
+  const propertyWhat3Words = isBBB ? '///skills.shorts.aced' : '///perfume.punctuate.ready';
   const defaultKeySafe = isBBB ? (settings?.bbbKeySafe || 'Unlocked (Key inside)') : (settings?.plasHafodKeySafe || 'Unlocked (Key inside)');
   const keySafeCode = data.keySafeCode || defaultKeySafe;
   const isUnlockedEntry = /unlocked|key inside/i.test(keySafeCode);
   const wifiSsid = data.wifiSsid || (isBBB ? settings?.bbbWifiSsid || 'BrynBugeiliaid_Guest' : settings?.plasHafodWifiSsid || 'PlasHafod_Guest_5G');
   const wifiPass = data.wifiPassword || (isBBB ? settings?.bbbWifiPassword || 'nantlle-ridge-views' : settings?.plasHafodWifiPassword || 'eryri-mountain-peace');
 
-  const directions = data.directions || (isCymraeg ? settings?.checkInDirectionsCy : settings?.checkInDirectionsEn) ||
-    `From the A55 follow the A487 heading towards Porthmadog. Once past Penygroes look for signs to NEBO. Do not turn towards Nebo. Follow the A487 for another mile. You will see a sign for a left turning ahead. Please indicate left and slow down. The turning is a very narrow lane opposite the entrance to TG Cefn Graianog (Quarry) - signage in cream with red writing.\n\nFollow the lane up the hill to the T-junction by the white farm house. Turn left. Follow the lane up the hill and take the first right turning. Follow the steep lane up around the bend approx. 1 mile. The entrance to Bwthyn Plas Hafod Cottage and Bryn Bugeiliaid will be sign posted on your left. Drive across track in the field and you will have reached your destination! There is a designated parking area for your accommodation.\n\nShould you travel through Porthmadog towards Caernarfon you will pass via the Villages of Bryncir and Pant Glas. Just after Pant Glas the signs for TG Cefn Graianog will be on your left and you need to take the narrow lane opposite on your right. Then follow the directions as above.\n\n(Caernarfon to Nebo = Approx. 11 miles / Porthmadog to Nebo = Approx. 11 miles)\nPostcode: LL54 6EB (Note: Sat Nav will take you via Nebo, so please follow the directions above).\nWhat3Words entrance: ///perfume.punctuate.ready`;
+  const cottageGuidanceEn = isBBB
+    ? 'Drive across the track and bear left, keep following the lane until you see the cottage ahead of you.\nWhat 3 words ///skills.shorts.aced'
+    : 'Drive across the track and bear right, you will see the cottage ahead of you.\nWhat 3 words ///perfume.punctuate.ready';
+
+  const defaultDirectionsEn = `From the A55 follow the A487 heading towards Porthmadog. Once past Penygroes look for signs to NEBO. Do not turn towards Nebo. Follow the A487 for another mile. You will see a sign for a left turning ahead. Please indicate left and slow down. The turning is a very narrow lane opposite the entrance to TG Cefn Graianog (Quarry) - signage in cream with red writing.\n\nFollow the lane up the hill to the T-junction by the white farm house. Turn left. Follow the lane up the hill and take the first right turning. Follow the steep lane up around the bend approx. 1 mile. The entrance to Bwthyn Plas Hafod Cottage and Bryn Bugeiliaid will be sign posted on your left. Drive across track in the field and you will have reached your destination! There is a designated parking area for your accommodation.\n\n${cottageGuidanceEn}\n\nShould you travel through Porthmadog towards Caernarfon you will pass via the Villages of Bryncir and Pant Glas. Just after Pant Glas the signs for TG Cefn Graianog will be on your left and you need to take the narrow lane opposite on your right. Then follow the directions as above.\n\n(Caernarfon to Nebo = Approx. 11 miles / Porthmadog to Nebo = Approx. 11 miles)\nPostcode: LL54 6EB (Note: Sat Nav will take you via Nebo, so please follow the directions above).\nWhat3Words entrance: ${propertyWhat3Words}`;
+
+  const cottageGuidanceCy = isBBB
+    ? 'Gyrrwch ar draws y trac a throi i’r chwith, daliwch i ddilyn y lôn nes i chi weld y bwthyn o’ch blaen.\nWhat 3 words ///skills.shorts.aced'
+    : 'Gyrrwch ar draws y trac a throi i’r dde, byddwch yn gweld y bwthyn o’ch blaen.\nWhat 3 words ///perfume.punctuate.ready';
+
+  const defaultDirectionsCy = `O'r A55 dilynwch yr A487 gan anelu tuag at Borthmadog. Ar ôl pasio Pen-y-groes edrychwch am arwyddion i NEBO. Peidiwch â throi tuag at Nebo. Dilynwch yr A487 am filltir arall. Byddwch yn gweld arwydd ar gyfer troi i'r chwith o'ch blaen. Rhowch eich dangosydd ymlaen ac arafwch. Mae'r troad yn lôn gul iawn gyferbyn â mynfa Chwarel TG Cefn Graianog (arwydd hufen gydag ysgrifen goch).\n\nDilynwch y lôn i fyny'r rhiw i'r gyffordd-T wrth y ffermdy gwyn. Trowch i'r chwith. Dilynwch y lôn i fyny'r rhiw a chymryd y troad cyntaf i'r dde. Dilynwch y lôn serth i fyny rownd y tro am oddeutu milltir. Bydd y fynedfa i Fwthyn Plas Hafod a Bryn Bugeiliaid wedi'i harwyddo ar eich chwith. Gyrrwch ar draws y trac yn y cae a byddwch wedi cyrraedd! Mae man parcio dynodedig ar gyfer eich llety.\n\n${cottageGuidanceCy}\n\nOs ydych yn teithio trwy Borthmadog tuag at Gaernarfon byddwch yn mynd trwy bentrefi Bryncir a Phant Glas. Yn syth ar ôl Pant Glas bydd yr arwyddion ar gyfer TG Cefn Graianog ar eich chwith ac mae angen i chi gymryd y lôn gul gyferbyn ar eich dde. Yna dilynwch y cyfarwyddiadau uchod.\n\n(Caernarfon i Nebo = Tua 11 milltir / Porthmadog i Nebo = Tua 11 milltir)\nCôd Post: LL54 6EB (Nodyn: Bydd Sat Nav yn eich tywys trwy Nebo, felly dilynwch y cyfarwyddiadau uchod).\nWhat3Words y fynedfa: ${propertyWhat3Words}`;
+
+  const directions = data.directions || (isCymraeg ? settings?.checkInDirectionsCy || defaultDirectionsCy : settings?.checkInDirectionsEn || defaultDirectionsEn);
 
   const directionsHtml = directions
     .split(/\n\n+/)
@@ -1089,7 +1125,7 @@ export function generateCheckInGuideHtml(
         <tr><th>${isCymraeg ? 'Dyddiad Gadael' : 'Check-out'}</th><td><strong>${formatDateUK(data.checkOut)}</strong> (${isCymraeg ? 'erbyn' : 'by'} <strong>${checkOutTime}</strong> ${isCymraeg ? 'fanbellaf' : 'at the latest'})</td></tr>
         <tr><th>${isCymraeg ? 'Hyd yr Arhosiad' : 'Duration'}</th><td>${data.totalNights} ${isCymraeg ? 'Noson' : 'Nights'}</td></tr>
         <tr><th>${isCymraeg ? 'Cyfeiriad' : 'Address'}</th><td>${address}</td></tr>
-        <tr><th>What3Words</th><td><code>///perfume.punctuate.ready</code></td></tr>
+        <tr><th>What3Words</th><td><code>${propertyWhat3Words}</code></td></tr>
       </table>
 
       <!-- Entry / Key Safe Callout -->
@@ -1124,7 +1160,7 @@ export function generateCheckInGuideHtml(
         </strong>
         <div style="background: #323149; border-radius: 10px; padding: 14px 16px; margin-bottom: 14px; text-align: center;">
           <div style="font-size: 12px; color: #cbd5e1; margin-bottom: 8px;">
-            📍 <strong>53°01'20.7"N 4°16'05.2"W</strong> • What3Words: <code style="color: #efda07;">///perfume.punctuate.ready</code>
+            📍 <strong>53°01'20.7"N 4°16'05.2"W</strong> • What3Words: <code style="color: #efda07;">${propertyWhat3Words}</code>
           </div>
           <a href="${googleMapsUrl}" target="_blank" rel="noopener" style="display: inline-block; background: #efda07; color: #1e1b2e !important; font-weight: 800; font-size: 13px; padding: 9px 18px; border-radius: 6px; text-decoration: none; letter-spacing: 0.3px;">
             🗺️ ${isCymraeg ? 'Agor y Lleoliad yn Google Maps →' : 'Open Exact Pin in Google Maps →'}
@@ -1200,14 +1236,26 @@ export function generateCheckInGuideText(
     'Plas Hafod Cottage, Nebo, Penygroes, Caernarfon, Gwynedd, LL54 6EB';
 
   const isBBB = data.propertyId === 'bryn-bugeiliaid-bach';
+  const propertyWhat3Words = isBBB ? '///skills.shorts.aced' : '///perfume.punctuate.ready';
   const defaultKeySafe = isBBB ? (settings?.bbbKeySafe || 'Unlocked (Key inside)') : (settings?.plasHafodKeySafe || 'Unlocked (Key inside)');
   const keySafeCode = data.keySafeCode || defaultKeySafe;
   const isUnlockedEntry = /unlocked|key inside/i.test(keySafeCode);
   const wifiSsid = data.wifiSsid || (isBBB ? settings?.bbbWifiSsid || 'BrynBugeiliaid_Guest' : settings?.plasHafodWifiSsid || 'PlasHafod_Guest_5G');
   const wifiPass = data.wifiPassword || (isBBB ? settings?.bbbWifiPassword || 'nantlle-ridge-views' : settings?.plasHafodWifiPassword || 'eryri-mountain-peace');
 
-  const directions = data.directions || (isCymraeg ? settings?.checkInDirectionsCy : settings?.checkInDirectionsEn) ||
-    `From the A55 follow the A487 heading towards Porthmadog. Once past Penygroes look for signs to NEBO. Do not turn towards Nebo. Follow the A487 for another mile. You will see a sign for a left turning ahead. Please indicate left and slow down. The turning is a very narrow lane opposite the entrance to TG Cefn Graianog (Quarry) - signage in cream with red writing.\n\nFollow the lane up the hill to the T-junction by the white farm house. Turn left. Follow the lane up the hill and take the first right turning. Follow the steep lane up around the bend approx. 1 mile. The entrance to Bwthyn Plas Hafod Cottage and Bryn Bugeiliaid will be sign posted on your left. Drive across track in the field and you will have reached your destination! There is a designated parking area for your accommodation.\n\nShould you travel through Porthmadog towards Caernarfon you will pass via the Villages of Bryncir and Pant Glas. Just after Pant Glas the signs for TG Cefn Graianog will be on your left and you need to take the narrow lane opposite on your right. Then follow the directions as above.\n\n(Caernarfon to Nebo = Approx. 11 miles / Porthmadog to Nebo = Approx. 11 miles)\nPostcode: LL54 6EB (Note: Sat Nav will take you via Nebo, so please follow the directions above).\nWhat3Words entrance: ///perfume.punctuate.ready`;
+  const cottageGuidanceEn = isBBB
+    ? 'Drive across the track and bear left, keep following the lane until you see the cottage ahead of you.\nWhat 3 words ///skills.shorts.aced'
+    : 'Drive across the track and bear right, you will see the cottage ahead of you.\nWhat 3 words ///perfume.punctuate.ready';
+
+  const defaultDirectionsEn = `From the A55 follow the A487 heading towards Porthmadog. Once past Penygroes look for signs to NEBO. Do not turn towards Nebo. Follow the A487 for another mile. You will see a sign for a left turning ahead. Please indicate left and slow down. The turning is a very narrow lane opposite the entrance to TG Cefn Graianog (Quarry) - signage in cream with red writing.\n\nFollow the lane up the hill to the T-junction by the white farm house. Turn left. Follow the lane up the hill and take the first right turning. Follow the steep lane up around the bend approx. 1 mile. The entrance to Bwthyn Plas Hafod Cottage and Bryn Bugeiliaid will be sign posted on your left. Drive across track in the field and you will have reached your destination! There is a designated parking area for your accommodation.\n\n${cottageGuidanceEn}\n\nShould you travel through Porthmadog towards Caernarfon you will pass via the Villages of Bryncir and Pant Glas. Just after Pant Glas the signs for TG Cefn Graianog will be on your left and you need to take the narrow lane opposite on your right. Then follow the directions as above.\n\n(Caernarfon to Nebo = Approx. 11 miles / Porthmadog to Nebo = Approx. 11 miles)\nPostcode: LL54 6EB (Note: Sat Nav will take you via Nebo, so please follow the directions above).\nWhat3Words entrance: ${propertyWhat3Words}`;
+
+  const cottageGuidanceCy = isBBB
+    ? 'Gyrrwch ar draws y trac a throi i’r chwith, daliwch i ddilyn y lôn nes i chi weld y bwthyn o’ch blaen.\nWhat 3 words ///skills.shorts.aced'
+    : 'Gyrrwch ar draws y trac a throi i’r dde, byddwch yn gweld y bwthyn o’ch blaen.\nWhat 3 words ///perfume.punctuate.ready';
+
+  const defaultDirectionsCy = `O'r A55 dilynwch yr A487 gan anelu tuag at Borthmadog. Ar ôl pasio Pen-y-groes edrychwch am arwyddion i NEBO. Peidiwch â throi tuag at Nebo. Dilynwch yr A487 am filltir arall. Byddwch yn gweld arwydd ar gyfer troi i'r chwith o'ch blaen. Rhowch eich dangosydd ymlaen ac arafwch. Mae'r troad yn lôn gul iawn gyferbyn â mynfa Chwarel TG Cefn Graianog (arwydd hufen gydag ysgrifen goch).\n\nDilynwch y lôn i fyny'r rhiw i'r gyffordd-T wrth y ffermdy gwyn. Trowch i'r chwith. Dilynwch y lôn i fyny'r rhiw a chymryd y troad cyntaf i'r dde. Dilynwch y lôn serth i fyny rownd y tro am oddeutu milltir. Bydd y fynedfa i Fwthyn Plas Hafod a Bryn Bugeiliaid wedi'i harwyddo ar eich chwith. Gyrrwch ar draws y trac yn y cae a byddwch wedi cyrraedd! Mae man parcio dynodedig ar gyfer eich llety.\n\n${cottageGuidanceCy}\n\nOs ydych yn teithio trwy Borthmadog tuag at Gaernarfon byddwch yn mynd trwy bentrefi Bryncir a Phant Glas. Yn syth ar ôl Pant Glas bydd yr arwyddion ar gyfer TG Cefn Graianog ar eich chwith ac mae angen i chi gymryd y lôn gul gyferbyn ar eich dde. Yna dilynwch y cyfarwyddiadau uchod.\n\n(Caernarfon i Nebo = Tua 11 milltir / Porthmadog i Nebo = Tua 11 milltir)\nCôd Post: LL54 6EB (Nodyn: Bydd Sat Nav yn eich tywys trwy Nebo, felly dilynwch y cyfarwyddiadau uchod).\nWhat3Words y fynedfa: ${propertyWhat3Words}`;
+
+  const directions = data.directions || (isCymraeg ? settings?.checkInDirectionsCy || defaultDirectionsCy : settings?.checkInDirectionsEn || defaultDirectionsEn);
 
   const googleMapsUrl = "https://www.google.com/maps/place/53%C2%B001'20.7%22N+4%C2%B016'05.2%22W/@53.0224173,-4.2681046,925m/data=!3m2!1e3!4b1!4m5!3m4!1s0x0:0xd26a6eeb24eac6fd!8m2!3d53.0224173!4d-4.2681046?hl=en";
 
@@ -1570,7 +1618,7 @@ export function generateDepositReceiptHtml(
             <td valign="middle">
               <div style="font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px; color: #323149;">${isCymraeg ? 'BWTHYN A ARCHEBWYD' : 'COTTAGE BOOKED'}</div>
               <div style="font-size: 16px; font-weight: 700; color: #0f172a; margin-top: 3px;">${data.propertyTitle}</div>
-              <div style="font-size: 13px; color: #64748b; margin-top: 2px;">${data.adults} Adults, ${data.children} Children, ${data.pets} Pets • ${data.totalNights} Nights</div>
+              <div style="font-size: 13px; color: #64748b; margin-top: 2px;">${data.adults} Adults, ${data.children} Children, ${data.pets || 0} Dogs • ${data.totalNights} Nights</div>
             </td>
           </tr>
         </table>
@@ -1818,7 +1866,7 @@ export function generateFullPaymentReceiptHtml(
             <td valign="middle">
               <div style="font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px; color: #323149;">${isCymraeg ? 'BWTHYN A ARCHEBWYD' : 'COTTAGE BOOKED'}</div>
               <div style="font-size: 16px; font-weight: 700; color: #0f172a; margin-top: 3px;">${data.propertyTitle}</div>
-              <div style="font-size: 13px; color: #64748b; margin-top: 2px;">${data.adults} Adults, ${data.children} Children, ${data.pets} Pets • ${data.totalNights} Nights</div>
+              <div style="font-size: 13px; color: #64748b; margin-top: 2px;">${data.adults} Adults, ${data.children} Children, ${data.pets || 0} Dogs • ${data.totalNights} Nights</div>
             </td>
           </tr>
         </table>
@@ -1966,6 +2014,372 @@ ${siteTitle}
 Website: https://plashafodcottage.co.uk
 Email: info@plashafodcottage.co.uk`;
 }
+
+/**
+ * 10. Check-out Reminder (Sent the evening before departure)
+ */
+export function generateCheckoutReminderHtml(
+  data: CheckoutReminderEmailData,
+  settings?: Partial<SiteSettings>,
+  isCymraeg: boolean = false
+): string {
+  const hosts = data.hostNames || settings?.hostNames || 'Siwsan & Neil';
+  const phone = data.emergencyPhone || settings?.emergencyHostPhone || settings?.phone || 'Siwsan: 07748 635273 / Neil: 07785 522890';
+  const siteTitle = settings?.siteTitle || 'Plas Hafod Cottage & Bryn Bugeiliaid Bach';
+  const checkOutTime = data.checkOutTime || settings?.checkOutTime || '10:00 AM';
+
+  const badgeText = isCymraeg ? 'ATGOFFA: AMWSER GADAEL' : 'CHECK-OUT REMINDER';
+  const bannerHeading = isCymraeg ? 'Gwybodaeth Gadael Yfory' : 'Check-out Information For Tomorrow';
+
+  return `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="light dark">
+  <meta name="supported-color-schemes" content="light dark">
+  <title>${bannerHeading} – ${data.propertyTitle}</title>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #f7f6f4; color: #2d3748; margin: 0; padding: 24px 12px; }
+    .card { max-width: 620px; margin: 0 auto; background: #ffffff; border-radius: 16px; overflow: hidden; border: 1px solid #e2e8f0; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.06); }
+    .header { background: #323149; padding: 32px 24px 24px; text-align: center; border-bottom: 3px solid #efda07; }
+    .status-badge { display: inline-block; background: #efda07; color: #1e1b2e; font-weight: 800; font-size: 11px; padding: 6px 14px; border-radius: 9999px; text-transform: uppercase; letter-spacing: 1.2px; margin-bottom: 14px; }
+    .content { padding: 30px 24px; }
+    .callout-box { background: #fefce8; border: 2px solid #facc15; border-radius: 12px; padding: 20px; margin: 20px 0; }
+    .checklist-card { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; margin: 20px 0; }
+    .footer { padding: 24px 20px; text-align: center; font-size: 12px; color: #94a3b8; background: #fafaf9; border-top: 1px solid #f1f5f9; line-height: 1.6; }
+
+    @media (prefers-color-scheme: dark) {
+      body { background-color: #121019 !important; color: #e2e8f0 !important; }
+      .card { background-color: #1c1829 !important; border-color: #2e2842 !important; color: #f1f5f9 !important; }
+      .header { background-color: #241f35 !important; }
+      .content { color: #e2e8f0 !important; }
+      .callout-box { background-color: #262038 !important; border-color: #efda07 !important; color: #f1f5f9 !important; }
+      .checklist-card { background-color: #201a30 !important; border-color: #3b3252 !important; color: #f1f5f9 !important; }
+      .footer { background-color: #151221 !important; border-color: #2e2842 !important; color: #64748b !important; }
+    }
+    ${EMAIL_MOBILE_RESPONSIVE_CSS}
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="header">
+      <div style="margin-bottom: 14px;">
+        <img src="${LOGO_WHITE_URL}" alt="Plas Hafod Cottage" width="165" style="display: inline-block; max-width: 165px; height: auto;" border="0" />
+      </div>
+      <span class="status-badge">${badgeText}</span>
+      <h1 style="margin: 0; font-size: 22px; font-weight: 700; color: #ffffff;">${bannerHeading}</h1>
+      <p style="margin: 6px 0 0; font-size: 14px; color: #cbbaff;">${data.propertyTitle}</p>
+    </div>
+
+    <div class="content">
+      <p style="font-size: 16px; margin-top: 0; color: #1e293b;">
+        ${isCymraeg ? 'Noswaith dda' : 'Good evening'} <strong>${data.guestName}</strong>,
+      </p>
+
+      <p style="font-size: 14px; line-height: 1.6; color: #475569;">
+        ${isCymraeg
+          ? `Gobeithio eich bod wedi mwynhau eich amser yn <strong>${data.propertyTitle}</strong>.`
+          : `We hope you have enjoyed your time at <strong>${data.propertyTitle}</strong>.`}
+      </p>
+
+      <!-- Time Callout -->
+      <div class="callout-box" style="text-align: center;">
+        <div style="font-size: 12px; text-transform: uppercase; letter-spacing: 1.2px; color: #854d0e; font-weight: 800; margin-bottom: 6px;">
+          ⏰ ${isCymraeg ? 'AMSER GADAEL YFORY' : 'DEPARTURE TIME TOMORROW'}
+        </div>
+        <div style="font-size: 24px; font-weight: 800; color: #1e1b2e; margin: 4px 0;">
+          ${checkOutTime}
+        </div>
+        <p style="font-size: 13px; color: #713f12; margin: 8px 0 0; line-height: 1.5;">
+          ${isCymraeg
+            ? `Mae hwn yn nodyn atgoffa caredig bod amser gadael am <strong>${checkOutTime}</strong> yfory fel bod gennym ddigon o amser i baratoi'r bwthyn ar gyfer ein gwesteion nesaf. <strong>Bydd ein glanhawr ar y safle am 10:15yb.</strong>`
+            : `This is a gentle reminder that check out is at <strong>${checkOutTime}</strong> tomorrow morning so that we have time to prepare the cottage for our next guests. <strong>Our cleaner will be on-site at 10:15am.</strong>`}
+        </p>
+      </div>
+
+      <!-- Departure Checklist -->
+      <div class="checklist-card">
+        <strong style="font-size: 15px; color: #0f172a; display: block; margin-bottom: 12px;">
+          📋 ${isCymraeg ? 'Cyn gadael a fyddech cystal â:' : 'Before leaving could you please:'}
+        </strong>
+        <table width="100%" cellpadding="0" cellspacing="0" border="0" role="presentation">
+          <tr>
+            <td style="padding: 6px 0; font-size: 13px; color: #475569; line-height: 1.5;">
+              🧺 ${isCymraeg ? 'Tynnu\'r dillad gwely a\'u rhoi yn y bagiau golchi a ddarperir' : 'Strip the bed linen and place it in the laundry bags provided'}
+            </td>
+          </tr>
+          <tr>
+            <td style="padding: 6px 0; font-size: 13px; color: #475569; line-height: 1.5;">
+              ♻️ ${isCymraeg ? 'Gwagio pob bin a rhoi ailgylchu / sbwriel yn y biniau allanol' : 'Empty all bins and place recycling / rubbish in the outside bins'}
+            </td>
+          </tr>
+          <tr>
+            <td style="padding: 6px 0; font-size: 13px; color: #475569; line-height: 1.5;">
+              🍽️ ${isCymraeg ? 'Llwytho a rhedeg y peiriant golchi llestri (os yw\'n berthnasol) / golchi llestri a ddefnyddiwyd' : 'Load and run the dishwasher (if applicable) / wash up used dishes'}
+            </td>
+          </tr>
+          <tr>
+            <td style="padding: 6px 0; font-size: 13px; color: #475569; line-height: 1.5;">
+              🔒 ${isCymraeg ? 'Sicrhau bod pob ffenestr a drws wedi\'u cau a\'u cloi' : 'Ensure all windows and doors are closed and locked'}
+            </td>
+          </tr>
+          <tr>
+            <td style="padding: 6px 0; font-size: 13px; color: #475569; line-height: 1.5;">
+              🔑 ${isCymraeg ? 'Gadael yr allwedd yn y blwch allweddi / ar fwrdd y gegin' : 'Leave the key in the key safe / on the kitchen table'}
+            </td>
+          </tr>
+        </table>
+      </div>
+
+      <p style="font-size: 14px; line-height: 1.6; color: #475569; margin-top: 20px;">
+        ${isCymraeg
+          ? 'Dymunwn daith ddiogel adref i chi a gobeithiwn eich croesawu yn ôl i Eryri yn y dyfodol!'
+          : 'We wish you a safe journey home and hope to welcome you back to Eryri / Snowdonia in the future.'}
+      </p>
+
+      <div style="margin-top: 28px; padding-top: 20px; border-top: 1px solid #edf2f7;">
+        <p style="font-size: 14px; margin: 0 0 4px; color: #1e293b;">
+          <strong>${isCymraeg ? 'Cofion Cynnes' : 'Warm regards'},</strong><br>
+          <strong>${hosts}</strong><br>
+          <span style="color: #64748b; font-size: 13px;">${siteTitle}</span>
+        </p>
+        <span style="font-size: 12px; color: #64748b;">Tel: ${phone}</span>
+      </div>
+    </div>
+
+    <div class="footer">
+      ${siteTitle}<br>
+      Website: <a href="https://plashafodcottage.co.uk" style="color: #4f46e5; text-decoration: none;">plashafodcottage.co.uk</a> • Tel: ${phone}
+    </div>
+  </div>
+</body>
+</html>
+`;
+}
+
+/**
+ * Plain Text Alternative: Check-out Reminder
+ */
+export function generateCheckoutReminderText(
+  data: CheckoutReminderEmailData,
+  settings?: Partial<SiteSettings>,
+  isCymraeg: boolean = false
+): string {
+  const hosts = data.hostNames || settings?.hostNames || 'Siwsan & Neil';
+  const siteTitle = settings?.siteTitle || 'Plas Hafod Cottage & Bryn Bugeiliaid Bach';
+  const checkOutTime = data.checkOutTime || settings?.checkOutTime || '10:00am';
+
+  if (isCymraeg) {
+    return `NODYN ATGOFFA GADAEL – ${data.propertyTitle}
+
+Noswaith dda ${data.guestName},
+
+Gobeithio eich bod wedi mwynhau eich amser yn ${data.propertyTitle}.
+
+Mae hwn yn nodyn atgoffa caredig bod amser gadael am ${checkOutTime} yfory er mwyn rhoi amser i ni baratoi'r bwthyn ar gyfer ein gwesteion nesaf. Bydd ein glanhawr ar y safle am 10:15yb.
+
+Cyn gadael a fyddech cystal â:
+- Tynnu'r dillad gwely a'u rhoi yn y bagiau golchi a ddarperir
+- Gwagio pob bin a rhoi ailgylchu / sbwriel yn y biniau allanol
+- Llwytho a rhedeg y peiriant golchi llestri (os yw'n berthnasol) / golchi llestri a ddefnyddiwyd
+- Sicrhau bod pob ffenestr a drws wedi'u cau a'u cloi
+- Gadael yr allwedd yn y blwch allweddi / ar fwrdd y gegin
+
+Dymunwn daith ddiogel adref i chi a gobeithiwn eich croesawu yn ôl i Eryri yn y dyfodol.
+
+Cofion cynnes,
+${hosts}
+${siteTitle}`;
+  }
+
+  return `CHECK OUT REMINDER – ${data.propertyTitle}
+
+Good evening ${data.guestName},
+
+We hope you have enjoyed your time at ${data.propertyTitle}.
+
+This is a gentle reminder that check out is at ${checkOutTime} tomorrow morning so that we have time to prepare the cottage for our next guests. Our cleaner will be on-site at 10:15am.
+
+Before leaving could you please:
+- Strip the bed linen and place it in the laundry bags provided
+- Empty all bins and place recycling / rubbish in the outside bins
+- Load and run the dishwasher (if applicable) / wash up used dishes
+- Ensure all windows and doors are closed and locked
+- Leave the key in the key safe / on the kitchen table
+
+We wish you a safe journey home and hope to welcome you back to Eryri / Snowdonia in the future.
+
+Warm regards,
+${hosts}
+${siteTitle}`;
+}
+
+/**
+ * 11. Google Review Request (Sent 1 week after stay)
+ */
+export function generateReviewRequestHtml(
+  data: ReviewRequestEmailData,
+  settings?: Partial<SiteSettings>,
+  isCymraeg: boolean = false
+): string {
+  const hosts = data.hostNames || settings?.hostNames || 'Siwsan & Neil';
+  const siteTitle = settings?.siteTitle || 'Plas Hafod Cottage & Bryn Bugeiliaid Bach';
+  const reviewUrl = data.reviewUrl || 'https://g.page/r/CbTWBi9K2SN0EBM/review';
+
+  const badgeText = isCymraeg ? 'ADOLYGIAD GOOGLE' : 'GOOGLE REVIEW';
+  const bannerHeading = isCymraeg
+    ? `Sut oedd eich arhosiad yn ${data.propertyTitle}?`
+    : `How was your stay at ${data.propertyTitle}?`;
+
+  return `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="light dark">
+  <meta name="supported-color-schemes" content="light dark">
+  <title>${bannerHeading}</title>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #f7f6f4; color: #2d3748; margin: 0; padding: 24px 12px; }
+    .card { max-width: 620px; margin: 0 auto; background: #ffffff; border-radius: 16px; overflow: hidden; border: 1px solid #e2e8f0; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.06); }
+    .header { background: #323149; padding: 32px 24px 24px; text-align: center; border-bottom: 3px solid #efda07; }
+    .status-badge { display: inline-block; background: #efda07; color: #1e1b2e; font-weight: 800; font-size: 11px; padding: 6px 14px; border-radius: 9999px; text-transform: uppercase; letter-spacing: 1.2px; margin-bottom: 14px; }
+    .content { padding: 30px 24px; }
+    .stars-callout { background: #fefce8; border: 2px solid #facc15; border-radius: 12px; padding: 24px; margin: 24px 0; text-align: center; }
+    .review-button { display: inline-block; background: #323149; color: #efda07 !important; font-weight: 800; font-size: 15px; padding: 14px 28px; border-radius: 8px; text-decoration: none; letter-spacing: 0.5px; box-shadow: 0 4px 12px rgba(50,49,73,0.2); }
+    .footer { padding: 24px 20px; text-align: center; font-size: 12px; color: #94a3b8; background: #fafaf9; border-top: 1px solid #f1f5f9; line-height: 1.6; }
+
+    @media (prefers-color-scheme: dark) {
+      body { background-color: #121019 !important; color: #e2e8f0 !important; }
+      .card { background-color: #1c1829 !important; border-color: #2e2842 !important; color: #f1f5f9 !important; }
+      .header { background-color: #241f35 !important; }
+      .content { color: #e2e8f0 !important; }
+      .stars-callout { background-color: #262038 !important; border-color: #efda07 !important; color: #f1f5f9 !important; }
+      .footer { background-color: #151221 !important; border-color: #2e2842 !important; color: #64748b !important; }
+    }
+    ${EMAIL_MOBILE_RESPONSIVE_CSS}
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="header">
+      <div style="margin-bottom: 14px;">
+        <img src="${LOGO_WHITE_URL}" alt="Plas Hafod Cottage" width="165" style="display: inline-block; max-width: 165px; height: auto;" border="0" />
+      </div>
+      <span class="status-badge">${badgeText}</span>
+      <h1 style="margin: 0; font-size: 22px; font-weight: 700; color: #ffffff;">${bannerHeading}</h1>
+      <p style="margin: 6px 0 0; font-size: 14px; color: #cbbaff;">${data.propertyTitle}</p>
+    </div>
+
+    <div class="content">
+      <p style="font-size: 16px; margin-top: 0; color: #1e293b;">
+        ${isCymraeg ? 'Helo' : 'Hi'} <strong>${data.guestName}</strong>,
+      </p>
+
+      <p style="font-size: 14px; line-height: 1.6; color: #475569;">
+        ${isCymraeg
+          ? `Gobeithio eich bod wedi cael taith ddiogel adref ac yn ymgartrefu ar ôl eich arhosiad yn <strong>${data.propertyTitle}</strong>.`
+          : `We hope you had a safe journey home and are settling back in after your stay at <strong>${data.propertyTitle}</strong>.`}
+      </p>
+
+      <p style="font-size: 14px; line-height: 1.6; color: #475569;">
+        ${isCymraeg
+          ? 'Rydym yn gwerthfawrogi\'n fawr eich bod wedi dewis aros gyda ni. Fel bwthyn gwyliau annibynnol bach, mae adolygiadau gwesteion yn gwneud gwahaniaeth enfawr i ni ac yn helpu ymwelwyr eraill i ddarganfod ein cornel heddychlon o Eryri.'
+          : 'We really appreciate you choosing to stay with us. As a small independent holiday cottage, guest reviews make a huge difference to us and help other visitors discover our peaceful corner of Eryri / Snowdonia.'}
+      </p>
+
+      <div class="stars-callout">
+        <div style="font-size: 24px; margin-bottom: 8px;">⭐⭐⭐⭐⭐</div>
+        <p style="font-size: 14px; color: #854d0e; margin: 0 0 16px; font-weight: 600; line-height: 1.5;">
+          ${isCymraeg
+            ? 'Os oes gennych gwpl o funudau, byddem yn hynod ddiolchgar pe gallech adael adolygiad byr i ni ar Google:'
+            : 'If you have a couple of minutes, we would be incredibly grateful if you could leave us a quick review on Google:'}
+        </p>
+        <div>
+          <a href="${reviewUrl}" target="_blank" rel="noopener" class="review-button">
+            ✍️ ${isCymraeg ? 'Gadael Adolygiad ar Google →' : 'Leave a Google Review →'}
+          </a>
+        </div>
+      </div>
+
+      <p style="font-size: 14px; line-height: 1.6; color: #475569;">
+        ${isCymraeg
+          ? 'Diolch yn fawr iawn am eich cefnogaeth, a gobeithiwn eich gweld eto cyn hir!'
+          : 'Thank you so much for your support, and we hope to see you again soon!'}
+      </p>
+
+      <div style="margin-top: 28px; padding-top: 20px; border-top: 1px solid #edf2f7;">
+        <p style="font-size: 14px; margin: 0 0 4px; color: #1e293b;">
+          <strong>${isCymraeg ? 'Cofion Cynnes' : 'Warmest regards'},</strong><br>
+          <strong>${hosts}</strong><br>
+          <span style="color: #64748b; font-size: 13px;">${siteTitle}</span>
+        </p>
+        <span style="font-size: 12px; color: #64748b;">Eryri / Snowdonia National Park</span>
+      </div>
+    </div>
+
+    <div class="footer">
+      ${siteTitle}<br>
+      Website: <a href="https://plashafodcottage.co.uk" style="color: #4f46e5; text-decoration: none;">plashafodcottage.co.uk</a>
+    </div>
+  </div>
+</body>
+</html>
+`;
+}
+
+/**
+ * Plain Text Alternative: Google Review Request
+ */
+export function generateReviewRequestText(
+  data: ReviewRequestEmailData,
+  settings?: Partial<SiteSettings>,
+  isCymraeg: boolean = false
+): string {
+  const hosts = data.hostNames || settings?.hostNames || 'Siwsan & Neil';
+  const siteTitle = settings?.siteTitle || 'Plas Hafod Cottage & Bryn Bugeiliaid Bach';
+  const reviewUrl = data.reviewUrl || 'https://g.page/r/CbTWBi9K2SN0EBM/review';
+
+  if (isCymraeg) {
+    return `SUT OEDD EICH ARHOSIAD YN ${data.propertyTitle.toUpperCase()}?
+
+Helo ${data.guestName},
+
+Gobeithio eich bod wedi cael taith ddiogel adref ac yn ymgartrefu ar ôl eich arhosiad yn ${data.propertyTitle}.
+
+Rydym yn gwerthfawrogi'n fawr eich bod wedi dewis aros gyda ni. Fel bwthyn gwyliau annibynnol bach, mae adolygiadau gwesteion yn gwneud gwahaniaeth enfawr i ni ac yn helpu ymwelwyr eraill i ddarganfod ein cornel heddychlon o Eryri.
+
+Os oes gennych gwpl o funudau, byddem yn hynod ddiolchgar pe gallech adael adolygiad byr i ni ar Google:
+${reviewUrl}
+
+Diolch yn fawr iawn am eich cefnogaeth, a gobeithiwn eich gweld eto cyn hir!
+
+Cofion cynnes,
+${hosts}
+${siteTitle}`;
+  }
+
+  return `HOW WAS YOUR STAY AT ${data.propertyTitle.toUpperCase()}?
+
+Hi ${data.guestName},
+
+We hope you had a safe journey home and are settling back in after your stay at ${data.propertyTitle}.
+
+We really appreciate you choosing to stay with us. As a small independent holiday cottage, guest reviews make a huge difference to us and help other visitors discover our peaceful corner of Eryri / Snowdonia.
+
+If you have a couple of minutes, we would be incredibly grateful if you could leave us a quick review on Google:
+${reviewUrl}
+
+Thank you so much for your support, and we hope to see you again soon!
+
+Warmest regards,
+${hosts}
+${siteTitle}`;
+}
+
 
 
 

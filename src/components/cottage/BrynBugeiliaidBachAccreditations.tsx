@@ -93,7 +93,7 @@ export function BrynBugeiliaidBachAccreditations({ isCymraeg = false, accreditat
           id: a.id,
           src: a.imageUrl,
           alt: a.title,
-          badge: a.badge,
+          badge: isCymraeg ? (a.badgeCy || a.badge) : a.badge,
           badgeColor: a.badgeColor || 'bg-[#efda07] text-stone-900',
           title: a.title,
           source: a.source,

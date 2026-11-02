@@ -7,6 +7,8 @@ import {
   DepositRequestEmailData,
   CheckInGuideEmailData,
   BalanceReminderEmailData,
+  CheckoutReminderEmailData,
+  ReviewRequestEmailData,
   generateOwnerBookingAlertHtml,
   generateGuestConfirmationHtml,
   generateOwnerContactAlertHtml,
@@ -21,6 +23,10 @@ import {
   generateCheckInGuideText,
   generateBalanceReminderHtml,
   generateBalanceReminderText,
+  generateCheckoutReminderHtml,
+  generateCheckoutReminderText,
+  generateReviewRequestHtml,
+  generateReviewRequestText,
 } from './templates';
 
 export function getResendClient() {
@@ -308,5 +314,100 @@ export async function sendBalanceReminderEmail(data: BalanceReminderEmailData, i
     return { success: false, error };
   }
 }
+
+export async function sendCheckoutReminderEmail(data: CheckoutReminderEmailData, isCymraeg: boolean = false) {
+  const client = getResendClient();
+  const { fromEmail, ownerEmail, publicReplyEmail } = getEmailConfig();
+
+  if (!client) {
+    const errMsg = 'RESEND_API_KEY environment variable is missing on server. Checkout reminder simulated.';
+    console.warn('[Resend Simulation]', errMsg, { to: data.guestEmail, property: data.propertyTitle });
+    return { success: true, simulated: true };
+  }
+
+  const siteSettings = await cmsClient.getSiteSettings(isCymraeg);
+  const customRecipients = siteSettings.notificationRecipients
+    ? siteSettings.notificationRecipients.split(',').map((s) => s.trim()).filter(Boolean)
+    : [];
+  const targetBccRecipients = customRecipients.length > 0 ? customRecipients : ownerEmail;
+
+  try {
+    const refHeader = `checkout-${Date.now()}`;
+    const subject = isCymraeg
+      ? `Nodyn Atgoffa Gadael – ${data.propertyTitle}`
+      : `Check out Reminder – ${data.propertyTitle}`;
+
+    const guestRes = await client.emails.send({
+      from: fromEmail,
+      to: data.guestEmail,
+      bcc: targetBccRecipients,
+      replyTo: publicReplyEmail,
+      subject,
+      html: generateCheckoutReminderHtml(data, siteSettings, isCymraeg),
+      text: generateCheckoutReminderText(data, siteSettings, isCymraeg),
+      headers: {
+        'X-Entity-Ref-ID': refHeader,
+      },
+    });
+
+    if (guestRes.error) {
+      console.error('Resend error sending checkout reminder:', guestRes.error);
+      return { success: false, error: guestRes.error };
+    }
+
+    return { success: true, guestRes };
+  } catch (error) {
+    console.error('Failed to send checkout reminder email via Resend:', error);
+    return { success: false, error };
+  }
+}
+
+export async function sendReviewRequestEmail(data: ReviewRequestEmailData, isCymraeg: boolean = false) {
+  const client = getResendClient();
+  const { fromEmail, ownerEmail, publicReplyEmail } = getEmailConfig();
+
+  if (!client) {
+    const errMsg = 'RESEND_API_KEY environment variable is missing on server. Review request simulated.';
+    console.warn('[Resend Simulation]', errMsg, { to: data.guestEmail, property: data.propertyTitle });
+    return { success: true, simulated: true };
+  }
+
+  const siteSettings = await cmsClient.getSiteSettings(isCymraeg);
+  const customRecipients = siteSettings.notificationRecipients
+    ? siteSettings.notificationRecipients.split(',').map((s) => s.trim()).filter(Boolean)
+    : [];
+  const targetBccRecipients = customRecipients.length > 0 ? customRecipients : ownerEmail;
+
+  try {
+    const refHeader = `review-${Date.now()}`;
+    const subject = isCymraeg
+      ? `Sut oedd eich arhosiad yn ${data.propertyTitle}?`
+      : `How was your stay at ${data.propertyTitle}?`;
+
+    const guestRes = await client.emails.send({
+      from: fromEmail,
+      to: data.guestEmail,
+      bcc: targetBccRecipients,
+      replyTo: publicReplyEmail,
+      subject,
+      html: generateReviewRequestHtml(data, siteSettings, isCymraeg),
+      text: generateReviewRequestText(data, siteSettings, isCymraeg),
+      headers: {
+        'X-Entity-Ref-ID': refHeader,
+      },
+    });
+
+    if (guestRes.error) {
+      console.error('Resend error sending review request:', guestRes.error);
+      return { success: false, error: guestRes.error };
+    }
+
+    return { success: true, guestRes };
+  } catch (error) {
+    console.error('Failed to send review request email via Resend:', error);
+    return { success: false, error };
+  }
+}
+
 
 

@@ -53,7 +53,7 @@ export function generateCottageJsonLd({ locale, siteUrl = SITE_URL }: CottageJso
       latitude: COTTAGE_GEO.latitude,
       longitude: COTTAGE_GEO.longitude,
     },
-    checkinTime: '16:00',
+    checkinTime: '15:00',
     checkoutTime: '10:00',
     petsAllowed: true,
     numberOfRooms: 4,

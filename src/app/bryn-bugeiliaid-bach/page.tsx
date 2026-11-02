@@ -152,12 +152,12 @@ export default async function BrynBugeiliaidBachPage() {
                 dining area and separate seating area to appreciate the breathtaking views.
               </p>
 
-              {/* Pet notice */}
+              {/* Dog notice */}
               <div className="flex items-center gap-3 p-4 bg-amber-50 border border-[#efda07] rounded-2xl text-amber-900 text-sm font-medium">
                 <Ban className="w-5 h-5 text-amber-700 shrink-0" />
                 <span>
                   <strong>Please Note:</strong> Unlike our main cottage Plas Hafod, Bryn Bugeiliaid Bach
-                  cannot accommodate pets.
+                  cannot accommodate dogs.
                 </span>
               </div>
 

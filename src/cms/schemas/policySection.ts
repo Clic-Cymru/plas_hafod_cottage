@@ -28,7 +28,7 @@ export const policySectionSchema = {
         list: [
           { title: 'Shield / Contract', value: 'shield' },
           { title: 'Alert / Cancellation', value: 'alert' },
-          { title: 'Dog / Pets', value: 'dog' },
+          { title: 'Dogs', value: 'dog' },
           { title: 'Clock / Times', value: 'clock' },
           { title: 'Sparkles / Cleaning', value: 'sparkles' },
           { title: 'Document / General', value: 'file' },

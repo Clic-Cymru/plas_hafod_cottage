@@ -17,6 +17,7 @@ import {
   parseISO,
   isWithinInterval,
 } from 'date-fns';
+import { cy } from 'date-fns/locale/cy';
 import { CheckCircle2, AlertCircle, Loader2, Dog, Ban } from 'lucide-react';
 import { formatDateUK } from '@/lib/date-utils';
 
@@ -94,17 +95,31 @@ export function LiveSiteBooking({
 
     return (
       <div className="flex-1 min-w-[260px] p-2">
-        <h4 className="text-center font-architects text-lg font-bold text-stone-900 mb-3">
-          {format(monthDate, 'MMMM yyyy')}
+        <h4 className="text-center font-architects text-lg font-bold text-stone-900 mb-3 capitalize">
+          {format(monthDate, 'MMMM yyyy', isCymraeg ? { locale: cy } : undefined)}
         </h4>
         <div className="grid grid-cols-7 gap-1 text-center text-xs font-semibold text-stone-500 mb-2 font-sans">
-          <span>Mo</span>
-          <span>Tu</span>
-          <span>We</span>
-          <span>Th</span>
-          <span>Fr</span>
-          <span>Sa</span>
-          <span>Su</span>
+          {isCymraeg ? (
+            <>
+              <span>Llu</span>
+              <span>Maw</span>
+              <span>Mer</span>
+              <span>Iau</span>
+              <span>Gwe</span>
+              <span>Sad</span>
+              <span>Sul</span>
+            </>
+          ) : (
+            <>
+              <span>Mo</span>
+              <span>Tu</span>
+              <span>We</span>
+              <span>Th</span>
+              <span>Fr</span>
+              <span>Sa</span>
+              <span>Su</span>
+            </>
+          )}
         </div>
         <div className="grid grid-cols-7 gap-1 text-xs">
           {days.map((d, i) => {
@@ -253,7 +268,7 @@ export function LiveSiteBooking({
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4 items-end">
             <div>
               <label className="block text-xs font-bold text-stone-700 uppercase tracking-wider font-sans mb-1">
-                {isCymraeg ? 'Cyrraedd (dd/mm/yyyy)' : 'Check-in (dd/mm/yyyy)'}
+                {isCymraeg ? 'Cyrraedd (dd/mm/bbbb)' : 'Check-in (dd/mm/yyyy)'}
               </label>
               <input
                 type="date"
@@ -265,7 +280,7 @@ export function LiveSiteBooking({
 
             <div>
               <label className="block text-xs font-bold text-stone-700 uppercase tracking-wider font-sans mb-1">
-                {isCymraeg ? 'Gadael (dd/mm/yyyy)' : 'Check-out (dd/mm/yyyy)'}
+                {isCymraeg ? 'Gadael (dd/mm/bbbb)' : 'Check-out (dd/mm/yyyy)'}
               </label>
               <input
                 type="date"
@@ -293,11 +308,11 @@ export function LiveSiteBooking({
               </select>
             </div>
 
-            {/* Pets Selection (Dogs allowed at Plas Hafod, strictly no pets at BBB) */}
+            {/* Dogs Selection (Dogs allowed at Plas Hafod, strictly no dogs at BBB) */}
             {!isBBB ? (
               <div>
                 <label className="block text-xs font-bold text-stone-700 uppercase tracking-wider font-sans mb-1">
-                  {isCymraeg ? 'Cŵn / Anifeiliaid' : 'Dogs'}
+                  {isCymraeg ? 'Cŵn' : 'Dogs'}
                 </label>
                 <select
                   value={pets}
@@ -312,11 +327,11 @@ export function LiveSiteBooking({
             ) : (
               <div>
                 <label className="block text-xs font-bold text-stone-500 uppercase tracking-wider font-sans mb-1">
-                  {isCymraeg ? 'Anifeiliaid' : 'Pets Policy'}
+                  {isCymraeg ? 'Polisi Cŵn' : 'Dog Policy'}
                 </label>
                 <div className="flex items-center gap-1.5 px-3 py-2 bg-stone-100 rounded-lg text-xs text-stone-600 border border-stone-200">
                   <Ban className="w-3.5 h-3.5 text-stone-400 shrink-0" />
-                  <span>No pets allowed</span>
+                  <span>{isCymraeg ? 'Dim cŵn' : 'No dogs allowed'}</span>
                 </div>
               </div>
             )}
@@ -347,7 +362,7 @@ export function LiveSiteBooking({
                         Average rate: £{calculation.baseRateAverage} / night
                         {calculation.discountAmount > 0 &&
                           ` • Includes ${calculation.appliedDiscountName}`}
-                        {!isBBB && pets > 0 && ` • Includes £${pets * 30} pet fee`}
+                        {!isBBB && pets > 0 && ` • ${isCymraeg ? `Ffi ci £${pets * 30}` : `Includes £${pets * 30} dog fee`}`}
                       </p>
                     </div>
 

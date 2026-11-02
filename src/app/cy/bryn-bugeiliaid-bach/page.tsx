@@ -151,12 +151,12 @@ export default async function WelshBrynBugeiliaidBachPage() {
                 sy’n cynnwys ardal fwyta ac ardal eistedd ar wahân i werthfawrogi’r golygfeydd syfrdanol.
               </p>
 
-              {/* Pet notice */}
+              {/* Dog notice */}
               <div className="flex items-center gap-3 p-4 bg-amber-50 border border-[#efda07] rounded-2xl text-amber-900 text-sm font-medium">
                 <Ban className="w-5 h-5 text-amber-700 shrink-0" />
                 <span>
                   <strong>Sylwch:</strong> Yn wahanol i’n prif fwthyn Plas Hafod, ni all Bryn Bugeiliaid Bach
-                  dderbyn anifeiliaid anwes.
+                  dderbyn cŵn.
                 </span>
               </div>
 

@@ -154,7 +154,7 @@ export default async function WelshContactPage() {
                 <div className="space-y-3.5 text-xs sm:text-sm text-stone-600">
                   <div className="flex items-center gap-3">
                     <Clock className="w-4 h-4 text-[#99a0c1] shrink-0" />
-                    <span>Cyrraedd o <strong>4:00 PM</strong> | Ymadael erbyn <strong>10:00 AM</strong></span>
+                    <span>Cyrraedd o <strong>3:00 PM</strong> | Ymadael erbyn <strong>10:00 AM</strong></span>
                   </div>
                   <div className="flex items-center gap-3">
                     <Compass className="w-4 h-4 text-[#99a0c1] shrink-0" />
@@ -162,7 +162,7 @@ export default async function WelshContactPage() {
                   </div>
                   <div className="flex items-center gap-3">
                     <ShieldCheck className="w-4 h-4 text-[#99a0c1] shrink-0" />
-                    <span>Gerddi caeedig diogel ar gyfer anifeiliaid anwes a chŵn</span>
+                    <span>Gerddi caeedig diogel ar gyfer cŵn & chroeso i gŵn (Plas Hafod)</span>
                   </div>
                 </div>
               </div>

@@ -39,14 +39,14 @@ export const defaultFaqsEn: FaqEntry[] = [
     icon: 'home',
     question: 'What is the difference between Plas Hafod Cottage and Bryn Bugeiliaid Bach?',
     answer:
-      'Plas Hafod Cottage is an 18th-century stone cottage sleeping 4–6 with 2 bedrooms, 2 bathrooms, an inglenook wood fireplace, and is dog-friendly. Bryn Bugeiliaid Bach is a luxury 2-bedroom self-contained annexe sleeping 2–4 with underfloor heating, log burner, and a panoramic conservatory designed as a peaceful retreat (no pets).',
+      'Plas Hafod Cottage is an 18th-century stone cottage sleeping 4–6 with 2 bedrooms, 2 bathrooms, an inglenook wood fireplace, and is dog-friendly. Bryn Bugeiliaid Bach is a luxury 2-bedroom self-contained annexe sleeping 2–4 with underfloor heating, log burner, and a panoramic conservatory designed as a peaceful retreat (no dogs allowed).',
   },
   {
     id: 'pets',
     icon: 'dog',
     question: 'Are dogs welcome at the properties?',
     answer:
-      'Dogs are warmly welcomed at Plas Hafod Cottage (up to 2 well-behaved dogs), with enclosed grounds and endless mountain trails directly outside. Bryn Bugeiliaid Bach remains strictly pet-free.',
+      'Dogs are warmly welcomed at Plas Hafod Cottage (up to 2 well-behaved dogs), with enclosed grounds and endless mountain trails directly outside. Bryn Bugeiliaid Bach remains strictly dog-free.',
   },
   {
     id: 'parking-directions',
@@ -91,14 +91,14 @@ export const defaultFaqsCy: FaqEntry[] = [
     icon: 'home',
     question: 'Beth yw’r gwahaniaeth rhwng Bwthyn Plas Hafod a Bryn Bugeiliaid Bach?',
     answer:
-      'Mae Bwthyn Plas Hafod yn fwthyn carreg o’r 18fed ganrif sy’n cysgu 4–6 gyda 2 ystafell wely, 2 ystafell ymolchi, lle tân agored, ac mae croeso i gŵn. Mae Bryn Bugeiliaid Bach yn anecs moethus hunangynhwysol 2 wely sy’n cysgu 2–4 gyda gwres dan lawr, llosgwr coed, ac ystafell wydr banoramig (dim anifeiliaid anwes).',
+      'Mae Bwthyn Plas Hafod yn fwthyn carreg o’r 18fed ganrif sy’n cysgu 4–6 gyda 2 ystafell wely, 2 ystafell ymolchi, lle tân agored, ac mae croeso i gŵn. Mae Bryn Bugeiliaid Bach yn anecs moethus hunangynhwysol 2 wely sy’n cysgu 2–4 gyda gwres dan lawr, llosgwr coed, ac ystafell wydr banoramig (dim cŵn).',
   },
   {
     id: 'pets',
     icon: 'dog',
     question: 'A oes croeso i gŵn?',
     answer:
-      'Mae croeso cynnes i gŵn yn Bwthyn Plas Hafod (hyd at 2 gi sy’n ymddwyn yn dda), gyda thir caeedig a llwybrau mynydd ar stepen y drws. Mae Bryn Bugeiliaid Bach yn aros yn ddi-anifeiliaid anwes.',
+      'Mae croeso cynnes i gŵn yn Bwthyn Plas Hafod (hyd at 2 gi sy’n ymddwyn yn dda), gyda thir caeedig a llwybrau mynydd ar stepen y drws. Mae Bryn Bugeiliaid Bach yn aros yn ddi-gŵn.',
   },
   {
     id: 'parking-directions',

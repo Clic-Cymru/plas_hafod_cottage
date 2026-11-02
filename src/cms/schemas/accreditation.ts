@@ -30,9 +30,15 @@ export const accreditationSchema = {
     },
     {
       name: 'badge',
-      title: 'Badge Ribbon Text',
+      title: 'Badge Ribbon Text (English)',
       type: 'string',
       description: 'Short tag shown at the top of the card e.g. "2026 Winner", "Official 5-Star", "Copa Gold Award", "Top-Rated Host"',
+    },
+    {
+      name: 'badgeCy',
+      title: 'Badge Ribbon Text (Welsh)',
+      type: 'string',
+      description: 'Welsh translation for badge ribbon tag e.g. "Enillydd 2026", "5 Seren Swyddogol", "Gwobr Copa Aur"',
     },
     {
       name: 'badgeColor',

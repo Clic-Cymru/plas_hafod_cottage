@@ -154,7 +154,7 @@ export default async function ContactPage() {
                 <div className="space-y-3.5 text-xs sm:text-sm text-stone-600">
                   <div className="flex items-center gap-3">
                     <Clock className="w-4 h-4 text-[#99a0c1] shrink-0" />
-                    <span>Check-in from <strong>4:00 PM</strong> | Check-out by <strong>10:00 AM</strong></span>
+                    <span>Check-in from <strong>3:00 PM</strong> | Check-out by <strong>10:00 AM</strong></span>
                   </div>
                   <div className="flex items-center gap-3">
                     <Compass className="w-4 h-4 text-[#99a0c1] shrink-0" />
@@ -162,7 +162,7 @@ export default async function ContactPage() {
                   </div>
                   <div className="flex items-center gap-3">
                     <ShieldCheck className="w-4 h-4 text-[#99a0c1] shrink-0" />
-                    <span>Enclosed gardens safe for pets & dogs welcome</span>
+                    <span>Enclosed gardens safe for dogs & dogs welcome (Plas Hafod)</span>
                   </div>
                 </div>
               </div>
