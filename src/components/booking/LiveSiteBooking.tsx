@@ -18,7 +18,16 @@ import {
   isWithinInterval,
 } from 'date-fns';
 import { cy } from 'date-fns/locale/cy';
-import { CheckCircle2, AlertCircle, Loader2, Dog, Ban, Calendar as CalendarIcon } from 'lucide-react';
+import {
+  CheckCircle2,
+  AlertCircle,
+  Loader2,
+  Dog,
+  Ban,
+  Calendar as CalendarIcon,
+  ChevronLeft,
+  ChevronRight,
+} from 'lucide-react';
 import { formatDateUK } from '@/lib/date-utils';
 
 interface LiveSiteBookingProps {
@@ -34,14 +43,17 @@ function BookingDateInput({
   min,
   onChange,
   isCymraeg = false,
+  isOccupied,
 }: {
   label: string;
   value: string;
   min?: string;
   onChange: (val: string) => void;
   isCymraeg?: boolean;
+  isOccupied?: (day: Date) => boolean;
 }) {
-  const dateInputRef = React.useRef<HTMLInputElement>(null);
+  const containerRef = React.useRef<HTMLDivElement>(null);
+  const [isOpen, setIsOpen] = useState(false);
   const placeholder = isCymraeg ? 'dd/mm/bbbb' : 'dd/mm/yyyy';
 
   const formatForDisplay = (iso: string) => {
@@ -54,10 +66,40 @@ function BookingDateInput({
   };
 
   const [textValue, setTextValue] = useState(formatForDisplay(value));
+  const [viewDate, setViewDate] = useState(() => {
+    if (value) {
+      const parts = value.split('-');
+      if (parts.length === 3) {
+        return new Date(Number(parts[0]), Number(parts[1]) - 1, 1);
+      }
+    }
+    return new Date(2026, 10, 1); // November 2026 default
+  });
 
   React.useEffect(() => {
     setTextValue(formatForDisplay(value));
+    if (value) {
+      const parts = value.split('-');
+      if (parts.length === 3) {
+        setViewDate(new Date(Number(parts[0]), Number(parts[1]) - 1, 1));
+      }
+    }
   }, [value]);
+
+  // Click outside listener to dismiss popover
+  React.useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    }
+    if (isOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isOpen]);
 
   const handleTextChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const raw = e.target.value;
@@ -77,26 +119,24 @@ function BookingDateInput({
       const d = new Date(Number(year), Number(month) - 1, Number(day));
       if (!isNaN(d.getTime())) {
         onChange(iso);
+        setViewDate(new Date(Number(year), Number(month) - 1, 1));
       }
     }
   };
 
-  const handleOpenPicker = () => {
-    if (dateInputRef.current) {
-      try {
-        if (typeof dateInputRef.current.showPicker === 'function') {
-          dateInputRef.current.showPicker();
-        } else {
-          dateInputRef.current.focus();
-        }
-      } catch (_) {
-        // Fallback for security/browser restrictions
-      }
-    }
-  };
+  // Calendar dates generation
+  const monthStart = startOfMonth(viewDate);
+  const monthEnd = endOfMonth(viewDate);
+  const startDate = startOfWeek(monthStart, { weekStartsOn: 1 });
+  const endDate = endOfWeek(monthEnd, { weekStartsOn: 1 });
+  const days = eachDayOfInterval({ start: startDate, end: endDate });
+
+  const weekHeaders = isCymraeg
+    ? ['Llu', 'Maw', 'Mer', 'Iau', 'Gwe', 'Sad', 'Sul']
+    : ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'];
 
   return (
-    <div>
+    <div ref={containerRef} className="relative">
       <label className="block text-xs font-bold text-stone-700 uppercase tracking-wider font-sans mb-1">
         {label}
       </label>
@@ -106,29 +146,119 @@ function BookingDateInput({
           value={textValue}
           placeholder={placeholder}
           onChange={handleTextChange}
-          onClick={handleOpenPicker}
+          onClick={() => setIsOpen((prev) => !prev)}
           className="w-full bg-white border border-stone-300 rounded-lg px-3 py-2 pr-9 text-stone-800 text-sm focus:outline-none focus:border-[#99a0c1] font-mono placeholder:text-stone-400 cursor-pointer"
         />
         <button
           type="button"
-          onClick={handleOpenPicker}
+          onClick={() => setIsOpen((prev) => !prev)}
           tabIndex={-1}
           aria-label={label}
           className="absolute right-2.5 p-1 text-stone-400 hover:text-stone-700 transition"
         >
           <CalendarIcon className="w-4 h-4" />
         </button>
-        <input
-          ref={dateInputRef}
-          type="date"
-          value={value}
-          min={min}
-          onChange={(e) => onChange(e.target.value)}
-          tabIndex={-1}
-          aria-hidden="true"
-          className="absolute inset-0 w-full h-full opacity-0 pointer-events-none"
-        />
       </div>
+
+      {isOpen && (
+        <div className="absolute top-full left-0 mt-1.5 z-50 bg-white border border-stone-200 rounded-2xl shadow-2xl p-4 w-[285px] font-sans">
+          {/* Header with Welsh/English month name and navigation */}
+          <div className="flex items-center justify-between mb-3 px-1">
+            <span className="font-bold text-sm text-stone-900 capitalize">
+              {format(viewDate, 'MMMM yyyy', isCymraeg ? { locale: cy } : undefined)}
+            </span>
+            <div className="flex items-center gap-1">
+              <button
+                type="button"
+                onClick={() => setViewDate((d) => subMonths(d, 1))}
+                aria-label="Previous month"
+                className="p-1.5 rounded-lg hover:bg-stone-100 text-stone-600 transition"
+              >
+                <ChevronLeft className="w-4 h-4" />
+              </button>
+              <button
+                type="button"
+                onClick={() => setViewDate((d) => addMonths(d, 1))}
+                aria-label="Next month"
+                className="p-1.5 rounded-lg hover:bg-stone-100 text-stone-600 transition"
+              >
+                <ChevronRight className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+
+          {/* Weekday headers */}
+          <div className="grid grid-cols-7 gap-1 text-center text-xs font-semibold text-stone-500 mb-2 font-sans">
+            {weekHeaders.map((h) => (
+              <span key={h}>{h}</span>
+            ))}
+          </div>
+
+          {/* Days Grid */}
+          <div className="grid grid-cols-7 gap-1 text-xs">
+            {days.map((d, i) => {
+              const inMonth = isSameMonth(d, viewDate);
+              const formatted = format(d, 'yyyy-MM-dd');
+              const occupied = isOccupied ? isOccupied(d) : false;
+              const isBeforeMin = min ? formatted <= min : false;
+              const isSelected = formatted === value;
+              const disabled = !inMonth || occupied || isBeforeMin;
+
+              return (
+                <button
+                  key={i}
+                  type="button"
+                  disabled={disabled}
+                  onClick={() => {
+                    onChange(formatted);
+                    setIsOpen(false);
+                  }}
+                  className={`h-8 w-8 mx-auto flex items-center justify-center rounded-lg font-mono text-xs transition ${
+                    !inMonth
+                      ? 'text-stone-300 cursor-default'
+                      : isSelected
+                      ? 'bg-[#323149] text-[#efda07] font-bold shadow-sm'
+                      : occupied
+                      ? 'bg-[#efda07] text-stone-900 font-semibold cursor-not-allowed'
+                      : isBeforeMin
+                      ? 'text-stone-300 cursor-not-allowed'
+                      : 'text-stone-800 hover:bg-stone-100 font-medium'
+                  }`}
+                >
+                  {format(d, 'd')}
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Clear / Today Footer buttons */}
+          <div className="flex items-center justify-between pt-3 mt-3 border-t border-stone-100 text-xs">
+            <button
+              type="button"
+              onClick={() => {
+                onChange('');
+                setTextValue('');
+                setIsOpen(false);
+              }}
+              className="text-stone-500 hover:text-stone-800 font-medium transition"
+            >
+              {isCymraeg ? 'Clirio' : 'Clear'}
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                const today = format(new Date(), 'yyyy-MM-dd');
+                onChange(today);
+                setViewDate(new Date());
+                setIsOpen(false);
+              }}
+              className="text-[#323149] hover:text-indigo-900 font-bold transition"
+            >
+              {isCymraeg ? 'Heddiw' : 'Today'}
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -376,6 +506,7 @@ export function LiveSiteBooking({
               value={checkIn}
               onChange={setCheckIn}
               isCymraeg={isCymraeg}
+              isOccupied={isOccupied}
             />
 
             <BookingDateInput
@@ -384,6 +515,7 @@ export function LiveSiteBooking({
               min={checkIn}
               onChange={setCheckOut}
               isCymraeg={isCymraeg}
+              isOccupied={isOccupied}
             />
 
             <div>
