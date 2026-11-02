@@ -26,7 +26,7 @@ export const siteSettingsSchema = {
     },
     {
       name: 'checkInAutomation',
-      title: '🔑 Check-in, Key Safe & WiFi Automation',
+      title: '🔑 Check-in & Key Automation',
       options: { collapsible: true, collapsed: false },
     },
     {
@@ -413,7 +413,7 @@ export const siteSettingsSchema = {
       fieldset: 'emailCopy',
       initialValue: 'Diolch am gysylltu â ni. Rydym wedi derbyn eich neges a byddwn yn ymateb cyn pen 24 awr.',
     },
-    // Check-in, Key Safe & WiFi Automation Fields
+    // Check-in & Key Automation Fields
     {
       name: 'checkInDaysBeforeArrival',
       title: 'Check-in Guide Dispatch Trigger (Days Before Arrival)',
@@ -441,40 +441,12 @@ export const siteSettingsSchema = {
       description: 'Default key box code or entry note for Plas Hafod Cottage.',
     },
     {
-      name: 'plasHafodWifiSsid',
-      title: 'Plas Hafod – WiFi Network Name (SSID)',
-      type: 'string',
-      fieldset: 'checkInAutomation',
-      initialValue: 'PlasHafod_Guest_5G',
-    },
-    {
-      name: 'plasHafodWifiPassword',
-      title: 'Plas Hafod – WiFi Password',
-      type: 'string',
-      fieldset: 'checkInAutomation',
-      initialValue: 'eryri-mountain-peace',
-    },
-    {
       name: 'bbbKeySafe',
       title: 'Bryn Bugeiliaid Bach – Key Safe / Entry Note',
       type: 'string',
       fieldset: 'checkInAutomation',
       initialValue: 'Unlocked (Key inside)',
       description: 'Default key box code or entry note for Bryn Bugeiliaid Bach annexe.',
-    },
-    {
-      name: 'bbbWifiSsid',
-      title: 'Bryn Bugeiliaid Bach – WiFi Network Name (SSID)',
-      type: 'string',
-      fieldset: 'checkInAutomation',
-      initialValue: 'BrynBugeiliaid_Guest',
-    },
-    {
-      name: 'bbbWifiPassword',
-      title: 'Bryn Bugeiliaid Bach – WiFi Password',
-      type: 'string',
-      fieldset: 'checkInAutomation',
-      initialValue: 'nantlle-ridge-views',
     },
     {
       name: 'checkInDirectionsEn',

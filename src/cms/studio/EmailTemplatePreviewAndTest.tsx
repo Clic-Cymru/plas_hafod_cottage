@@ -113,6 +113,8 @@ const TEMPLATE_KEY_MAP: Record<string, string> = {
   full_payment_receipt: 'full-payment-receipt',
   checkout_reminder: 'checkout-reminder',
   review_request: 'review-request',
+  visitor_contact: 'visitor-contact',
+  owner_contact: 'owner-contact',
 };
 
 export function EmailTemplatePreviewAndTest() {

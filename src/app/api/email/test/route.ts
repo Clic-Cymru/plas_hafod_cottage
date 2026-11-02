@@ -135,8 +135,6 @@ function getMockCheckInData(propertyTitle: string, siteSettings: any): CheckInGu
     children: booking.children,
     pets: booking.pets,
     keySafeCode: (isBBB ? siteSettings.bbbKeySafe : siteSettings.plasHafodKeySafe) || 'Unlocked (Key inside)',
-    wifiSsid: isBBB ? siteSettings.bbbWifiSsid : siteSettings.plasHafodWifiSsid,
-    wifiPassword: isBBB ? siteSettings.bbbWifiPassword : siteSettings.plasHafodWifiPassword,
     directions: siteSettings.checkInDirectionsEn,
     wasteInstructions: siteSettings.wasteBinInstructionsEn,
     checkInTime: siteSettings.checkInTime || '3:00 PM',

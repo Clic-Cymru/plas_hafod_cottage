@@ -59,8 +59,6 @@ export interface CheckInGuideEmailData {
   children?: number;
   pets?: number;
   keySafeCode: string;
-  wifiSsid?: string;
-  wifiPassword?: string;
   directions?: string;
   wasteInstructions?: string;
   checkInTime?: string;
@@ -1029,8 +1027,6 @@ export function generateCheckInGuideHtml(
   const defaultKeySafe = isBBB ? (settings?.bbbKeySafe || 'Unlocked (Key inside)') : (settings?.plasHafodKeySafe || 'Unlocked (Key inside)');
   const keySafeCode = data.keySafeCode || defaultKeySafe;
   const isUnlockedEntry = /unlocked|key inside/i.test(keySafeCode);
-  const wifiSsid = data.wifiSsid || (isBBB ? settings?.bbbWifiSsid || 'BrynBugeiliaid_Guest' : settings?.plasHafodWifiSsid || 'PlasHafod_Guest_5G');
-  const wifiPass = data.wifiPassword || (isBBB ? settings?.bbbWifiPassword || 'nantlle-ridge-views' : settings?.plasHafodWifiPassword || 'eryri-mountain-peace');
 
   const cottageGuidanceEn = isBBB
     ? 'Drive across the track and bear left, keep following the lane until you see the cottage ahead of you.\nWhat 3 words ///skills.shorts.aced'
@@ -1169,19 +1165,6 @@ export function generateCheckInGuideHtml(
         ${directionsHtml}
       </div>
 
-      <!-- WiFi Info Card -->
-      <div class="info-card">
-        <div style="display: flex; align-items: center; margin-bottom: 8px;">
-          <strong style="font-size: 15px; color: #0f172a;">📶 ${isCymraeg ? 'Rhyngrwyd Di-wifr (WiFi)' : 'Complimentary High-Speed WiFi'}</strong>
-        </div>
-        <p style="margin: 4px 0 2px; font-size: 13px; color: #475569;">
-          <strong>Network (SSID):</strong> <code style="background: #e2e8f0; padding: 2px 6px; border-radius: 4px; font-family: monospace;">${wifiSsid}</code>
-        </p>
-        <p style="margin: 2px 0 0; font-size: 13px; color: #475569;">
-          <strong>Password:</strong> <code style="background: #e2e8f0; padding: 2px 6px; border-radius: 4px; font-family: monospace;">${wifiPass}</code>
-        </p>
-      </div>
-
       <!-- Bins & Care Info -->
       <div class="info-card">
         <strong style="font-size: 14px; color: #0f172a; display: block; margin-bottom: 4px;">
@@ -1240,8 +1223,6 @@ export function generateCheckInGuideText(
   const defaultKeySafe = isBBB ? (settings?.bbbKeySafe || 'Unlocked (Key inside)') : (settings?.plasHafodKeySafe || 'Unlocked (Key inside)');
   const keySafeCode = data.keySafeCode || defaultKeySafe;
   const isUnlockedEntry = /unlocked|key inside/i.test(keySafeCode);
-  const wifiSsid = data.wifiSsid || (isBBB ? settings?.bbbWifiSsid || 'BrynBugeiliaid_Guest' : settings?.plasHafodWifiSsid || 'PlasHafod_Guest_5G');
-  const wifiPass = data.wifiPassword || (isBBB ? settings?.bbbWifiPassword || 'nantlle-ridge-views' : settings?.plasHafodWifiPassword || 'eryri-mountain-peace');
 
   const cottageGuidanceEn = isBBB
     ? 'Drive across the track and bear left, keep following the lane until you see the cottage ahead of you.\nWhat 3 words ///skills.shorts.aced'
@@ -1273,10 +1254,6 @@ It would be appreciated if you could email/phone us a few days prior to your sta
 DIRECTIONS:
 ${directions}
 Google Maps Link: ${googleMapsUrl}
-
-WIFI DETAILS:
-- Network (SSID): ${wifiSsid}
-- Password: ${wifiPass}
 
 CONTACT DETAILS:
 ${phone}

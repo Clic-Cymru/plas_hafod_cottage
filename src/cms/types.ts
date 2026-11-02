@@ -214,15 +214,11 @@ export interface SiteSettings {
   guestBookingEmailNextStepsCy?: string;
   guestContactEmailReplyEn?: string;
   guestContactEmailReplyCy?: string;
-  // Check-in, Key Safe & WiFi Automation
+  // Check-in & Key Automation
   checkInDaysBeforeArrival?: number;
   balanceReminderDaysBeforeArrival?: number;
   plasHafodKeySafe?: string;
-  plasHafodWifiSsid?: string;
-  plasHafodWifiPassword?: string;
   bbbKeySafe?: string;
-  bbbWifiSsid?: string;
-  bbbWifiPassword?: string;
   checkInDirectionsEn?: string;
   checkInDirectionsCy?: string;
   wasteBinInstructionsEn?: string;

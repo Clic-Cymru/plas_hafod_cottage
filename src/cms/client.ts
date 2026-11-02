@@ -669,11 +669,7 @@ export const cmsClient = {
             checkInDaysBeforeArrival: site.checkInDaysBeforeArrival ?? defaultSiteSettings.checkInDaysBeforeArrival,
             balanceReminderDaysBeforeArrival: site.balanceReminderDaysBeforeArrival ?? defaultSiteSettings.balanceReminderDaysBeforeArrival,
             plasHafodKeySafe: site.plasHafodKeySafe || defaultSiteSettings.plasHafodKeySafe,
-            plasHafodWifiSsid: site.plasHafodWifiSsid || defaultSiteSettings.plasHafodWifiSsid,
-            plasHafodWifiPassword: site.plasHafodWifiPassword || defaultSiteSettings.plasHafodWifiPassword,
             bbbKeySafe: site.bbbKeySafe || defaultSiteSettings.bbbKeySafe,
-            bbbWifiSsid: site.bbbWifiSsid || defaultSiteSettings.bbbWifiSsid,
-            bbbWifiPassword: site.bbbWifiPassword || defaultSiteSettings.bbbWifiPassword,
             checkInDirectionsEn: site.checkInDirectionsEn || defaultSiteSettings.checkInDirectionsEn,
             checkInDirectionsCy: site.checkInDirectionsCy || defaultSiteSettings.checkInDirectionsCy,
             wasteBinInstructionsEn: site.wasteBinInstructionsEn || defaultSiteSettings.wasteBinInstructionsEn,
@@ -999,11 +995,7 @@ export const defaultSiteSettings: SiteSettings = {
   checkInDaysBeforeArrival: 30,
   balanceReminderDaysBeforeArrival: 60,
   plasHafodKeySafe: 'Unlocked (Key inside)',
-  plasHafodWifiSsid: 'PlasHafod_Guest_5G',
-  plasHafodWifiPassword: 'eryri-mountain-peace',
   bbbKeySafe: 'Unlocked (Key inside)',
-  bbbWifiSsid: 'BrynBugeiliaid_Guest',
-  bbbWifiPassword: 'nantlle-ridge-views',
   checkInDirectionsEn:
     `Head for NORTH WALES: CONWY • BANGOR • CAERNARFON • PORTHMADOG\n\nDirections:\nFrom the A55 follow the A487 heading towards Porthmadog. Once past Penygroes the village of Nebo will be signposted on your left - do not take this turning. Carry on for approx half a mile. You will see a sign for a left turning ahead. Please indicate left and slow down. The turning is a very narrow lane opposite the entrance to TG Cefn Graianog (Quarry) - signage in cream with red writing.\n\nFollow the lane up the hill to the T-junction by the white farm house. Turn left. Follow the lane up the hill and take the first right turning. Follow the steep lane up around the bend approx. 1 mile. The entrance to Bwthyn Plas Hafod Cottage and Bryn Bugeiliaid will be sign posted on your left by the double gates with two green wheelie bins.\n\nDrive across track in the field and you will have reached your destination!\n\nThere is a designated parking area for your accommodation - see slate on fencing!\n\nShould you travel through Porthmadog towards Caernarfon you will pass via the Villages of Bryncir and Pant Glas. Just after Pant Glas the signs for TG Cefn Graianog will be on your left and you need to take the narrow lane opposite on your right. Then follow the directions as above...\n\n(Caernarfon to Nebo = Approx. 11 miles / Porthmadog to Nebo = Approx. 11 miles)\n(Post Code of the property is LL54 6EB but this will take you via Nebo so please do follow directions as above)`,
   checkInDirectionsCy:

@@ -192,8 +192,6 @@ async function handleAutomatedEmails(request: Request) {
           children: booking.children || 0,
           pets: booking.pets || 0,
           keySafeCode,
-          wifiSsid: isPlasHafod ? siteSettings.plasHafodWifiSsid : siteSettings.bbbWifiSsid,
-          wifiPassword: isPlasHafod ? siteSettings.plasHafodWifiPassword : siteSettings.bbbWifiPassword,
           directions: siteSettings.checkInDirectionsEn,
           wasteInstructions: siteSettings.wasteBinInstructionsEn,
           checkInTime: siteSettings.checkInTime || '3:00 PM',
