@@ -2,6 +2,7 @@ import React from 'react';
 import Image from 'next/image';
 import { Award, Star, CheckCircle2 } from 'lucide-react';
 import { Accreditation } from '@/cms/types';
+import { BADGE_CY_MAP } from '@/cms/client';
 
 interface Props {
   isCymraeg?: boolean;
@@ -93,7 +94,7 @@ export function BrynBugeiliaidBachAccreditations({ isCymraeg = false, accreditat
           id: a.id,
           src: a.imageUrl,
           alt: a.title,
-          badge: isCymraeg ? (a.badgeCy || a.badge) : a.badge,
+          badge: isCymraeg ? (a.badgeCy || BADGE_CY_MAP[a.badge] || a.badge) : a.badge,
           badgeColor: a.badgeColor || 'bg-[#efda07] text-stone-900',
           title: a.title,
           source: a.source,

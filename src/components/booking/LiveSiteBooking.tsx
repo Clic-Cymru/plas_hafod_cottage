@@ -18,7 +18,7 @@ import {
   isWithinInterval,
 } from 'date-fns';
 import { cy } from 'date-fns/locale/cy';
-import { CheckCircle2, AlertCircle, Loader2, Dog, Ban } from 'lucide-react';
+import { CheckCircle2, AlertCircle, Loader2, Dog, Ban, Calendar as CalendarIcon } from 'lucide-react';
 import { formatDateUK } from '@/lib/date-utils';
 
 interface LiveSiteBookingProps {
@@ -26,6 +26,111 @@ interface LiveSiteBookingProps {
   isCymraeg?: boolean;
   pricingConfig: PricingConfig;
   blockedDates: BlockedDateRange[];
+}
+
+function BookingDateInput({
+  label,
+  value,
+  min,
+  onChange,
+  isCymraeg = false,
+}: {
+  label: string;
+  value: string;
+  min?: string;
+  onChange: (val: string) => void;
+  isCymraeg?: boolean;
+}) {
+  const dateInputRef = React.useRef<HTMLInputElement>(null);
+  const placeholder = isCymraeg ? 'dd/mm/bbbb' : 'dd/mm/yyyy';
+
+  const formatForDisplay = (iso: string) => {
+    if (!iso) return '';
+    const parts = iso.split('-');
+    if (parts.length === 3) {
+      return `${parts[2]}/${parts[1]}/${parts[0]}`;
+    }
+    return iso;
+  };
+
+  const [textValue, setTextValue] = useState(formatForDisplay(value));
+
+  React.useEffect(() => {
+    setTextValue(formatForDisplay(value));
+  }, [value]);
+
+  const handleTextChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const raw = e.target.value;
+    setTextValue(raw);
+
+    if (!raw.trim()) {
+      onChange('');
+      return;
+    }
+
+    const match = raw.match(/^(\d{1,2})[\/\-\.](\d{1,2})[\/\-\.](\d{4})$/);
+    if (match) {
+      const day = match[1].padStart(2, '0');
+      const month = match[2].padStart(2, '0');
+      const year = match[3];
+      const iso = `${year}-${month}-${day}`;
+      const d = new Date(Number(year), Number(month) - 1, Number(day));
+      if (!isNaN(d.getTime())) {
+        onChange(iso);
+      }
+    }
+  };
+
+  const handleOpenPicker = () => {
+    if (dateInputRef.current) {
+      try {
+        if (typeof dateInputRef.current.showPicker === 'function') {
+          dateInputRef.current.showPicker();
+        } else {
+          dateInputRef.current.focus();
+        }
+      } catch (_) {
+        // Fallback for security/browser restrictions
+      }
+    }
+  };
+
+  return (
+    <div>
+      <label className="block text-xs font-bold text-stone-700 uppercase tracking-wider font-sans mb-1">
+        {label}
+      </label>
+      <div className="relative flex items-center">
+        <input
+          type="text"
+          value={textValue}
+          placeholder={placeholder}
+          onChange={handleTextChange}
+          onClick={handleOpenPicker}
+          className="w-full bg-white border border-stone-300 rounded-lg px-3 py-2 pr-9 text-stone-800 text-sm focus:outline-none focus:border-[#99a0c1] font-mono placeholder:text-stone-400 cursor-pointer"
+        />
+        <button
+          type="button"
+          onClick={handleOpenPicker}
+          tabIndex={-1}
+          aria-label={label}
+          className="absolute right-2.5 p-1 text-stone-400 hover:text-stone-700 transition"
+        >
+          <CalendarIcon className="w-4 h-4" />
+        </button>
+        <input
+          ref={dateInputRef}
+          type="date"
+          value={value}
+          min={min}
+          onChange={(e) => onChange(e.target.value)}
+          tabIndex={-1}
+          aria-hidden="true"
+          className="absolute inset-0 w-full h-full opacity-0 pointer-events-none"
+        />
+      </div>
+    </div>
+  );
 }
 
 export function LiveSiteBooking({
@@ -266,30 +371,20 @@ export function LiveSiteBooking({
 
         <div className="max-w-4xl mx-auto bg-white border border-stone-200 rounded-2xl p-6 sm:p-8 shadow-sm">
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4 items-end">
-            <div>
-              <label className="block text-xs font-bold text-stone-700 uppercase tracking-wider font-sans mb-1">
-                {isCymraeg ? 'Cyrraedd (dd/mm/bbbb)' : 'Check-in (dd/mm/yyyy)'}
-              </label>
-              <input
-                type="date"
-                value={checkIn}
-                onChange={(e) => setCheckIn(e.target.value)}
-                className="w-full bg-white border border-stone-300 rounded-lg px-3 py-2 text-stone-800 text-sm focus:outline-none focus:border-[#99a0c1] font-mono"
-              />
-            </div>
+            <BookingDateInput
+              label={isCymraeg ? 'Cyrraedd (dd/mm/bbbb)' : 'Check-in (dd/mm/yyyy)'}
+              value={checkIn}
+              onChange={setCheckIn}
+              isCymraeg={isCymraeg}
+            />
 
-            <div>
-              <label className="block text-xs font-bold text-stone-700 uppercase tracking-wider font-sans mb-1">
-                {isCymraeg ? 'Gadael (dd/mm/bbbb)' : 'Check-out (dd/mm/yyyy)'}
-              </label>
-              <input
-                type="date"
-                value={checkOut}
-                min={checkIn}
-                onChange={(e) => setCheckOut(e.target.value)}
-                className="w-full bg-white border border-stone-300 rounded-lg px-3 py-2 text-stone-800 text-sm focus:outline-none focus:border-[#99a0c1] font-mono"
-              />
-            </div>
+            <BookingDateInput
+              label={isCymraeg ? 'Gadael (dd/mm/bbbb)' : 'Check-out (dd/mm/yyyy)'}
+              value={checkOut}
+              min={checkIn}
+              onChange={setCheckOut}
+              isCymraeg={isCymraeg}
+            />
 
             <div>
               <label className="block text-xs font-bold text-stone-700 uppercase tracking-wider font-sans mb-1">

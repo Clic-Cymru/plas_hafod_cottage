@@ -194,6 +194,21 @@ let mockContactStore: ContactMessage[] = [];
  * Headless CMS Client Bridge
  * Handles fetching CMS content & executing Mutation API calls.
  */
+export const BADGE_CY_MAP: Record<string, string> = {
+  'Official 5-Star': '5 Seren Swyddogol',
+  '2026 Winner': 'Enillydd 2026',
+  '2025 Winner': 'Enillydd 2025',
+  'Gold Copa Award': 'Gwobr Copa Aur',
+  'Copa Gold Award': 'Gwobr Copa Aur',
+  '2026 Accredited': 'Achrededig 2026',
+  '2026 Finalist': 'Cystadleuydd 2026',
+  'Top-Rated Host': 'Lletywr Gradd Uchaf',
+  'Official Grading': 'Graddio Swyddogol',
+  'Consecutive Excellence': 'Rhagoriaeth Barhaus',
+  'Silver Award': 'Gwobr Arian',
+  'Certified Welcome': 'Croeso Ardystiedig',
+};
+
 export const cmsClient = {
   async getPricingConfig(propertyId: 'plas-hafod' | 'bryn-bugeiliaid-bach' = 'plas-hafod'): Promise<PricingConfig> {
     if (isSanityLive && sanityClient) {
@@ -548,6 +563,12 @@ export const cmsClient = {
         }`;
         const data = await sanityClient.fetch(query, { property, isCymraeg });
         if (Array.isArray(data) && data.length > 0) {
+          if (isCymraeg) {
+            return data.map((item) => ({
+              ...item,
+              badge: item.badgeCy || BADGE_CY_MAP[item.badge] || item.badge,
+            }));
+          }
           return data;
         }
       } catch (err) {
@@ -565,7 +586,7 @@ export const cmsClient = {
       return filtered.map((item) => ({
         ...item,
         title: item.titleCy || item.title,
-        badge: item.badgeCy || item.badge,
+        badge: item.badgeCy || BADGE_CY_MAP[item.badge] || item.badge,
         score: item.scoreCy || item.score,
         description: item.descriptionCy || item.description,
       }));

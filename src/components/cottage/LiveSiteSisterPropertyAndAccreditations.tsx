@@ -7,6 +7,7 @@ import { Award, Star, CheckCircle2 } from 'lucide-react';
 import { LiveSiteFooter } from '@/components/navigation/LiveSiteFooter';
 import { Accreditation } from '@/cms/types';
 import { defaultAccreditations } from '@/data/defaultAccreditations';
+import { BADGE_CY_MAP } from '@/cms/client';
 
 interface SisterProps {
   isCymraeg?: boolean;
@@ -41,7 +42,7 @@ export function LiveSiteSisterPropertyAndAccreditations({
     .map((a) => ({
       ...a,
       title: isCymraeg ? (a.titleCy || a.title) : a.title,
-      badge: isCymraeg ? (a.badgeCy || a.badge) : a.badge,
+      badge: isCymraeg ? (a.badgeCy || BADGE_CY_MAP[a.badge] || a.badge) : a.badge,
       score: isCymraeg ? (a.scoreCy || a.score) : a.score,
       description: isCymraeg ? (a.descriptionCy || a.description) : a.description,
     }));
@@ -52,7 +53,7 @@ export function LiveSiteSisterPropertyAndAccreditations({
   const displayAwards = rawAwards.map((a) => ({
     ...a,
     title: isCymraeg ? (a.titleCy || a.title) : a.title,
-    badge: isCymraeg ? (a.badgeCy || a.badge) : a.badge,
+    badge: isCymraeg ? (a.badgeCy || BADGE_CY_MAP[a.badge] || a.badge) : a.badge,
     score: isCymraeg ? (a.scoreCy || a.score) : a.score,
     description: isCymraeg ? (a.descriptionCy || a.description) : a.description,
   }));
@@ -265,16 +266,16 @@ export function LiveSiteSisterPropertyAndAccreditations({
               {isCymraeg ? 'Safonau Allweddol:' : 'Official Standards:'}
             </span>
             <span className="inline-flex items-center gap-1 bg-white px-2.5 py-1 rounded-lg border border-stone-200/80 shadow-2xs font-semibold text-stone-800">
-              ⭐ 5-Star Visit Wales
+              ⭐ {isCymraeg ? '5 Seren Croeso Cymru' : '5-Star Visit Wales'}
             </span>
             <span className="inline-flex items-center gap-1 bg-white px-2.5 py-1 rounded-lg border border-stone-200/80 shadow-2xs font-semibold text-stone-800">
-              🥇 Copa Gold Plastic Free
+              🏆 {isCymraeg ? 'Copa Aur Di-blastig' : 'Copa Gold Plastic Free'}
             </span>
             <span className="inline-flex items-center gap-1 bg-white px-2.5 py-1 rounded-lg border border-stone-200/80 shadow-2xs font-semibold text-stone-800">
-              🏆 9.6/10 Booking.com
+              ⭐ 9.6/10 Booking.com
             </span>
             <span className="inline-flex items-center gap-1 bg-white px-2.5 py-1 rounded-lg border border-stone-200/80 shadow-2xs font-semibold text-stone-800">
-              🎖️ Airbnb Superhost
+              🎖️ {isCymraeg ? 'Uwch-westeiwr Airbnb' : 'Airbnb Superhost'}
             </span>
           </div>
         </div>
