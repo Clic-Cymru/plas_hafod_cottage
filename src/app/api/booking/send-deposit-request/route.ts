@@ -284,6 +284,7 @@ export async function POST(request: Request) {
     // ACTION C: Default — Send / Re-send Deposit Request Email
     const emailResult = await sendDepositRequestEmail({
       propertyTitle,
+      propertyId: inquiry.propertyId,
       guestName: inquiry.guestName,
       guestEmail: inquiry.guestEmail,
       guestPhone: inquiry.guestPhone,

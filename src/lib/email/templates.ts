@@ -20,6 +20,7 @@ export interface BookingEmailData {
   notes?: string;
   inquiryId?: string;
   paymentReference?: string;
+  propertyId?: 'plas-hafod' | 'bryn-bugeiliaid-bach';
 }
 
 export interface ContactEmailData {

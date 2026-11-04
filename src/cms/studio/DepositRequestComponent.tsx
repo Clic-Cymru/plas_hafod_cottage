@@ -619,7 +619,7 @@ Please quote reference "${computedRef}" with your transfer.`;
 
         <div>
           <span style={{ fontSize: '11px', color: '#854d0e', fontWeight: 700, textTransform: 'uppercase' }}>
-            Deposit to Collect (25%)
+            Deposit to Collect {totalPrice > 0 && depositAmount > 0 ? (depositAmount === 200 ? '(Fixed £200)' : `(${Math.round((depositAmount / totalPrice) * 100)}%)`) : ''}
           </span>
           <div style={{ fontSize: '18px', fontWeight: 800, color: '#b45309', marginTop: '2px' }}>
             £{depositAmount || 0}

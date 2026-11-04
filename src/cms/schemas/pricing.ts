@@ -38,12 +38,35 @@ export const pricingSchema = {
       description: 'Default minimum booking nights when no season override applies.',
     },
     {
+      name: 'depositType',
+      title: 'Deposit Calculation Mode',
+      type: 'string',
+      options: {
+        list: [
+          { title: 'Fixed Amount (£) [e.g. £200 flat deposit]', value: 'fixed' },
+          { title: 'Percentage of Total (%) [e.g. 25% of stay]', value: 'percentage' },
+        ],
+        layout: 'radio',
+      },
+      initialValue: 'fixed',
+      validation: (Rule: any) => Rule.required(),
+      description: 'Choose whether the booking deposit required to secure dates is a fixed sum (default: £200) or a percentage of the total stay price.',
+    },
+    {
+      name: 'fixedDepositAmount',
+      title: 'Fixed Deposit Amount (£)',
+      type: 'number',
+      initialValue: 200,
+      validation: (Rule: any) => Rule.min(0),
+      description: 'The fixed deposit amount in GBP required to secure a reservation when Fixed mode is selected (default: £200).',
+    },
+    {
       name: 'depositPercentage',
       title: 'Required Deposit Percentage (%)',
       type: 'number',
       initialValue: 25,
       validation: (Rule: any) => Rule.required().min(0).max(100),
-      description: 'Percentage of total booking required as initial deposit to secure dates.',
+      description: 'Percentage of total booking required as initial deposit when Percentage mode is selected (default: 25%).',
     },
     {
       name: 'cleaningFee',
@@ -185,15 +208,22 @@ export const pricingSchema = {
     select: {
       propertyId: 'propertyId',
       baseRate: 'baseRate',
+      depositType: 'depositType',
+      fixedDepositAmount: 'fixedDepositAmount',
+      depositPercentage: 'depositPercentage',
     },
-    prepare({ propertyId, baseRate }: any) {
+    prepare({ propertyId, baseRate, depositType, fixedDepositAmount, depositPercentage }: any) {
       const name =
         propertyId === 'bryn-bugeiliaid-bach'
           ? 'Bryn Bugeiliaid Bach (Annexe)'
           : 'Plas Hafod Cottage (Main)';
+      const depLabel =
+        depositType === 'percentage'
+          ? `${depositPercentage || 25}% deposit`
+          : `£${fixedDepositAmount ?? 200} fixed deposit`;
       return {
         title: `${name} Rates`,
-        subtitle: `Standard Rate: £${baseRate || 0} / night`,
+        subtitle: `Base: £${baseRate || 0}/night • ${depLabel}`,
       };
     },
   },

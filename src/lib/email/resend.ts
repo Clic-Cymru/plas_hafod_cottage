@@ -218,6 +218,20 @@ export async function sendDepositRequestEmail(data: DepositRequestEmailData) {
   }
 
   const siteSettings = await cmsClient.getSiteSettings(false);
+  if (data.propertyId) {
+    try {
+      const propPricing = await cmsClient.getPricingConfig(data.propertyId);
+      if (propPricing?.depositType) {
+        siteSettings.depositType = propPricing.depositType;
+        if (typeof propPricing.depositPercentage === 'number') {
+          siteSettings.depositPercentage = propPricing.depositPercentage;
+        }
+        if (typeof propPricing.fixedDepositAmount === 'number') {
+          siteSettings.fixedDepositAmount = propPricing.fixedDepositAmount;
+        }
+      }
+    } catch (_) {}
+  }
   const customRecipients = siteSettings.notificationRecipients
     ? siteSettings.notificationRecipients.split(',').map((s) => s.trim()).filter(Boolean)
     : [];
