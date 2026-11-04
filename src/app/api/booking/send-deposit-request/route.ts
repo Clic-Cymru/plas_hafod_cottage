@@ -1,7 +1,11 @@
 import { NextResponse } from 'next/server';
 import { cmsClient } from '@/cms/client';
 import { sanityClient, isSanityLive } from '@/cms/sanity.client';
-import { sendDepositRequestEmail } from '@/lib/email/resend';
+import {
+  sendDepositRequestEmail,
+  sendDepositReceiptEmail,
+  sendFullPaymentReceiptEmail,
+} from '@/lib/email/resend';
 import { BookingInquiry } from '@/cms/types';
 
 export const dynamic = 'force-dynamic';
@@ -36,6 +40,7 @@ export async function POST(request: Request) {
       customNote,
       bankDetailsOverride,
       inquiryData: directData,
+      action = 'deposit-request',
     } = body;
 
     if (!inquiryId && !directData) {
@@ -127,7 +132,156 @@ export async function POST(request: Request) {
 
     const depositDeadline = formatDeadlineUK(holdHours);
 
-    // 4. Send Deposit Request Email via Resend
+    const sentAt = new Date().toISOString();
+    const token = process.env.SANITY_API_WRITE_TOKEN;
+    const projId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID || process.env.SANITY_PROJECT_ID;
+    const dataset = process.env.NEXT_PUBLIC_SANITY_DATASET || process.env.SANITY_DATASET || 'production';
+
+    // ACTION A: Deposit Cleared & Confirmed
+    if (action === 'deposit-confirmed') {
+      const emailResult = await sendDepositReceiptEmail({
+        propertyTitle,
+        guestName: inquiry.guestName,
+        guestEmail: inquiry.guestEmail,
+        guestPhone: inquiry.guestPhone,
+        checkIn: inquiry.checkIn,
+        checkOut: inquiry.checkOut,
+        totalNights: inquiry.totalNights || 1,
+        adults: Number(inquiry.adults || 2),
+        children: Number(inquiry.children || 0),
+        pets: Number(inquiry.pets || 0),
+        totalPrice: Number(inquiry.calculatedTotal || inquiry.totalPrice || 0),
+        depositAmount: Number(inquiry.depositAmount || 0),
+        balanceDue: Number(inquiry.balanceDue || 0),
+        appliedDiscountName: inquiry.appliedDiscountName,
+        discountAmount: inquiry.discountAmount,
+        inquiryId: inquiry.id || inquiryId,
+        paymentReference,
+      });
+
+      if (!emailResult.success) {
+        return NextResponse.json(
+          { error: 'Failed to send deposit receipt email via Resend', details: emailResult.error },
+          { status: 500 }
+        );
+      }
+
+      if (sanityDocId && projId && projId !== 'demo-project' && token) {
+        const sanityUrl = `https://${projId}.api.sanity.io/v2024-01-01/data/mutate/${dataset}`;
+        try {
+          await fetch(sanityUrl, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({
+              mutations: [
+                {
+                  patch: {
+                    id: sanityDocId,
+                    set: {
+                      status: 'confirmed',
+                      depositReceiptSentAt: sentAt,
+                    },
+                  },
+                },
+              ],
+            }),
+          });
+        } catch (err) {
+          console.error('Failed to update Sanity mutation for deposit cleared:', err);
+        }
+      }
+
+      inquiry.status = 'confirmed';
+
+      return NextResponse.json({
+        success: true,
+        status: 'confirmed',
+        inquiryId: inquiry.id || inquiryId,
+        paymentReference,
+        message: `Deposit cleared and confirmed! Deposit receipt sent to ${inquiry.guestEmail}.`,
+      });
+    }
+
+    // ACTION B: Complete and Confirmed (Full Payment Received -> Send Receipt & Directions Guide)
+    if (action === 'complete-confirmed' || action === 'resend-full-payment') {
+      const emailResult = await sendFullPaymentReceiptEmail({
+        propertyTitle,
+        guestName: inquiry.guestName,
+        guestEmail: inquiry.guestEmail,
+        guestPhone: inquiry.guestPhone,
+        checkIn: inquiry.checkIn,
+        checkOut: inquiry.checkOut,
+        totalNights: inquiry.totalNights || 1,
+        adults: Number(inquiry.adults || 2),
+        children: Number(inquiry.children || 0),
+        pets: Number(inquiry.pets || 0),
+        totalPrice: Number(inquiry.calculatedTotal || inquiry.totalPrice || 0),
+        depositAmount: Number(inquiry.depositAmount || 0),
+        balanceDue: Number(inquiry.balanceDue || 0),
+        appliedDiscountName: inquiry.appliedDiscountName,
+        discountAmount: inquiry.discountAmount,
+        inquiryId: inquiry.id || inquiryId,
+        paymentReference,
+      });
+
+      if (!emailResult.success) {
+        return NextResponse.json(
+          { error: 'Failed to send full payment receipt email via Resend', details: emailResult.error },
+          { status: 500 }
+        );
+      }
+
+      if (sanityDocId && projId && projId !== 'demo-project' && token) {
+        const sanityUrl = `https://${projId}.api.sanity.io/v2024-01-01/data/mutate/${dataset}`;
+        try {
+          await fetch(sanityUrl, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({
+              mutations: [
+                {
+                  patch: {
+                    id: sanityDocId,
+                    set: {
+                      status: 'completed',
+                      finalBalancePaid: true,
+                      finalBalancePaidAt: sentAt,
+                      checkInEmailStatus: 'sent',
+                      checkInEmailSentAt: sentAt,
+                      finalPaymentReceiptSentAt: sentAt,
+                    },
+                  },
+                },
+              ],
+            }),
+          });
+        } catch (err) {
+          console.error('Failed to update Sanity mutation for complete booking:', err);
+        }
+      }
+
+      inquiry.status = 'completed';
+      inquiry.finalBalancePaid = true;
+      inquiry.finalBalancePaidAt = sentAt;
+      inquiry.checkInEmailStatus = 'sent';
+      inquiry.checkInEmailSentAt = sentAt;
+
+      return NextResponse.json({
+        success: true,
+        status: 'completed',
+        inquiryId: inquiry.id || inquiryId,
+        paymentReference,
+        message: `Booking marked as complete & confirmed! Full payment receipt and arrival directions emailed to ${inquiry.guestEmail}.`,
+      });
+    }
+
+    // ACTION C: Default — Send / Re-send Deposit Request Email
     const emailResult = await sendDepositRequestEmail({
       propertyTitle,
       guestName: inquiry.guestName,
@@ -166,13 +320,6 @@ export async function POST(request: Request) {
         { status: 500 }
       );
     }
-
-    const sentAt = new Date().toISOString();
-
-    // 5. Update Status in Sanity via Mutation API
-    const token = process.env.SANITY_API_WRITE_TOKEN;
-    const projId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID || process.env.SANITY_PROJECT_ID;
-    const dataset = process.env.NEXT_PUBLIC_SANITY_DATASET || process.env.SANITY_DATASET || 'production';
 
     if (sanityDocId && projId && projId !== 'demo-project' && token) {
       const sanityUrl = `https://${projId}.api.sanity.io/v2024-01-01/data/mutate/${dataset}`;

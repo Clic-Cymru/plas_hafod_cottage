@@ -167,11 +167,9 @@ async function handleAutomatedEmails(request: Request) {
 
       evaluated.push(logEntry);
 
-      // Check-In Guide Action (Trigger when within check-in window and balance is paid)
-      const isWithinCheckInWindow = daysUntil <= checkInDays && daysUntil >= 0;
+      // Check-In Guide Action (Trigger only when explicitly requested via action=checkin, NOT automated on timer because directions & check-in are sent immediately when marked complete/full payment received)
       const shouldTriggerCheckIn =
-        (targetAction === 'checkin' || (isWithinCheckInWindow && booking.finalBalancePaid)) &&
-        (force || booking.checkInEmailStatus !== 'sent');
+        targetAction === 'checkin' && (force || booking.checkInEmailStatus !== 'sent');
 
       if (shouldTriggerCheckIn) {
         const defaultKeySafe = isPlasHafod

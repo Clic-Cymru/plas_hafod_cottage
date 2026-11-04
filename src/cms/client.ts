@@ -276,7 +276,7 @@ export const cmsClient = {
       try {
         const query = `{
           "manual": *[_type == "blockedDates" && (propertyId == $propertyId || propertyId == "both") && defined(startDate) && defined(endDate)],
-          "confirmed": *[_type == "bookingInquiry" && (propertyId == $propertyId || (!defined(propertyId) && $propertyId == "plas-hafod")) && status in ["confirmed", "deposit_paid", "paid", "deposit_requested"] && defined(checkIn) && defined(checkOut)]
+          "confirmed": *[_type == "bookingInquiry" && (propertyId == $propertyId || (!defined(propertyId) && $propertyId == "plas-hafod")) && status in ["confirmed", "deposit_paid", "paid", "deposit_requested", "completed"] && defined(checkIn) && defined(checkOut)]
         }`;
         const data = await sanityClient.fetch(query, { propertyId });
 
@@ -385,14 +385,24 @@ export const cmsClient = {
         }))
       : [];
 
+    const prefix = inquiry.propertyId === 'bryn-bugeiliaid-bach' ? 'BBB' : 'PH';
+    const nameParts = (inquiry.guestName || 'GUEST').trim().split(/\s+/);
+    const lastName = nameParts[nameParts.length - 1].replace(/[^A-Za-z0-9]/g, '').toUpperCase().slice(0, 8);
+    const dateStr = (inquiry.checkIn || '').replace(/[^0-9]/g, '').slice(2, 6);
+    const paymentReference = inquiry.paymentReference || `${prefix}-${dateStr || '26'}-${lastName || 'GUEST'}`;
+    const now = new Date().toISOString();
+
     const newRecord: BookingInquiry = {
       ...inquiry,
       nightlyBreakdown,
       calculatedTotal,
       totalPrice: inquiry.totalPrice ?? calculatedTotal,
       id: `inquiry-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`,
-      status: 'pending',
-      createdAt: new Date().toISOString(),
+      status: 'deposit_requested',
+      paymentReference,
+      depositSentAt: now,
+      depositEmailStatus: 'sent',
+      createdAt: now,
     };
 
     const token = process.env.SANITY_API_WRITE_TOKEN;

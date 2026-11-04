@@ -37,14 +37,15 @@ export const bookingInquirySchema = {
       type: 'string',
       options: {
         list: [
-          { title: '⏳ Pending Review', value: 'pending' },
           { title: '✉️ Deposit Requested / Provisional Hold', value: 'deposit_requested' },
-          { title: '✅ Confirmed / Deposit Paid', value: 'confirmed' },
+          { title: '✅ Confirmed Booking - Awaiting Full Payment', value: 'confirmed' },
+          { title: '🎉 Complete and Confirmed (Paid in Full)', value: 'completed' },
+          { title: '⏳ Pending Review', value: 'pending' },
           { title: '❌ Declined / Cancelled', value: 'declined' },
         ],
         layout: 'radio',
       },
-      initialValue: 'pending',
+      initialValue: 'deposit_requested',
     },
     {
       name: 'guestName',
@@ -389,13 +390,15 @@ export const bookingInquirySchema = {
       const propBadge = propertyId === 'bryn-bugeiliaid-bach' ? '[BBB]' : '[Plas Hafod]';
       let statusLabel = 'NEW INQUIRY';
       if (status === 'deposit_requested') {
-        statusLabel = 'DEPOSIT SENT';
+        statusLabel = 'DEPOSIT REQUESTED';
       } else if (status === 'confirmed') {
         if (finalBalancePaid) {
-          statusLabel = checkInEmailStatus === 'sent' ? 'BALANCE PAID · KEY SENT' : 'BALANCE PAID';
+          statusLabel = 'COMPLETE AND CONFIRMED';
         } else {
-          statusLabel = 'CONFIRMED · BAL DUE';
+          statusLabel = 'CONFIRMED BOOKING - AWAITING FULL PAYMENT';
         }
+      } else if (status === 'completed') {
+        statusLabel = 'COMPLETE AND CONFIRMED';
       } else if (status === 'declined') {
         statusLabel = 'DECLINED';
       }

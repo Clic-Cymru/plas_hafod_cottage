@@ -71,6 +71,7 @@ export interface BookingInquiry {
   // Final Balance & Automated Check-in Workflow
   finalBalancePaid?: boolean;
   finalBalancePaidAt?: string;
+  finalPaymentReceiptSentAt?: string;
   keySafeCodeOverride?: string;
   checkInEmailStatus?: 'not_sent' | 'sent' | 'failed';
   checkInEmailSentAt?: string;

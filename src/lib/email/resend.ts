@@ -19,6 +19,10 @@ import {
   generateVisitorContactAutoReplyText,
   generateDepositRequestHtml,
   generateDepositRequestText,
+  generateDepositReceiptHtml,
+  generateDepositReceiptText,
+  generateFullPaymentReceiptHtml,
+  generateFullPaymentReceiptText,
   generateCheckInGuideHtml,
   generateCheckInGuideText,
   generateBalanceReminderHtml,
@@ -87,18 +91,45 @@ export async function sendBookingEmails(data: BookingEmailData, isCymraeg: boole
       console.error('Resend error sending owner alert:', ownerRes.error);
     }
 
-    // 2. Send Confirmation to Guest (replying goes to the public business email)
+    // 2. Send Combined Deposit Request & Reservation Details to Guest (replying goes to the public business email)
+    const paymentReference = data.paymentReference || refHeader;
+    const holdHours = siteSettings.depositHoldHours || 24;
+    const depositDeadline = new Date(Date.now() + holdHours * 60 * 60 * 1000).toLocaleString('en-GB', {
+      weekday: 'long',
+      day: 'numeric',
+      month: 'short',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: true,
+    });
+
+    const depositData: DepositRequestEmailData = {
+      ...data,
+      paymentReference,
+      bankAccountName: siteSettings.bankAccountName || 'SIWSAN BRODA - Plas Hafod',
+      bankName: siteSettings.bankName || 'Lloyds Bank',
+      bankSortCode: siteSettings.bankSortCode || '77-48-24',
+      bankAccountNumber: siteSettings.bankAccountNumber || '15999760',
+      bankIban: siteSettings.bankIban,
+      bankBic: siteSettings.bankBic,
+      holdHours,
+      depositDeadline,
+      depositInstructions: isCymraeg ? siteSettings.depositInstructionsCy : siteSettings.depositInstructions,
+      hostNames: siteSettings.hostNames || 'Siwsan & Neil',
+      contactPhone: siteSettings.phone,
+    };
+
     const guestSubject = isCymraeg
-      ? `Cais Archebu wedi’i Dderbyn – ${data.propertyTitle}`
-      : `Booking Request Received – ${data.propertyTitle}`;
+      ? `Dyddiadau ar Gael: Cais am Flaendal – ${data.propertyTitle} (${paymentReference})`
+      : `Dates Available: Deposit Request – ${data.propertyTitle} (${paymentReference})`;
 
     const guestRes = await client.emails.send({
       from: fromEmail,
       to: data.guestEmail,
       replyTo: publicReplyEmail,
       subject: guestSubject,
-      html: generateGuestConfirmationHtml(data, siteSettings, isCymraeg),
-      text: generateGuestConfirmationText(data, siteSettings, isCymraeg),
+      html: generateDepositRequestHtml(depositData, siteSettings, isCymraeg),
+      text: generateDepositRequestText(depositData, siteSettings, isCymraeg),
       headers: {
         'X-Entity-Ref-ID': refHeader,
       },
@@ -217,6 +248,98 @@ export async function sendDepositRequestEmail(data: DepositRequestEmailData) {
     return { success: true, guestRes };
   } catch (error) {
     console.error('Failed to send deposit request email via Resend:', error);
+    return { success: false, error };
+  }
+}
+
+export async function sendDepositReceiptEmail(data: BookingEmailData, isCymraeg: boolean = false) {
+  const client = getResendClient();
+  const { fromEmail, ownerEmail, publicReplyEmail } = getEmailConfig();
+
+  const siteSettings = await cmsClient.getSiteSettings(isCymraeg);
+  const customRecipients = siteSettings.notificationRecipients
+    ? siteSettings.notificationRecipients.split(',').map((s) => s.trim()).filter(Boolean)
+    : [];
+  const targetBccRecipients = customRecipients.length > 0 ? customRecipients : ownerEmail;
+
+  if (!client) {
+    console.warn('[Resend Simulation] Deposit receipt simulated:', { to: data.guestEmail, property: data.propertyTitle });
+    return { success: true, simulated: true };
+  }
+
+  try {
+    const refHeader = data.paymentReference ? `dep-${data.paymentReference}` : `dep-${Date.now()}`;
+    const subject = isCymraeg
+      ? `Cadarnhad Blaendal – ${data.propertyTitle} (${formatDateUK(data.checkIn)})`
+      : `Deposit Receipt – ${data.propertyTitle} (${formatDateUK(data.checkIn)})`;
+
+    const guestRes = await client.emails.send({
+      from: fromEmail,
+      to: data.guestEmail,
+      bcc: targetBccRecipients,
+      replyTo: publicReplyEmail,
+      subject,
+      html: generateDepositReceiptHtml(data, siteSettings, isCymraeg),
+      text: generateDepositReceiptText(data, siteSettings, isCymraeg),
+      headers: {
+        'X-Entity-Ref-ID': refHeader,
+      },
+    });
+
+    if (guestRes.error) {
+      console.error('Resend error sending deposit receipt:', guestRes.error);
+      return { success: false, error: guestRes.error };
+    }
+
+    return { success: true, guestRes };
+  } catch (error) {
+    console.error('Failed to send deposit receipt email via Resend:', error);
+    return { success: false, error };
+  }
+}
+
+export async function sendFullPaymentReceiptEmail(data: BookingEmailData, isCymraeg: boolean = false) {
+  const client = getResendClient();
+  const { fromEmail, ownerEmail, publicReplyEmail } = getEmailConfig();
+
+  const siteSettings = await cmsClient.getSiteSettings(isCymraeg);
+  const customRecipients = siteSettings.notificationRecipients
+    ? siteSettings.notificationRecipients.split(',').map((s) => s.trim()).filter(Boolean)
+    : [];
+  const targetBccRecipients = customRecipients.length > 0 ? customRecipients : ownerEmail;
+
+  if (!client) {
+    console.warn('[Resend Simulation] Full payment receipt simulated:', { to: data.guestEmail, property: data.propertyTitle });
+    return { success: true, simulated: true };
+  }
+
+  try {
+    const refHeader = data.paymentReference ? `full-${data.paymentReference}` : `full-${Date.now()}`;
+    const subject = isCymraeg
+      ? `Taliad Llawn Wedi’i Dderbyn a Chyfarwyddiadau Cyrraedd – ${data.propertyTitle}`
+      : `Full Payment Receipt & Arrival Guide – ${data.propertyTitle}`;
+
+    const guestRes = await client.emails.send({
+      from: fromEmail,
+      to: data.guestEmail,
+      bcc: targetBccRecipients,
+      replyTo: publicReplyEmail,
+      subject,
+      html: generateFullPaymentReceiptHtml(data, siteSettings, isCymraeg),
+      text: generateFullPaymentReceiptText(data, siteSettings, isCymraeg),
+      headers: {
+        'X-Entity-Ref-ID': refHeader,
+      },
+    });
+
+    if (guestRes.error) {
+      console.error('Resend error sending full payment receipt:', guestRes.error);
+      return { success: false, error: guestRes.error };
+    }
+
+    return { success: true, guestRes };
+  } catch (error) {
+    console.error('Failed to send full payment receipt email via Resend:', error);
     return { success: false, error };
   }
 }

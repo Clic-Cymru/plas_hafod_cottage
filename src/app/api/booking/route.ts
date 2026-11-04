@@ -105,6 +105,7 @@ export async function POST(request: Request) {
         balanceDue: calculation.balanceDue,
         notes,
         inquiryId: inquiryRecord.id,
+        paymentReference: inquiryRecord.paymentReference,
       },
       Boolean(isCymraeg)
     );

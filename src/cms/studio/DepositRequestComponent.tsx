@@ -154,13 +154,120 @@ export function DepositRequestComponent(props: DepositRequestProps) {
     }
   };
 
-  const handleMarkAsPaid = () => {
-    if (onChange) {
-      onChange(PatchEvent.from([set('confirmed', ['status'])]));
+  const handleMarkDepositConfirmed = async () => {
+    setIsSending(true);
+    setStatusMessage(null);
+    try {
+      const res = await fetch('/api/booking/send-deposit-request', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'deposit-confirmed',
+          inquiryId: docId || inquiryRefId,
+          inquiryData: {
+            _id: docId,
+            id: inquiryRefId,
+            guestName,
+            guestEmail,
+            guestPhone,
+            checkIn,
+            checkOut,
+            totalNights,
+            propertyId,
+            totalPrice,
+            calculatedTotal: totalPrice,
+            depositAmount,
+            balanceDue,
+            paymentReference: computedRef,
+          },
+        }),
+      });
+
+      const data = await res.json();
+      const now = new Date().toISOString();
+      if (onChange) {
+        onChange(
+          PatchEvent.from([
+            set('confirmed', ['status']),
+            set(now, ['depositPaidAt']),
+          ])
+        );
+      }
       setStatusMessage({
         type: 'success',
-        text: 'Status updated to Confirmed (Deposit Paid)! Dates are now fully booked.',
+        text: '✓ Deposit cleared! Status updated to "Confirmed Booking - Awaiting Full Payment" and confirmation receipt sent to guest.',
       });
+    } catch (err: unknown) {
+      console.error(err);
+      if (onChange) {
+        onChange(PatchEvent.from([set('confirmed', ['status'])]));
+      }
+      setStatusMessage({
+        type: 'info',
+        text: 'Status marked as "Confirmed Booking - Awaiting Full Payment".',
+      });
+    } finally {
+      setIsSending(false);
+    }
+  };
+
+  const handleMarkCompleteConfirmed = async () => {
+    setIsSending(true);
+    setStatusMessage(null);
+    try {
+      const res = await fetch('/api/booking/send-deposit-request', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'complete-confirmed',
+          inquiryId: docId || inquiryRefId,
+          inquiryData: {
+            _id: docId,
+            id: inquiryRefId,
+            guestName,
+            guestEmail,
+            guestPhone,
+            checkIn,
+            checkOut,
+            totalNights,
+            propertyId,
+            totalPrice,
+            calculatedTotal: totalPrice,
+            depositAmount,
+            balanceDue,
+            paymentReference: computedRef,
+          },
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok || data.error) {
+        throw new Error(data.error || 'Failed to complete booking.');
+      }
+
+      const now = new Date().toISOString();
+      if (onChange) {
+        onChange(
+          PatchEvent.from([
+            set('completed', ['status']),
+            set(true, ['finalBalancePaid']),
+            set(now, ['finalBalancePaidAt']),
+            set(now, ['finalPaymentReceiptSentAt']),
+            set('sent', ['checkInEmailStatus']),
+            set(now, ['checkInEmailSentAt']),
+          ])
+        );
+      }
+      setStatusMessage({
+        type: 'success',
+        text: '🎉 Booking marked as Complete & Confirmed! Full payment receipt, directions and check-in instructions have been emailed to the guest.',
+      });
+    } catch (err: unknown) {
+      console.error(err);
+      const msg = err instanceof Error ? err.message : 'Error marking booking complete.';
+      setStatusMessage({ type: 'error', text: msg });
+    } finally {
+      setIsSending(false);
     }
   };
 
@@ -255,8 +362,10 @@ Please quote reference "${computedRef}" with your transfer.`;
     setTimeout(() => setCopied(false), 3000);
   };
 
-  const isSent = depositEmailStatus === 'sent' || status === 'deposit_requested';
-  const isConfirmed = status === 'confirmed';
+  const isCompleted = status === 'completed' || finalBalancePaid;
+  const isConfirmed = status === 'confirmed' && !isCompleted;
+  const isDepositRequested =
+    status === 'deposit_requested' || (!isConfirmed && !isCompleted && (depositEmailStatus === 'sent' || Boolean(depositSentAt)));
 
   return (
     <div
@@ -303,21 +412,132 @@ Please quote reference "${computedRef}" with your transfer.`;
             fontWeight: 700,
             letterSpacing: '0.5px',
             textTransform: 'uppercase',
-            background: isConfirmed ? '#dcfce7' : isSent ? '#fef3c7' : '#f1f5f9',
-            color: isConfirmed ? '#166534' : isSent ? '#92400e' : '#475569',
-            border: `1px solid ${isConfirmed ? '#86efac' : isSent ? '#fcd34d' : '#cbd5e1'}`,
+            background: isCompleted
+              ? '#dcfce7'
+              : isConfirmed
+              ? '#eff6ff'
+              : isDepositRequested
+              ? '#fef3c7'
+              : '#f1f5f9',
+            color: isCompleted
+              ? '#15803d'
+              : isConfirmed
+              ? '#1d4ed8'
+              : isDepositRequested
+              ? '#92400e'
+              : '#475569',
+            border: `1px solid ${
+              isCompleted
+                ? '#86efac'
+                : isConfirmed
+                ? '#93c5fd'
+                : isDepositRequested
+                ? '#fcd34d'
+                : '#cbd5e1'
+            }`,
           }}
         >
-          {isConfirmed ? '✅ Confirmed / Paid' : isSent ? '✉️ Deposit Requested' : '⏳ Pending Review'}
+          {isCompleted
+            ? '🎉 COMPLETE AND CONFIRMED'
+            : isConfirmed
+            ? '✅ CONFIRMED BOOKING - AWAITING FULL PAYMENT'
+            : isDepositRequested
+            ? '✉️ DEPOSIT REQUESTED'
+            : '⏳ PENDING REVIEW'}
         </div>
       </div>
 
-      {/* Status timestamp if already sent */}
-      {depositSentAt && (
+      {/* Deposit Requested Banner */}
+      {isDepositRequested && !isConfirmed && !isCompleted && (
+        <div
+          style={{
+            background: '#fffbeb',
+            border: '1px solid #fde68a',
+            borderRadius: '8px',
+            padding: '10px 14px',
+            marginBottom: '16px',
+            fontSize: '13px',
+            color: '#92400e',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            flexWrap: 'wrap',
+            gap: '8px',
+          }}
+        >
+          <div>
+            <strong>Deposit Requested:</strong> {depositSentAt ? new Date(depositSentAt).toLocaleString('en-GB') : 'Provisional hold active'}
+            <span style={{ marginLeft: '12px', color: '#b45309' }}>Ref: <strong>{computedRef}</strong></span>
+          </div>
+          <button
+            type="button"
+            onClick={handleMarkDepositConfirmed}
+            disabled={isSending}
+            style={{
+              background: '#15803d',
+              color: '#ffffff',
+              border: 'none',
+              borderRadius: '6px',
+              padding: '6px 14px',
+              fontSize: '12px',
+              fontWeight: 700,
+              cursor: isSending ? 'not-allowed' : 'pointer',
+            }}
+          >
+            Mark Deposit Cleared &amp; Confirmed ✓
+          </button>
+        </div>
+      )}
+
+      {/* Confirmed - Awaiting Full Payment Banner */}
+      {isConfirmed && !isCompleted && (
+        <div
+          style={{
+            background: '#eff6ff',
+            border: '1px solid #bfdbfe',
+            borderRadius: '8px',
+            padding: '10px 14px',
+            marginBottom: '16px',
+            fontSize: '13px',
+            color: '#1e40af',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            flexWrap: 'wrap',
+            gap: '8px',
+          }}
+        >
+          <div>
+            <strong>Status:</strong> Confirmed Booking — Awaiting Full Payment (£{balanceDue || Math.max(0, totalPrice - depositAmount)})
+            <span style={{ marginLeft: '12px', color: '#2563eb' }}>Ref: <strong>{computedRef}</strong></span>
+          </div>
+          <button
+            type="button"
+            onClick={handleMarkCompleteConfirmed}
+            disabled={isSending}
+            style={{
+              background: '#15803d',
+              color: '#ffffff',
+              border: 'none',
+              borderRadius: '6px',
+              padding: '6px 14px',
+              fontSize: '12px',
+              fontWeight: 700,
+              cursor: isSending ? 'not-allowed' : 'pointer',
+              boxShadow: '0 1px 2px rgba(0,0,0,0.05)',
+            }}
+          >
+            Mark Full Payment Received &amp; Send Directions ✓
+          </button>
+        </div>
+      )}
+
+      {/* Completed & Confirmed Banner */}
+      {isCompleted && (
         <div
           style={{
             background: '#f0fdf4',
-            border: '1px solid #bbf7d0',
+            border: '1px solid #86efac',
             borderRadius: '8px',
             padding: '10px 14px',
             marginBottom: '16px',
@@ -326,30 +546,31 @@ Please quote reference "${computedRef}" with your transfer.`;
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
+            flexWrap: 'wrap',
+            gap: '8px',
           }}
         >
           <div>
-            <strong>Deposit Request Sent:</strong> {new Date(depositSentAt).toLocaleString('en-GB')}
+            <strong>🎉 Complete &amp; Confirmed</strong> (Paid in Full: £{totalPrice})
             <span style={{ marginLeft: '12px', color: '#15803d' }}>Ref: <strong>{computedRef}</strong></span>
           </div>
-          {!isConfirmed && (
-            <button
-              type="button"
-              onClick={handleMarkAsPaid}
-              style={{
-                background: '#15803d',
-                color: '#ffffff',
-                border: 'none',
-                borderRadius: '6px',
-                padding: '6px 12px',
-                fontSize: '12px',
-                fontWeight: 700,
-                cursor: 'pointer',
-              }}
-            >
-              Mark Deposit Cleared &amp; Confirmed ✓
-            </button>
-          )}
+          <button
+            type="button"
+            onClick={handleMarkCompleteConfirmed}
+            disabled={isSending}
+            style={{
+              background: '#047857',
+              color: '#ffffff',
+              border: 'none',
+              borderRadius: '6px',
+              padding: '6px 14px',
+              fontSize: '12px',
+              fontWeight: 700,
+              cursor: isSending ? 'not-allowed' : 'pointer',
+            }}
+          >
+            📧 Re-send Receipt &amp; Directions
+          </button>
         </div>
       )}
 
@@ -503,7 +724,7 @@ Please quote reference "${computedRef}" with your transfer.`;
         >
           {isSending ? (
             <>⏳ Sending Deposit Request...</>
-          ) : isSent ? (
+          ) : isDepositRequested ? (
             <>📧 Re-send Deposit Request Email</>
           ) : (
             <>📧 Send Deposit Request Email</>
@@ -530,10 +751,11 @@ Please quote reference "${computedRef}" with your transfer.`;
           {copied ? '✅ Copied to Clipboard!' : '📋 Copy Payment Details (Text/WhatsApp)'}
         </button>
 
-        {!isConfirmed && (
+        {!isConfirmed && !isCompleted && (
           <button
             type="button"
-            onClick={handleMarkAsPaid}
+            onClick={handleMarkDepositConfirmed}
+            disabled={isSending}
             style={{
               background: '#f8fafc',
               color: '#15803d',
@@ -542,17 +764,38 @@ Please quote reference "${computedRef}" with your transfer.`;
               padding: '12px 16px',
               fontSize: '13px',
               fontWeight: 700,
-              cursor: 'pointer',
+              cursor: isSending ? 'not-allowed' : 'pointer',
               marginLeft: 'auto',
             }}
           >
-            Mark Paid &amp; Confirmed ✓
+            Mark Deposit Cleared &amp; Confirmed ✓
+          </button>
+        )}
+
+        {isConfirmed && !isCompleted && (
+          <button
+            type="button"
+            onClick={handleMarkCompleteConfirmed}
+            disabled={isSending}
+            style={{
+              background: '#f0fdf4',
+              color: '#15803d',
+              border: '1px solid #86efac',
+              borderRadius: '8px',
+              padding: '12px 16px',
+              fontSize: '13px',
+              fontWeight: 700,
+              cursor: isSending ? 'not-allowed' : 'pointer',
+              marginLeft: 'auto',
+            }}
+          >
+            Mark Complete &amp; Confirmed (Send Directions) ✓
           </button>
         )}
       </div>
 
-      {/* Check-in & Final Balance Automation Box (For Confirmed Bookings) */}
-      {isConfirmed && (
+      {/* Check-in & Final Balance Automation Box */}
+      {(isConfirmed || isCompleted) && (
         <div
           style={{
             marginTop: '20px',
@@ -562,38 +805,61 @@ Please quote reference "${computedRef}" with your transfer.`;
         >
           <div
             style={{
-              background: finalBalancePaid ? '#f0fdf4' : '#fffbeb',
-              border: `1px solid ${finalBalancePaid ? '#86efac' : '#fde68a'}`,
+              background: isCompleted ? '#f0fdf4' : '#fffbeb',
+              border: `1px solid ${isCompleted ? '#86efac' : '#fde68a'}`,
               borderRadius: '10px',
               padding: '16px 18px',
             }}
           >
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px', flexWrap: 'wrap', gap: '8px' }}>
               <div>
-                <strong style={{ fontSize: '14px', color: finalBalancePaid ? '#166534' : '#92400e', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  {finalBalancePaid ? '✅ Final Balance: PAID IN FULL' : '⏳ Final Balance: PENDING PAYMENT'}
+                <strong style={{ fontSize: '14px', color: isCompleted ? '#166534' : '#92400e', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  {isCompleted ? '🎉 Final Balance: PAID IN FULL' : '⏳ Final Balance: PENDING PAYMENT'}
                 </strong>
                 <p style={{ margin: '4px 0 0', fontSize: '12px', color: '#4b5563' }}>
-                  Remaining balance due: <strong>£{balanceDue}</strong>
+                  {isCompleted
+                    ? `Total stay of £${totalPrice} has been paid in full.`
+                    : `Remaining balance due: £${balanceDue || Math.max(0, totalPrice - depositAmount)}`}
                 </p>
               </div>
 
-              <button
-                type="button"
-                onClick={handleToggleFinalBalance}
-                style={{
-                  background: finalBalancePaid ? '#ffffff' : '#15803d',
-                  color: finalBalancePaid ? '#374151' : '#ffffff',
-                  border: `1px solid ${finalBalancePaid ? '#d1d5db' : '#15803d'}`,
-                  borderRadius: '6px',
-                  padding: '7px 14px',
-                  fontSize: '12px',
-                  fontWeight: 600,
-                  cursor: 'pointer',
-                }}
-              >
-                {finalBalancePaid ? '↩ Mark as Unpaid' : '✓ Mark Final Balance as Paid (BACS Received)'}
-              </button>
+              {!isCompleted ? (
+                <button
+                  type="button"
+                  onClick={handleMarkCompleteConfirmed}
+                  disabled={isSending}
+                  style={{
+                    background: '#15803d',
+                    color: '#ffffff',
+                    border: 'none',
+                    borderRadius: '6px',
+                    padding: '8px 16px',
+                    fontSize: '12px',
+                    fontWeight: 700,
+                    cursor: isSending ? 'not-allowed' : 'pointer',
+                    boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+                  }}
+                >
+                  ✓ Mark Complete &amp; Confirmed (Send Directions)
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  onClick={handleToggleFinalBalance}
+                  style={{
+                    background: '#ffffff',
+                    color: '#374151',
+                    border: '1px solid #d1d5db',
+                    borderRadius: '6px',
+                    padding: '7px 14px',
+                    fontSize: '12px',
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                  }}
+                >
+                  ↩ Mark as Unpaid / Awaiting Payment
+                </button>
+              )}
             </div>
 
             <div
@@ -608,27 +874,27 @@ Please quote reference "${computedRef}" with your transfer.`;
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px' }}>
                 <div>
                   <div style={{ fontSize: '13px', fontWeight: 600, color: '#1f2937' }}>
-                    🔑 Check-in Guide &amp; Key Safe Code (14-Day Automation)
+                    🔑 Check-in Guide &amp; Key Safe Code / Directions
                   </div>
                   <div style={{ fontSize: '12px', color: '#6b7280', marginTop: '2px' }}>
                     Status:{' '}
-                    {checkInEmailStatus === 'sent' ? (
+                    {checkInEmailStatus === 'sent' || isCompleted ? (
                       <span style={{ color: '#15803d', fontWeight: 600 }}>
-                        Sent to guest on {checkInEmailSentAt ? new Date(checkInEmailSentAt).toLocaleDateString('en-GB') : 'Yes'}
+                        Sent to guest with receipt {checkInEmailSentAt ? `on ${new Date(checkInEmailSentAt).toLocaleDateString('en-GB')}` : ''}
                       </span>
                     ) : (
                       <span style={{ color: '#b45309' }}>
-                        Not yet dispatched (fires automatically 14 days before stay once balance is paid)
+                        Dispatches immediately when booking is marked Complete and Confirmed
                       </span>
                     )}
                   </div>
                 </div>
 
                 <div style={{ display: 'flex', gap: '8px' }}>
-                  {finalBalancePaid ? (
+                  {isCompleted ? (
                     <button
                       type="button"
-                      onClick={() => handleDispatchAction('checkin')}
+                      onClick={handleMarkCompleteConfirmed}
                       disabled={isSending}
                       style={{
                         background: '#323149',
@@ -641,7 +907,7 @@ Please quote reference "${computedRef}" with your transfer.`;
                         cursor: isSending ? 'not-allowed' : 'pointer',
                       }}
                     >
-                      {checkInEmailStatus === 'sent' ? 'Re-send Check-in Guide Now' : 'Send Check-in Guide Now 🚀'}
+                      📧 Re-send Receipt &amp; Directions
                     </button>
                   ) : (
                     <button
