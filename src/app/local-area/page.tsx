@@ -50,10 +50,11 @@ export const metadata: Metadata = {
 };
 
 export default async function LocalAreaPage() {
-  const [attractions, snowdonPaths, siteSettings] = await Promise.all([
+  const [attractions, snowdonPaths, siteSettings, pageContent] = await Promise.all([
     cmsClient.getLocalAttractions(false),
     cmsClient.getSnowdonPaths(false),
     cmsClient.getSiteSettings(false),
+    cmsClient.getPageContent('local-area', false),
   ]);
 
   const breadcrumbsJsonLd = generateBreadcrumbJsonLd([
@@ -78,8 +79,12 @@ export default async function LocalAreaPage() {
       <main className="flex-1">
         {/* Floating Subpage Hero with Snowdon Landscape Background & Wave Divider */}
         <SubpageHero
-          title="LOCAL AREA"
-          subtitle="Our portfolio of information on local events, activities and tourist attractions will help you decide where to go and what to see during your stay at Plas Hafod. Situated off the beaten track in the hamlet of Nebo near Penygroes, Plas Hafod is within easy reach of Dinas Dinlle beach, the mountain trails of Snowdon, Caernarfon Castle, the Welsh Highland Railway, and Portmeirion."
+          title={pageContent?.heroHeadingEn || 'LOCAL AREA'}
+          subtitle={
+            pageContent?.heroSubheadingEn ||
+            pageContent?.bodyEn ||
+            'Our portfolio of information on local events, activities and tourist attractions will help you decide where to go and what to see during your stay at Plas Hafod. Situated off the beaten track in the hamlet of Nebo near Penygroes, Plas Hafod is within easy reach of Dinas Dinlle beach, the mountain trails of Snowdon, Caernarfon Castle, the Welsh Highland Railway, and Portmeirion.'
+          }
           imageSrc="/images/wp/snowdon.jpg"
           imageAlt="Snowdonia mountain range"
         />

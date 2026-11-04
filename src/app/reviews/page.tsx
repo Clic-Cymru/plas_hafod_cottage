@@ -47,10 +47,11 @@ export const metadata: Metadata = {
 };
 
 export default async function ReviewsPage() {
-  const [reviewSettings, guestbookEntries, siteSettings] = await Promise.all([
+  const [reviewSettings, guestbookEntries, siteSettings, pageContent] = await Promise.all([
     cmsClient.getReviewSettings(false),
     cmsClient.getGuestbookEntries('both', false),
     cmsClient.getSiteSettings(false),
+    cmsClient.getPageContent('reviews', false),
   ]);
 
   const hasTrustindex =
@@ -73,7 +74,8 @@ export default async function ReviewsPage() {
       <main className="flex-1">
         {/* Floating Subpage Hero with Landscape Background & Wave Divider */}
         <SubpageHero
-          title="REVIEWS"
+          title={pageContent?.heroHeadingEn || 'REVIEWS'}
+          subtitle={pageContent?.heroSubheadingEn || pageContent?.bodyEn}
           imageSrc="/images/wp/hero-slide-1.jpg"
           imageAlt="Plas Hafod panoramic landscape"
         />

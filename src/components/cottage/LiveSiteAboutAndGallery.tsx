@@ -17,13 +17,15 @@ import {
   Pause,
 } from 'lucide-react';
 import { liveCarouselImages, CarouselSlide } from '@/data/carouselImages';
+import { PropertyDetails } from '@/cms/types';
 
 interface AboutAndGalleryProps {
   isCymraeg?: boolean;
   galleryImages?: { id: number; src: string; alt: string }[] | null;
+  propertyDetails?: PropertyDetails | null;
 }
 
-export function LiveSiteAboutAndGallery({ isCymraeg = false, galleryImages }: AboutAndGalleryProps) {
+export function LiveSiteAboutAndGallery({ isCymraeg = false, galleryImages, propertyDetails }: AboutAndGalleryProps) {
   const slides = useMemo(
     () => (galleryImages && galleryImages.length > 0 ? galleryImages : liveCarouselImages),
     [galleryImages]
@@ -168,15 +170,33 @@ export function LiveSiteAboutAndGallery({ isCymraeg = false, galleryImages }: Ab
               {isCymraeg ? 'CROESO I' : 'WELCOME TO'}
               <br />
               <span className="text-[#99A0C1]">
-                {isCymraeg ? 'FWTHYN PLAS HAFOD' : 'PLAS HAFOD COTTAGE'}
+                {isCymraeg
+                  ? (propertyDetails?.nameCy || 'FWTHYN PLAS HAFOD')
+                  : (propertyDetails?.nameEn || 'PLAS HAFOD COTTAGE')}
               </span>
             </h2>
+
+            {/* Tagline if provided in CMS */}
+            {(isCymraeg ? propertyDetails?.taglineCy : propertyDetails?.taglineEn) && (
+              <p className="text-base sm:text-lg font-architects text-stone-600 tracking-wide mt-2">
+                {isCymraeg ? propertyDetails?.taglineCy : propertyDetails?.taglineEn}
+              </p>
+            )}
 
             {/* Gold Accent Divider (Elementor divider #EFDA07) */}
             <div className="w-20 h-1 bg-[#EFDA07] mt-3 mb-6" />
 
             <div className="space-y-4 text-stone-700 text-base sm:text-lg leading-relaxed font-sans font-light">
-              {isCymraeg ? (
+              {(isCymraeg ? propertyDetails?.fullStoryCy || propertyDetails?.shortDescriptionCy : propertyDetails?.fullStoryEn || propertyDetails?.shortDescriptionEn) ? (
+                <div className="whitespace-pre-line space-y-4">
+                  {(isCymraeg
+                    ? (propertyDetails?.fullStoryCy || propertyDetails?.shortDescriptionCy)
+                    : (propertyDetails?.fullStoryEn || propertyDetails?.shortDescriptionEn)
+                  )?.split('\n\n').map((para, i) => (
+                    <p key={i}>{para}</p>
+                  ))}
+                </div>
+              ) : isCymraeg ? (
                 <>
                   <p>
                     Wedi’i adeiladu yn y 1800au, mae Plas Hafod wedi’i adnewyddu, ei ymestyn

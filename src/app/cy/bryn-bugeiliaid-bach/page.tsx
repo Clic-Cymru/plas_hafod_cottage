@@ -53,12 +53,13 @@ export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
 export default async function WelshBrynBugeiliaidBachPage() {
-  const [pricingConfig, blockedDates, accreditations, siteSettings, galleryImages] = await Promise.all([
+  const [pricingConfig, blockedDates, accreditations, siteSettings, galleryImages, propertyDetails] = await Promise.all([
     cmsClient.getPricingConfig('bryn-bugeiliaid-bach'),
     cmsClient.getBlockedDates('bryn-bugeiliaid-bach'),
     cmsClient.getAccreditations('bryn-bugeiliaid-bach', true),
-    cmsClient.getSiteSettings(false),
+    cmsClient.getSiteSettings(true),
     cmsClient.getGalleryImages('bryn-bugeiliaid-bach'),
+    cmsClient.getPropertyDetails('bryn-bugeiliaid-bach', true),
   ]);
 
   const breadcrumbsJsonLd = generateBreadcrumbJsonLd([
@@ -132,24 +133,36 @@ export default async function WelshBrynBugeiliaidBachPage() {
                 className="text-lg sm:text-xl font-architects text-stone-700 tracking-wide"
                 style={{ fontFamily: "'Architects Daughter', cursive, sans-serif" }}
               >
-                Llety anecs hunangynhwysol clyd i’r brif eiddo yn cynnig yr un golygfeydd godidog
+                {propertyDetails?.taglineCy || propertyDetails?.taglineEn || 'Llety anecs hunangynhwysol clyd i’r brif eiddo yn cynnig yr un golygfeydd godidog'}
               </p>
 
-              <p>
-                Llety 2 ystafell wely wedi’i adnewyddu’n hyfryd yn edrych dros Ddyffryn Nantlle ac yn
-                swatio ychydig o dan Grib Nantlle drawiadol yn Eryri hardd. Mwynhewch olygfeydd heb eu hail
-                o arfordir Gogledd Cymru yn edrych drosodd i Ynys Môn a thu hwnt o’r ystafell wydr braf.
-              </p>
-              <p>
-                Mae’r eiddo’n cynnwys tân coed clyd yn y brif ardal fyw, gan gynnwys gwres dan y llawr ar
-                y llawr gwaelod a gwres canolog ar y llawr 1af lle mae 2 ystafell wely gyda gwelyau dwbl
-                cyfforddus ac ystafell gawod fawr.
-              </p>
-              <p>
-                Mae’r gegin wedi’i chyfarparu’n dda ac yn cynnwys ardal fwyta ar gyfer 4 person neu beth
-                am fwynhau’r awyr agored ac ymlacio gyda’r nos wrth ymyl y pwll tân yn yr ardd lechi a glaswellt
-                sy’n cynnwys ardal fwyta ac ardal eistedd ar wahân i werthfawrogi’r golygfeydd syfrdanol.
-              </p>
+              {propertyDetails?.fullStoryCy || propertyDetails?.shortDescriptionCy || propertyDetails?.fullStoryEn || propertyDetails?.shortDescriptionEn ? (
+                <div className="space-y-4">
+                  {(propertyDetails.fullStoryCy || propertyDetails.shortDescriptionCy || propertyDetails.fullStoryEn || propertyDetails.shortDescriptionEn)
+                    ?.split('\n\n')
+                    .map((para, i) => (
+                      <p key={i}>{para}</p>
+                    ))}
+                </div>
+              ) : (
+                <>
+                  <p>
+                    Llety 2 ystafell wely wedi’i adnewyddu’n hyfryd yn edrych dros Ddyffryn Nantlle ac yn
+                    swatio ychydig o dan Grib Nantlle drawiadol yn Eryri hardd. Mwynhewch olygfeydd heb eu hail
+                    o arfordir Gogledd Cymru yn edrych drosodd i Ynys Môn a thu hwnt o’r ystafell wydr braf.
+                  </p>
+                  <p>
+                    Mae’r eiddo’n cynnwys tân coed clyd yn y brif ardal fyw, gan gynnwys gwres dan y llawr ar
+                    y llawr gwaelod a gwres canolog ar y llawr 1af lle mae 2 ystafell wely gyda gwelyau dwbl
+                    cyfforddus ac ystafell gawod fawr.
+                  </p>
+                  <p>
+                    Mae’r gegin wedi’i chyfarparu’n dda ac yn cynnwys ardal fwyta ar gyfer 4 person neu beth
+                    am fwynhau’r awyr agored ac ymlacio gyda’r nos wrth ymyl y pwll tân yn yr ardd lechi a glaswellt
+                    sy’n cynnwys ardal fwyta ac ardal eistedd ar wahân i werthfawrogi’r golygfeydd syfrdanol.
+                  </p>
+                </>
+              )}
 
               {/* Dog notice */}
               <div className="flex items-center gap-3 p-4 bg-amber-50 border border-[#efda07] rounded-2xl text-amber-900 text-sm font-medium">
@@ -168,11 +181,15 @@ export default async function WelshBrynBugeiliaidBachPage() {
                 </div>
                 <div className="flex items-center gap-3 bg-white p-3.5 rounded-xl border border-stone-200/80 shadow-xs">
                   <Bed className="w-5 h-5 text-[#99a0c1]" />
-                  <span className="text-xs font-semibold text-stone-800">2 Ystafell Wely Ddwbl</span>
+                  <span className="text-xs font-semibold text-stone-800">
+                    {propertyDetails?.bedrooms ? `${propertyDetails.bedrooms} Ystafell Wely Ddwbl` : '2 Ystafell Wely Ddwbl'}
+                  </span>
                 </div>
                 <div className="flex items-center gap-3 bg-white p-3.5 rounded-xl border border-stone-200/80 shadow-xs">
                   <Bath className="w-5 h-5 text-[#99a0c1]" />
-                  <span className="text-xs font-semibold text-stone-800">Cawod Eang</span>
+                  <span className="text-xs font-semibold text-stone-800">
+                    {propertyDetails?.bathrooms ? `${propertyDetails.bathrooms} Ystafell Ymolchi` : 'Cawod Eang'}
+                  </span>
                 </div>
                 <div className="flex items-center gap-3 bg-white p-3.5 rounded-xl border border-stone-200/80 shadow-xs">
                   <Coffee className="w-5 h-5 text-[#99a0c1]" />

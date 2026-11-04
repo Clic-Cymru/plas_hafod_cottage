@@ -44,7 +44,13 @@ export async function POST(request: Request) {
     const blockedDates = await cmsClient.getBlockedDates(validatedPropertyId);
 
     // Verify calculation independently on server to ensure pricing integrity
-    const calculation = calculateStayPrice(checkIn, checkOut, pricingConfig, blockedDates);
+    const calculation = calculateStayPrice(
+      checkIn,
+      checkOut,
+      pricingConfig,
+      blockedDates,
+      validatedPropertyId === 'bryn-bugeiliaid-bach' ? 0 : Number(pets)
+    );
 
     if (!calculation.isValid) {
       return NextResponse.json(

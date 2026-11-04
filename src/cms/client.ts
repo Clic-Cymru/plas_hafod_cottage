@@ -13,6 +13,7 @@ import {
   PolicySection,
   PropertyDetails,
   ReviewSettings,
+  PageContent,
 } from './types';
 import { sanityClient, isSanityLive } from './sanity.client';
 import { defaultAttractions } from '@/data/defaultAttractions';
@@ -26,6 +27,8 @@ export const defaultPricingConfig: PricingConfig = {
   fixedDepositAmount: 200,
   depositPercentage: 25, // 25% deposit to secure booking
   cleaningFee: 45,
+  petFee: 40, // 1 dog = £40
+  petFee2Dogs: 55, // 2 dogs = £55
   seasons: [
     {
       id: 'summer-peak-2026',
@@ -77,6 +80,8 @@ export const bbbPricingConfig: PricingConfig = {
   fixedDepositAmount: 200,
   depositPercentage: 25,
   cleaningFee: 35,
+  petFee: 0, // no pets allowed at annexe
+  petFee2Dogs: 0,
   seasons: [
     {
       id: 'bbb-summer-peak-2026',
@@ -213,7 +218,8 @@ export const cmsClient = {
   async getPricingConfig(propertyId: 'plas-hafod' | 'bryn-bugeiliaid-bach' = 'plas-hafod'): Promise<PricingConfig> {
     if (isSanityLive && sanityClient) {
       try {
-        const query = `*[_type == "pricingConfig" && propertyId == $propertyId][0] {
+        // Fetch pricing document (prefer published over draft to ensure consistency)
+        const query = `*[_type == "pricingConfig" && propertyId == $propertyId && !(_id in path("drafts.**"))][0] || *[_type == "pricingConfig" && propertyId == $propertyId][0] {
           ...,
           "resolvedRates": seasonalRates[] {
             ...,
@@ -238,7 +244,7 @@ export const cmsClient = {
           let discounts = data.discounts || [];
           try {
             const offers = await sanityClient.fetch(
-              `*[_type == "specialOffer" && active == true && (propertyId == $propertyId || propertyId == "both")] | order(minNights asc)`,
+              `*[_type == "specialOffer" && active == true && (propertyId == $propertyId || propertyId == "both") && !(_id in path("drafts.**"))] | order(minNights asc)`,
               { propertyId }
             );
             if (Array.isArray(offers) && offers.length > 0) {
@@ -254,12 +260,22 @@ export const cmsClient = {
             }
           } catch (_) {}
 
+          const defaultPetFee1 = propertyId === 'bryn-bugeiliaid-bach' ? 0 : 40;
+          const defaultPetFee2 = propertyId === 'bryn-bugeiliaid-bach' ? 0 : 55;
+          const petFee1 = typeof data.petFee === 'number' ? data.petFee : defaultPetFee1;
+          const petFee2 =
+            typeof data.petFee2Dogs === 'number'
+              ? data.petFee2Dogs
+              : (petFee1 > 0 ? (data.petFee === 40 ? 55 : petFee1 * 2) : defaultPetFee2);
+
           return {
             baseRate: data.baseRate,
             depositType: data.depositType ?? 'fixed',
             fixedDepositAmount: data.fixedDepositAmount ?? 200,
             depositPercentage: data.depositPercentage ?? 25,
             cleaningFee: data.cleaningFee ?? (propertyId === 'bryn-bugeiliaid-bach' ? 35 : 45),
+            petFee: petFee1,
+            petFee2Dogs: petFee2,
             seasons,
             discounts,
           };
@@ -942,6 +958,179 @@ export const cmsClient = {
     }
     return null;
   },
+
+  async getPropertyDetails(
+    propertyId: 'plas-hafod' | 'bryn-bugeiliaid-bach' = 'plas-hafod',
+    isCymraeg: boolean = false
+  ): Promise<PropertyDetails> {
+    const fallback = propertyId === 'bryn-bugeiliaid-bach' ? defaultBbbDetails : defaultPlasHafodDetails;
+    if (isSanityLive && sanityClient) {
+      try {
+        const query = `*[_type == "propertyDetails" && propertyId == $propertyId && !(_id in path("drafts.**"))][0] || *[_type == "propertyDetails" && propertyId == $propertyId][0] {
+          _id,
+          propertyId,
+          nameEn,
+          nameCy,
+          taglineEn,
+          taglineCy,
+          sleeps,
+          bedrooms,
+          bathrooms,
+          petFriendly,
+          shortDescriptionEn,
+          shortDescriptionCy,
+          fullStoryEn,
+          fullStoryCy,
+          featuresEn,
+          featuresCy,
+          "galleryImages": galleryImages[] {
+            "url": asset->url,
+            caption
+          }
+        }`;
+        const data = await sanityClient.fetch(query, { propertyId });
+        if (data && (data.nameEn || data.bedrooms || data.propertyId)) {
+          return {
+            id: data._id || fallback.id,
+            propertyId: data.propertyId || propertyId,
+            nameEn: data.nameEn || fallback.nameEn,
+            nameCy: data.nameCy || fallback.nameCy,
+            taglineEn: data.taglineEn || fallback.taglineEn,
+            taglineCy: data.taglineCy || fallback.taglineCy,
+            sleeps: typeof data.sleeps === 'number' ? data.sleeps : fallback.sleeps,
+            bedrooms: typeof data.bedrooms === 'number' ? data.bedrooms : fallback.bedrooms,
+            bathrooms: typeof data.bathrooms === 'number' ? data.bathrooms : fallback.bathrooms,
+            petFriendly: typeof data.petFriendly === 'boolean' ? data.petFriendly : fallback.petFriendly,
+            shortDescriptionEn: data.shortDescriptionEn || fallback.shortDescriptionEn,
+            shortDescriptionCy: data.shortDescriptionCy || fallback.shortDescriptionCy,
+            fullStoryEn: data.fullStoryEn || fallback.fullStoryEn,
+            fullStoryCy: data.fullStoryCy || fallback.fullStoryCy,
+            featuresEn: Array.isArray(data.featuresEn) && data.featuresEn.length > 0 ? data.featuresEn : fallback.featuresEn,
+            featuresCy: Array.isArray(data.featuresCy) && data.featuresCy.length > 0 ? data.featuresCy : fallback.featuresCy,
+            galleryImages: data.galleryImages || fallback.galleryImages,
+          };
+        }
+      } catch (err) {
+        console.warn('Failed to fetch propertyDetails from Sanity, using fallback:', err);
+      }
+    }
+    return fallback;
+  },
+
+  async getPageContent(
+    slug: string,
+    isCymraeg: boolean = false
+  ): Promise<PageContent | null> {
+    if (isSanityLive && sanityClient) {
+      try {
+        const query = `*[_type == "pageContent" && slug == $slug && !(_id in path("drafts.**"))][0] || *[_type == "pageContent" && slug == $slug][0] {
+          _id,
+          slug,
+          titleEn,
+          titleCy,
+          heroHeadingEn,
+          heroHeadingCy,
+          heroSubheadingEn,
+          heroSubheadingCy,
+          bodyEn,
+          bodyCy,
+          seoTitleEn,
+          seoTitleCy,
+          seoDescriptionEn,
+          seoDescriptionCy,
+          "galleryImages": galleryImages[] {
+            "url": asset->url,
+            caption
+          }
+        }`;
+        const data = await sanityClient.fetch(query, { slug });
+        if (data && data.slug) {
+          return {
+            id: data._id,
+            slug: data.slug,
+            titleEn: data.titleEn || '',
+            titleCy: data.titleCy,
+            heroHeadingEn: data.heroHeadingEn,
+            heroHeadingCy: data.heroHeadingCy,
+            heroSubheadingEn: data.heroSubheadingEn,
+            heroSubheadingCy: data.heroSubheadingCy,
+            bodyEn: data.bodyEn,
+            bodyCy: data.bodyCy,
+            seoTitleEn: data.seoTitleEn,
+            seoTitleCy: data.seoTitleCy,
+            seoDescriptionEn: data.seoDescriptionEn,
+            seoDescriptionCy: data.seoDescriptionCy,
+            galleryImages: data.galleryImages,
+          };
+        }
+      } catch (err) {
+        console.warn('Failed to fetch pageContent from Sanity:', err);
+      }
+    }
+    return null;
+  },
+};
+
+export const defaultPlasHafodDetails: PropertyDetails = {
+  id: 'property-plas-hafod',
+  propertyId: 'plas-hafod',
+  nameEn: 'Plas Hafod Cottage',
+  nameCy: 'Bwthyn Plas Hafod',
+  taglineEn: '18th-century luxury 5-star mountain retreat with inglenook fire',
+  taglineCy: 'Encil mynydd moethus 5-seren o’r 18fed ganrif gyda tân inglenook',
+  sleeps: 4,
+  bedrooms: 2,
+  bathrooms: 2,
+  petFriendly: true,
+  shortDescriptionEn: 'Traditional stone holiday cottage with panoramic mountain and sea views, nestled in the peaceful hamlet of Nebo on the slopes of the Nantlle Ridge.',
+  shortDescriptionCy: 'Bwthyn gwyliau cerrig traddodiadol gyda golygfeydd panoramig o’r mynyddoedd a’r môr, wedi’i leoli ym mhentref heddychlon Nebo.',
+  featuresEn: [
+    '2 Double Bedrooms (Sleeps 4)',
+    'Inglenook Fireplace with Log Burner',
+    'Dog Friendly (Up to 2 dogs)',
+    'Enclosed Private Garden & Patio',
+    'Direct Access to Nantlle Ridge Footpaths',
+    'Spectacular Views to Anglesey & Ireland',
+  ],
+  featuresCy: [
+    '2 Ystafell Wely Ddwbl (Lletya 4)',
+    'Lle Tân Inglenook gyda Llosgwr Coed',
+    'Croeso i Gŵn (Hyd at 2 gi)',
+    'Gardd Breifat Gaeedig a Phatio',
+    'Mynediad Uniongyrchol i Lwybr Crib Nantlle',
+    'Golygfeydd Ysblennydd i Fôn ac Iwerddon',
+  ],
+};
+
+export const defaultBbbDetails: PropertyDetails = {
+  id: 'property-bryn-bugeiliaid-bach',
+  propertyId: 'bryn-bugeiliaid-bach',
+  nameEn: 'Bryn Bugeiliaid Bach',
+  nameCy: 'Bryn Bugeiliaid Bach',
+  taglineEn: 'Luxury peaceful 2-person annexe retreat with conservatory and underfloor heating',
+  taglineCy: 'Encil annedd heddychlon moethus i 2 berson gyda hystafell wydr a gwres dan y llawr',
+  sleeps: 2,
+  bedrooms: 1,
+  bathrooms: 1,
+  petFriendly: false,
+  shortDescriptionEn: 'A luxury self-contained romantic hideaway set beside Plas Hafod with sweeping sea and mountain panoramas (adults retreat, strictly no pets).',
+  shortDescriptionCy: 'Encil rhamantus hunangynhaliol moethus wrth ymyl Plas Hafod gyda golygfeydd panoramig o’r môr a’r mynyddoedd (encil i oedolion, dim cŵn).',
+  featuresEn: [
+    '1 Luxury Bedroom with King Bed',
+    'Panoramic Glass Conservatory',
+    'Underfloor Heating & Log Burner',
+    'Peaceful Adults Only Retreat',
+    'Strictly No Pets (Hypoallergenic)',
+    'Private Gated Parking & Sun Terrace',
+  ],
+  featuresCy: [
+    '1 Ystafell Wely Foethus gyda Gwely Brenin',
+    'Ystafell Wydr Banoramig',
+    'Gwres Dan y Llawr a Llosgwr Coed',
+    'Encil Heddychlon i Oedolion yn Unig',
+    'Dim Cŵn (Hypoalergenig)',
+    'Parcio Preifat a Theras Haul',
+  ],
 };
 
 // Default Fallback Datasets

@@ -49,13 +49,14 @@ export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
 export default async function HomePage() {
-  const [pricingConfig, blockedDates, accreditations, heroSlides, siteSettings, galleryImages] = await Promise.all([
+  const [pricingConfig, blockedDates, accreditations, heroSlides, siteSettings, galleryImages, propertyDetails] = await Promise.all([
     cmsClient.getPricingConfig(),
     cmsClient.getBlockedDates(),
     cmsClient.getAccreditations('plas-hafod', false),
     cmsClient.getHeroSlides(false),
     cmsClient.getSiteSettings(false),
     cmsClient.getGalleryImages('plas-hafod'),
+    cmsClient.getPropertyDetails('plas-hafod', false),
   ]);
 
   const { lodgingBusiness, breadcrumbs } = generateCottageJsonLd({ locale: 'en' });
@@ -80,7 +81,11 @@ export default async function HomePage() {
             slides={heroSlides}
             siteSettings={siteSettings}
           />
-          <LiveSiteAboutAndGallery isCymraeg={false} galleryImages={galleryImages} />
+          <LiveSiteAboutAndGallery
+            isCymraeg={false}
+            galleryImages={galleryImages}
+            propertyDetails={propertyDetails}
+          />
           <LiveSiteBooking
             propertyId="plas-hafod"
             isCymraeg={false}

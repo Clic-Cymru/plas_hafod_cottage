@@ -32,8 +32,28 @@ export interface PricingConfig {
   fixedDepositAmount?: number;
   depositPercentage: number; // e.g. 25%
   cleaningFee?: number;
+  petFee?: number;
+  petFee2Dogs?: number;
   seasons: Season[];
   discounts: DiscountRule[];
+}
+
+export interface PageContent {
+  id: string;
+  slug: string;
+  titleEn: string;
+  titleCy?: string;
+  heroHeadingEn?: string;
+  heroHeadingCy?: string;
+  heroSubheadingEn?: string;
+  heroSubheadingCy?: string;
+  bodyEn?: string;
+  bodyCy?: string;
+  seoTitleEn?: string;
+  seoTitleCy?: string;
+  seoDescriptionEn?: string;
+  seoDescriptionCy?: string;
+  galleryImages?: { url: string; caption?: string }[];
 }
 
 export interface BookingInquiry {

@@ -45,7 +45,10 @@ export const metadata: Metadata = {
 };
 
 export default async function WelshTermsPage() {
-  const siteSettings = await cmsClient.getSiteSettings(false);
+  const [siteSettings, pageContent] = await Promise.all([
+    cmsClient.getSiteSettings(true),
+    cmsClient.getPageContent('terms', true),
+  ]);
 
   const breadcrumbsJsonLd = generateBreadcrumbJsonLd([
     { name: 'Hafan', url: `${SITE_URL}/cy` },
@@ -63,8 +66,12 @@ export default async function WelshTermsPage() {
       <main className="flex-1">
         {/* Floating Subpage Hero with Landscape Background & Wave Divider */}
         <SubpageHero
-          title="TELERAU AC AMODAU"
-          subtitle="Gwnewch yn siŵr eich bod yn darllen ac yn deall ein Telerau ac Amodau Archebu isod yn llawn cyn cadarnhau eich archeb."
+          title={pageContent?.heroHeadingCy || pageContent?.heroHeadingEn || 'TELERAU AC AMODAU'}
+          subtitle={
+            pageContent?.heroSubheadingCy ||
+            pageContent?.bodyCy ||
+            'Gwnewch yn siŵr eich bod yn darllen ac yn deall ein Telerau ac Amodau Archebu isod yn llawn cyn cadarnhau eich archeb.'
+          }
           imageSrc="/images/wp/hero-bg.jpg"
           imageAlt="Golygfeydd Plas Hafod"
         />

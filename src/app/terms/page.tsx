@@ -64,9 +64,10 @@ function renderIcon(iconType?: string) {
 }
 
 export default async function TermsPage() {
-  const [policySections, siteSettings] = await Promise.all([
+  const [policySections, siteSettings, pageContent] = await Promise.all([
     cmsClient.getPolicySections(false),
     cmsClient.getSiteSettings(false),
+    cmsClient.getPageContent('terms', false),
   ]);
 
   const breadcrumbsJsonLd = generateBreadcrumbJsonLd([
@@ -85,8 +86,12 @@ export default async function TermsPage() {
       <main className="flex-1">
         {/* Floating Subpage Hero with Landscape Background & Wave Divider */}
         <SubpageHero
-          title="TERMS & CONDITIONS"
-          subtitle="Please ensure you read and fully understand our Booking Terms and Conditions below before confirming your reservation."
+          title={pageContent?.heroHeadingEn || 'TERMS & CONDITIONS'}
+          subtitle={
+            pageContent?.heroSubheadingEn ||
+            pageContent?.bodyEn ||
+            'Please ensure you read and fully understand our Booking Terms and Conditions below before confirming your reservation.'
+          }
           imageSrc="/images/wp/hero-bg.jpg"
           imageAlt="Plas Hafod landscape"
         />

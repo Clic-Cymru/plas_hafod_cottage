@@ -53,12 +53,13 @@ export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
 export default async function BrynBugeiliaidBachPage() {
-  const [pricingConfig, blockedDates, accreditations, siteSettings, galleryImages] = await Promise.all([
+  const [pricingConfig, blockedDates, accreditations, siteSettings, galleryImages, propertyDetails] = await Promise.all([
     cmsClient.getPricingConfig('bryn-bugeiliaid-bach'),
     cmsClient.getBlockedDates('bryn-bugeiliaid-bach'),
     cmsClient.getAccreditations('bryn-bugeiliaid-bach', false),
     cmsClient.getSiteSettings(false),
     cmsClient.getGalleryImages('bryn-bugeiliaid-bach'),
+    cmsClient.getPropertyDetails('bryn-bugeiliaid-bach', false),
   ]);
 
   const breadcrumbsJsonLd = generateBreadcrumbJsonLd([
@@ -132,25 +133,37 @@ export default async function BrynBugeiliaidBachPage() {
                 className="text-lg sm:text-xl font-architects text-stone-700 tracking-wide"
                 style={{ fontFamily: "'Architects Daughter', cursive, sans-serif" }}
               >
-                A cozy self-contained annexe to the main property offering the same stunning views
+                {propertyDetails?.taglineEn || 'A cozy self-contained annexe to the main property offering the same stunning views'}
               </p>
 
-              <p>
-                A beautifully restored 2 bed accommodation overlooking Dyffryn Nantlle and nestled just
-                below the impressive Nantlle Ridge in beautiful Snowdonia. Enjoy unrivalled views of the
-                North Wales coast looking over to Anglesey and beyond from the impressive addition of a well
-                appointed conservatory.
-              </p>
-              <p>
-                The property boasts a cozy log fire in the main living area, including underfloor heating on
-                the ground floor and central heating on the 1st floor where there are 2 bedrooms with comfortable
-                double beds and a spacious shower room.
-              </p>
-              <p>
-                The kitchen is well equipped and includes dining area for 4 persons or why not enjoy the great
-                outdoors and relax in the evening by the fire pit in the slated and grassed garden which includes
-                dining area and separate seating area to appreciate the breathtaking views.
-              </p>
+              {propertyDetails?.fullStoryEn || propertyDetails?.shortDescriptionEn ? (
+                <div className="space-y-4">
+                  {(propertyDetails.fullStoryEn || propertyDetails.shortDescriptionEn)
+                    ?.split('\n\n')
+                    .map((para, i) => (
+                      <p key={i}>{para}</p>
+                    ))}
+                </div>
+              ) : (
+                <>
+                  <p>
+                    A beautifully restored 2 bed accommodation overlooking Dyffryn Nantlle and nestled just
+                    below the impressive Nantlle Ridge in beautiful Snowdonia. Enjoy unrivalled views of the
+                    North Wales coast looking over to Anglesey and beyond from the impressive addition of a well
+                    appointed conservatory.
+                  </p>
+                  <p>
+                    The property boasts a cozy log fire in the main living area, including underfloor heating on
+                    the ground floor and central heating on the 1st floor where there are 2 bedrooms with comfortable
+                    double beds and a spacious shower room.
+                  </p>
+                  <p>
+                    The kitchen is well equipped and includes dining area for 4 persons or why not enjoy the great
+                    outdoors and relax in the evening by the fire pit in the slated and grassed garden which includes
+                    dining area and separate seating area to appreciate the breathtaking views.
+                  </p>
+                </>
+              )}
 
               {/* Dog notice */}
               <div className="flex items-center gap-3 p-4 bg-amber-50 border border-[#efda07] rounded-2xl text-amber-900 text-sm font-medium">
@@ -169,11 +182,15 @@ export default async function BrynBugeiliaidBachPage() {
                 </div>
                 <div className="flex items-center gap-3 bg-white p-3.5 rounded-xl border border-stone-200/80 shadow-xs">
                   <Bed className="w-5 h-5 text-[#99a0c1]" />
-                  <span className="text-xs font-semibold text-stone-800">2 Double Bedrooms</span>
+                  <span className="text-xs font-semibold text-stone-800">
+                    {propertyDetails?.bedrooms ? `${propertyDetails.bedrooms} Double Bedrooms` : '2 Double Bedrooms'}
+                  </span>
                 </div>
                 <div className="flex items-center gap-3 bg-white p-3.5 rounded-xl border border-stone-200/80 shadow-xs">
                   <Bath className="w-5 h-5 text-[#99a0c1]" />
-                  <span className="text-xs font-semibold text-stone-800">Spacious Shower</span>
+                  <span className="text-xs font-semibold text-stone-800">
+                    {propertyDetails?.bathrooms ? `${propertyDetails.bathrooms} Bathrooms` : 'Spacious Shower'}
+                  </span>
                 </div>
                 <div className="flex items-center gap-3 bg-white p-3.5 rounded-xl border border-stone-200/80 shadow-xs">
                   <Coffee className="w-5 h-5 text-[#99a0c1]" />

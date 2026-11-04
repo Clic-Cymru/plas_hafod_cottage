@@ -406,10 +406,13 @@ export function LiveSiteBooking({
     );
   };
 
+  const fee1Dog = pricingConfig?.petFee ?? 40;
+  const fee2Dogs = pricingConfig?.petFee2Dogs ?? 55;
+
   const calculation = useMemo(() => {
     if (!checkIn || !checkOut) return null;
-    return calculateStayPrice(checkIn, checkOut, pricingConfig, blockedDates);
-  }, [checkIn, checkOut, pricingConfig, blockedDates]);
+    return calculateStayPrice(checkIn, checkOut, pricingConfig, blockedDates, isBBB ? 0 : pets);
+  }, [checkIn, checkOut, pricingConfig, blockedDates, isBBB, pets]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -547,8 +550,8 @@ export function LiveSiteBooking({
                   className="w-full bg-white border border-stone-300 rounded-lg px-3 py-2 text-stone-800 text-sm focus:outline-none focus:border-[#99a0c1]"
                 >
                   <option value={0}>{isCymraeg ? '0 Ci' : '0 Dogs'}</option>
-                  <option value={1}>{isCymraeg ? '1 Ci (£30)' : '1 Dog (£30)'}</option>
-                  <option value={2}>{isCymraeg ? '2 Gi (£60)' : '2 Dogs (£60)'}</option>
+                  <option value={1}>{isCymraeg ? `1 Ci (£${fee1Dog})` : `1 Dog (£${fee1Dog})`}</option>
+                  <option value={2}>{isCymraeg ? `2 Gi (£${fee2Dogs})` : `2 Dogs (£${fee2Dogs})`}</option>
                 </select>
               </div>
             ) : (
@@ -589,7 +592,8 @@ export function LiveSiteBooking({
                         Average rate: £{calculation.baseRateAverage} / night
                         {calculation.discountAmount > 0 &&
                           ` • Includes ${calculation.appliedDiscountName}`}
-                        {!isBBB && pets > 0 && ` • ${isCymraeg ? `Ffi ci £${pets * 30}` : `Includes £${pets * 30} dog fee`}`}
+                        {!isBBB && pets > 0 && calculation.petFee > 0 &&
+                          ` • ${isCymraeg ? `Ffi ci £${calculation.petFee}` : `Includes £${calculation.petFee} dog fee`}`}
                       </p>
                     </div>
 
@@ -598,7 +602,7 @@ export function LiveSiteBooking({
                         {isCymraeg ? 'Cyfanswm' : 'Total Price'}
                       </p>
                       <p className="text-3xl font-architects text-stone-900 font-bold">
-                        £{calculation.totalPrice + (!isBBB ? pets * 30 : 0)}
+                        £{calculation.totalPrice}
                       </p>
                       <p className="text-xs text-[#99a0c1] font-semibold mt-0.5">
                         {isCymraeg ? 'Blaendal: ' : 'Deposit: '}£{calculation.depositAmount}

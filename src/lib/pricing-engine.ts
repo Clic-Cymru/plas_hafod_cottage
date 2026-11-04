@@ -17,6 +17,7 @@ export interface CalculationResult {
   discountAmount: number;
   appliedDiscountName?: string;
   cleaningFee: number;
+  petFee: number;
   totalPrice: number;
   depositType?: 'fixed' | 'percentage';
   fixedDepositAmount?: number;
@@ -49,8 +50,18 @@ export function calculateStayPrice(
   checkInStr: string,
   checkOutStr: string,
   config: PricingConfig,
-  blockedDates: BlockedDateRange[] = []
+  blockedDates: BlockedDateRange[] = [],
+  pets: number = 0
 ): CalculationResult {
+  let petFee = 0;
+  if (pets === 1) {
+    petFee = typeof config.petFee === 'number' ? config.petFee : 40;
+  } else if (pets >= 2) {
+    petFee = typeof config.petFee2Dogs === 'number'
+      ? config.petFee2Dogs
+      : (typeof config.petFee === 'number' ? config.petFee * 2 : 55);
+  }
+
   if (!checkInStr || !checkOutStr) {
     return {
       isValid: false,
@@ -61,6 +72,7 @@ export function calculateStayPrice(
       subtotal: 0,
       discountAmount: 0,
       cleaningFee: config.cleaningFee || 0,
+      petFee,
       totalPrice: 0,
       depositType: config.depositType || 'fixed',
       fixedDepositAmount: config.fixedDepositAmount ?? 200,
@@ -86,6 +98,7 @@ export function calculateStayPrice(
       subtotal: 0,
       discountAmount: 0,
       cleaningFee: config.cleaningFee || 0,
+      petFee,
       totalPrice: 0,
       depositType: config.depositType || 'fixed',
       fixedDepositAmount: config.fixedDepositAmount ?? 200,
@@ -116,6 +129,7 @@ export function calculateStayPrice(
         subtotal: 0,
         discountAmount: 0,
         cleaningFee: config.cleaningFee || 0,
+        petFee,
         totalPrice: 0,
         depositPercentage: config.depositPercentage,
         depositAmount: 0,
@@ -162,6 +176,7 @@ export function calculateStayPrice(
       subtotal: nightlyBreakdown.reduce((s, n) => s + n.rate, 0),
       discountAmount: 0,
       cleaningFee: config.cleaningFee || 0,
+      petFee,
       totalPrice: 0,
       depositPercentage: config.depositPercentage,
       depositAmount: 0,
@@ -194,7 +209,7 @@ export function calculateStayPrice(
   }
 
   const cleaningFee = config.cleaningFee || 0;
-  const totalPrice = Math.max(0, subtotal - discountAmount + cleaningFee);
+  const totalPrice = Math.max(0, subtotal - discountAmount + cleaningFee + petFee);
   const depositType = config.depositType || 'fixed';
   const fixedDepositAmount = typeof config.fixedDepositAmount === 'number' ? config.fixedDepositAmount : 200;
   let depositAmount = 0;
@@ -214,6 +229,7 @@ export function calculateStayPrice(
     discountAmount,
     appliedDiscountName,
     cleaningFee,
+    petFee,
     totalPrice,
     depositType,
     fixedDepositAmount,

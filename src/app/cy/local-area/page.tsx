@@ -94,9 +94,10 @@ const snowdonPathsCy = [
 ];
 
 export default async function WelshLocalAreaPage() {
-  const [attractions, siteSettings] = await Promise.all([
+  const [attractions, siteSettings, pageContent] = await Promise.all([
     cmsClient.getLocalAttractions(true),
     cmsClient.getSiteSettings(false),
+    cmsClient.getPageContent('local-area', true),
   ]);
 
   const breadcrumbsJsonLd = generateBreadcrumbJsonLd([
@@ -121,8 +122,12 @@ export default async function WelshLocalAreaPage() {
       <main className="flex-1">
         {/* Floating Subpage Hero with Snowdon Landscape Background & Wave Divider */}
         <SubpageHero
-          title="ARDAL LEOL"
-          subtitle="Bydd ein portffolio o wybodaeth am ddigwyddiadau lleol, gweithgareddau ac atyniadau twristiaeth yn eich helpu i benderfynu ble i fynd a beth i'w weld yn ystod eich arhosiad ym Mhlas Hafod. Wedi'i leoli oddi ar y prif lwybrau ym mhentrefan Nebo ger Pen-y-groes, mae Plas Hafod o fewn cyrraedd hawdd i draeth Dinas Dinlle, llwybrau mynydd Yr Wyddfa, Castell Caernarfon, Rheilffordd Ucheldir Cymru, a Phorthmeirion."
+          title={pageContent?.heroHeadingCy || pageContent?.heroHeadingEn || 'ARDAL LEOL'}
+          subtitle={
+            pageContent?.heroSubheadingCy ||
+            pageContent?.bodyCy ||
+            "Bydd ein portffolio o wybodaeth am ddigwyddiadau lleol, gweithgareddau ac atyniadau twristiaeth yn eich helpu i benderfynu ble i fynd a beth i'w weld yn ystod eich arhosiad ym Mhlas Hafod. Wedi'i leoli oddi ar y prif lwybrau ym mhentrefan Nebo ger Pen-y-groes, mae Plas Hafod o fewn cyrraedd hawdd i draeth Dinas Dinlle, llwybrau mynydd Yr Wyddfa, Castell Caernarfon, Rheilffordd Ucheldir Cymru, a Phorthmeirion."
+          }
           imageSrc="/images/wp/snowdon.jpg"
           imageAlt="Mynyddoedd Eryri ger Plas Hafod"
         />

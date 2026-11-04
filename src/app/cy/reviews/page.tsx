@@ -47,10 +47,11 @@ export const metadata: Metadata = {
 };
 
 export default async function WelshReviewsPage() {
-  const [reviewSettings, guestbookEntries, siteSettings] = await Promise.all([
+  const [reviewSettings, guestbookEntries, siteSettings, pageContent] = await Promise.all([
     cmsClient.getReviewSettings(true),
     cmsClient.getGuestbookEntries('both', true),
     cmsClient.getSiteSettings(false),
+    cmsClient.getPageContent('reviews', true),
   ]);
 
   const hasTrustindex =
@@ -73,7 +74,8 @@ export default async function WelshReviewsPage() {
       <main className="flex-1">
         {/* Floating Subpage Hero with Landscape Background & Wave Divider */}
         <SubpageHero
-          title="ADOLYGIADAU"
+          title={pageContent?.heroHeadingCy || pageContent?.heroHeadingEn || 'ADOLYGIADAU'}
+          subtitle={pageContent?.heroSubheadingCy || pageContent?.bodyCy}
           imageSrc="/images/wp/hero-slide-1.jpg"
           imageAlt="Golygfeydd mynydd a môr Plas Hafod"
         />
