@@ -2260,31 +2260,26 @@ export function generateCheckoutReminderHtml(
         </strong>
         <table width="100%" cellpadding="0" cellspacing="0" border="0" role="presentation">
           <tr>
-            <td style="padding: 6px 0; font-size: 13px; color: #475569; line-height: 1.5;">
-              🧺 ${isCymraeg ? 'Tynnu\'r dillad gwely a\'u rhoi yn y bagiau golchi a ddarperir' : 'Strip the bed linen and place it in the laundry bags provided'}
+            <td style="padding: 6px 0; font-size: 14px; color: #475569; line-height: 1.5;">
+              ♻️ ${isCymraeg ? 'Sicrhau bod yr holl ailgylchu wedi’i roi yn y blychau cywir' : 'Ensure all recycling is placed in the correct boxes'}
             </td>
           </tr>
           <tr>
-            <td style="padding: 6px 0; font-size: 13px; color: #475569; line-height: 1.5;">
-              ♻️ ${isCymraeg ? 'Gwagio pob bin a rhoi ailgylchu / sbwriel yn y biniau allanol' : 'Empty all bins and place recycling / rubbish in the outside bins'}
+            <td style="padding: 6px 0; font-size: 14px; color: #475569; line-height: 1.5;">
+              🔒 ${isCymraeg ? 'Sicrhau bod pob ffenestr a drws ar gau' : 'Ensure all windows and doors are closed'}
             </td>
           </tr>
           <tr>
-            <td style="padding: 6px 0; font-size: 13px; color: #475569; line-height: 1.5;">
-              🍽️ ${isCymraeg ? 'Llwytho a rhedeg y peiriant golchi llestri (os yw\'n berthnasol) / golchi llestri a ddefnyddiwyd' : 'Load and run the dishwasher (if applicable) / wash up used dishes'}
-            </td>
-          </tr>
-          <tr>
-            <td style="padding: 6px 0; font-size: 13px; color: #475569; line-height: 1.5;">
-              🔒 ${isCymraeg ? 'Sicrhau bod pob ffenestr a drws wedi\'u cau a\'u cloi' : 'Ensure all windows and doors are closed and locked'}
-            </td>
-          </tr>
-          <tr>
-            <td style="padding: 6px 0; font-size: 13px; color: #475569; line-height: 1.5;">
-              🔑 ${isCymraeg ? 'Gadael yr allwedd yn y blwch allweddi / ar fwrdd y gegin' : 'Leave the key in the key safe / on the kitchen table'}
+            <td style="padding: 6px 0; font-size: 14px; color: #475569; line-height: 1.5;">
+              🔑 ${isCymraeg ? 'Gadael yr allwedd yn y clo ar y tu mewn' : 'Leave the key in the lock on the inside'}
             </td>
           </tr>
         </table>
+        <p style="font-size: 13.5px; color: #334155; line-height: 1.5; margin: 14px 0 0; padding-top: 12px; border-top: 1px dashed #cbd5e1; font-style: italic;">
+          ${isCymraeg
+            ? 'Byddem yn gwerthfawrogi’n fawr pe gallech adael yr eiddo yn y cyflwr y byddech yn disgwyl dod o hyd iddo.'
+            : 'It would be very much appreciated if you could leave the property in a state you would expect to find it in.'}
+        </p>
       </div>
 
       <p style="font-size: 14px; line-height: 1.6; color: #475569; margin-top: 20px;">
@@ -2335,11 +2330,11 @@ Gobeithio eich bod wedi mwynhau eich amser yn ${data.propertyTitle}.
 Mae hwn yn nodyn atgoffa caredig bod amser gadael am ${checkOutTime} yfory er mwyn rhoi amser i ni baratoi'r bwthyn ar gyfer ein gwesteion nesaf. Bydd ein glanhawr ar y safle am 10:15yb.
 
 Cyn gadael a fyddech cystal â:
-- Tynnu'r dillad gwely a'u rhoi yn y bagiau golchi a ddarperir
-- Gwagio pob bin a rhoi ailgylchu / sbwriel yn y biniau allanol
-- Llwytho a rhedeg y peiriant golchi llestri (os yw'n berthnasol) / golchi llestri a ddefnyddiwyd
-- Sicrhau bod pob ffenestr a drws wedi'u cau a'u cloi
-- Gadael yr allwedd yn y blwch allweddi / ar fwrdd y gegin
+- Sicrhau bod yr holl ailgylchu wedi’i roi yn y blychau cywir
+- Sicrhau bod pob ffenestr a drws ar gau
+- Gadael yr allwedd yn y clo ar y tu mewn
+
+Byddem yn gwerthfawrogi’n fawr pe gallech adael yr eiddo yn y cyflwr y byddech yn disgwyl dod o hyd iddo.
 
 Dymunwn daith ddiogel adref i chi a gobeithiwn eich croesawu yn ôl i Eryri yn y dyfodol.
 
@@ -2357,11 +2352,11 @@ We hope you have enjoyed your time at ${data.propertyTitle}.
 This is a gentle reminder that check out is at ${checkOutTime} tomorrow morning so that we have time to prepare the cottage for our next guests. Our cleaner will be on-site at 10:15am.
 
 Before leaving could you please:
-- Strip the bed linen and place it in the laundry bags provided
-- Empty all bins and place recycling / rubbish in the outside bins
-- Load and run the dishwasher (if applicable) / wash up used dishes
-- Ensure all windows and doors are closed and locked
-- Leave the key in the key safe / on the kitchen table
+- Ensure all recycling is placed in the correct boxes
+- Ensure all windows and doors are closed
+- Leave the key in the lock on the inside
+
+It would be very much appreciated if you could leave the property in a state you would expect to find it in.
 
 We wish you a safe journey home and hope to welcome you back to Eryri / Snowdonia in the future.
 
