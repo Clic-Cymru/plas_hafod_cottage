@@ -86,6 +86,29 @@ export function calculateStayPrice(
   const checkIn = parseISO(checkInStr);
   const checkOut = parseISO(checkOutStr);
 
+  // Enforce that check-in is at least 1 day ahead of the current date (tomorrow or later)
+  const tomorrowStr = format(addDays(new Date(), 1), 'yyyy-MM-dd');
+  if (checkInStr < tomorrowStr) {
+    return {
+      isValid: false,
+      errorMessage: 'Check-in date must be at least one day ahead of the current date.',
+      totalNights: 0,
+      nightlyBreakdown: [],
+      baseRateAverage: config.baseRate,
+      subtotal: 0,
+      discountAmount: 0,
+      cleaningFee: config.cleaningFee || 0,
+      petFee,
+      totalPrice: 0,
+      depositType: config.depositType || 'fixed',
+      fixedDepositAmount: config.fixedDepositAmount ?? 200,
+      depositPercentage: config.depositPercentage,
+      depositAmount: 0,
+      balanceDue: 0,
+      minStayRequired: 2,
+    };
+  }
+
   const totalNights = differenceInCalendarDays(checkOut, checkIn);
 
   if (totalNights <= 0) {

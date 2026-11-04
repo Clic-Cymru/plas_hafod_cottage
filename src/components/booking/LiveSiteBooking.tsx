@@ -5,6 +5,7 @@ import { PricingConfig, BlockedDateRange } from '@/cms/types';
 import { calculateStayPrice } from '@/lib/pricing-engine';
 import {
   format,
+  addDays,
   addMonths,
   subMonths,
   startOfMonth,
@@ -65,6 +66,12 @@ function BookingDateInput({
     return iso;
   };
 
+  const todayIso = format(new Date(), 'yyyy-MM-dd');
+  const tomorrowDate = addDays(new Date(), 1);
+  const tomorrowIso = format(tomorrowDate, 'yyyy-MM-dd');
+  // Any date <= effectiveExclusiveMin is disabled (defaults to todayIso so only tomorrow onwards is selectable)
+  const effectiveExclusiveMin = min && min > todayIso ? min : todayIso;
+
   const [textValue, setTextValue] = useState(formatForDisplay(value));
   const [viewDate, setViewDate] = useState(() => {
     if (value) {
@@ -73,7 +80,7 @@ function BookingDateInput({
         return new Date(Number(parts[0]), Number(parts[1]) - 1, 1);
       }
     }
-    return new Date(2026, 10, 1); // November 2026 default
+    return startOfMonth(tomorrowDate);
   });
 
   React.useEffect(() => {
@@ -83,8 +90,13 @@ function BookingDateInput({
       if (parts.length === 3) {
         setViewDate(new Date(Number(parts[0]), Number(parts[1]) - 1, 1));
       }
+    } else if (min && min > todayIso) {
+      const parts = min.split('-');
+      if (parts.length === 3) {
+        setViewDate(new Date(Number(parts[0]), Number(parts[1]) - 1, 1));
+      }
     }
-  }, [value]);
+  }, [value, min, todayIso]);
 
   // Click outside listener to dismiss popover
   React.useEffect(() => {
@@ -170,9 +182,10 @@ function BookingDateInput({
             <div className="flex items-center gap-1">
               <button
                 type="button"
+                disabled={startOfMonth(viewDate) <= startOfMonth(tomorrowDate)}
                 onClick={() => setViewDate((d) => subMonths(d, 1))}
                 aria-label="Previous month"
-                className="p-1.5 rounded-lg hover:bg-stone-100 text-stone-600 transition"
+                className="p-1.5 rounded-lg hover:bg-stone-100 text-stone-600 disabled:opacity-30 disabled:cursor-not-allowed transition"
               >
                 <ChevronLeft className="w-4 h-4" />
               </button>
@@ -200,7 +213,7 @@ function BookingDateInput({
               const inMonth = isSameMonth(d, viewDate);
               const formatted = format(d, 'yyyy-MM-dd');
               const occupied = isOccupied ? isOccupied(d) : false;
-              const isBeforeMin = min ? formatted <= min : false;
+              const isBeforeMin = formatted <= effectiveExclusiveMin;
               const isSelected = formatted === value;
               const disabled = !inMonth || occupied || isBeforeMin;
 
@@ -231,7 +244,7 @@ function BookingDateInput({
             })}
           </div>
 
-          {/* Clear / Today Footer buttons */}
+          {/* Clear / Tomorrow Footer buttons */}
           <div className="flex items-center justify-between pt-3 mt-3 border-t border-stone-100 text-xs">
             <button
               type="button"
@@ -247,14 +260,16 @@ function BookingDateInput({
             <button
               type="button"
               onClick={() => {
-                const today = format(new Date(), 'yyyy-MM-dd');
-                onChange(today);
-                setViewDate(new Date());
+                const nextSelectable = format(addDays(parseISO(effectiveExclusiveMin), 1), 'yyyy-MM-dd');
+                onChange(nextSelectable);
+                setViewDate(parseISO(nextSelectable));
                 setIsOpen(false);
               }}
               className="text-[#323149] hover:text-indigo-900 font-bold transition"
             >
-              {isCymraeg ? 'Heddiw' : 'Today'}
+              {effectiveExclusiveMin === todayIso
+                ? (isCymraeg ? 'Yfory' : 'Tomorrow')
+                : (isCymraeg ? 'Diwrnod Nesaf' : 'Next Day')}
             </button>
           </div>
         </div>
@@ -290,7 +305,10 @@ export function LiveSiteBooking({
     };
   }, [propertyId]);
 
-  const [currentCalendarDate, setCurrentCalendarDate] = useState(new Date(2026, 9, 1)); // October 2026
+  const minSelectableDate = format(addDays(new Date(), 1), 'yyyy-MM-dd');
+  const minCalendarMonth = startOfMonth(addDays(new Date(), 1));
+
+  const [currentCalendarDate, setCurrentCalendarDate] = useState(() => startOfMonth(addDays(new Date(), 1)));
   const [checkIn, setCheckIn] = useState('');
   const [checkOut, setCheckOut] = useState('');
   const [adults, setAdults] = useState(2);
@@ -309,7 +327,12 @@ export function LiveSiteBooking({
   const month1 = currentCalendarDate;
   const month2 = addMonths(currentCalendarDate, 1);
 
-  const prevMonth = () => setCurrentCalendarDate(subMonths(currentCalendarDate, 1));
+  const canGoPrevMonth = startOfMonth(currentCalendarDate) > minCalendarMonth;
+  const prevMonth = () => {
+    if (canGoPrevMonth) {
+      setCurrentCalendarDate(subMonths(currentCalendarDate, 1));
+    }
+  };
   const nextMonth = () => setCurrentCalendarDate(addMonths(currentCalendarDate, 1));
 
   // Determine if day is blocked/occupied
@@ -361,6 +384,7 @@ export function LiveSiteBooking({
             const inMonth = isSameMonth(d, monthDate);
             const occupied = isOccupied(d);
             const formatted = format(d, 'yyyy-MM-dd');
+            const isPastOrToday = formatted < minSelectableDate;
             const isSelected =
               formatted === checkIn ||
               formatted === checkOut ||
@@ -373,9 +397,9 @@ export function LiveSiteBooking({
               <button
                 key={i}
                 type="button"
-                disabled={!inMonth || occupied}
+                disabled={!inMonth || occupied || isPastOrToday}
                 onClick={() => {
-                  if (!inMonth || occupied) return;
+                  if (!inMonth || occupied || isPastOrToday) return;
                   if (!checkIn || (checkIn && checkOut)) {
                     setCheckIn(formatted);
                     setCheckOut('');
@@ -392,6 +416,8 @@ export function LiveSiteBooking({
                     ? 'text-stone-300 bg-stone-50 cursor-default'
                     : occupied
                     ? 'bg-[#efda07] text-stone-900 font-semibold cursor-not-allowed'
+                    : isPastOrToday
+                    ? 'text-stone-300 bg-stone-50/60 cursor-not-allowed'
                     : isSelected
                     ? 'bg-[#99a0c1] text-white font-bold'
                     : 'text-stone-700 hover:bg-[#99a0c1]/20 cursor-pointer'
@@ -466,8 +492,9 @@ export function LiveSiteBooking({
           <div className="flex items-center justify-between px-2 mb-3">
             <button
               onClick={prevMonth}
+              disabled={!canGoPrevMonth}
               aria-label="Previous Month"
-              className="p-1.5 rounded-full bg-stone-100 hover:bg-stone-200 text-stone-700 transition"
+              className="p-1.5 rounded-full bg-stone-100 hover:bg-stone-200 text-stone-700 disabled:opacity-30 disabled:cursor-not-allowed transition"
             >
               &larr;
             </button>
@@ -507,7 +534,12 @@ export function LiveSiteBooking({
             <BookingDateInput
               label={isCymraeg ? 'Cyrraedd (dd/mm/bbbb)' : 'Check-in (dd/mm/yyyy)'}
               value={checkIn}
-              onChange={setCheckIn}
+              onChange={(val) => {
+                setCheckIn(val);
+                if (checkOut && val && checkOut <= val) {
+                  setCheckOut('');
+                }
+              }}
               isCymraeg={isCymraeg}
               isOccupied={isOccupied}
             />
@@ -515,7 +547,7 @@ export function LiveSiteBooking({
             <BookingDateInput
               label={isCymraeg ? 'Gadael (dd/mm/bbbb)' : 'Check-out (dd/mm/yyyy)'}
               value={checkOut}
-              min={checkIn}
+              min={checkIn || minSelectableDate}
               onChange={setCheckOut}
               isCymraeg={isCymraeg}
               isOccupied={isOccupied}
