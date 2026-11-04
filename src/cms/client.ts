@@ -31,6 +31,70 @@ export const defaultPricingConfig: PricingConfig = {
   petFee2Dogs: 55, // 2 dogs = £55
   seasons: [
     {
+      id: 'autumn-half-term-welsh-2026',
+      name: 'Autumn Half Term (Welsh Schools)',
+      startDate: '2026-10-23',
+      endDate: '2026-11-01',
+      nightlyRate: 215,
+      minStay: 3,
+    },
+    {
+      id: 'autumn-half-term-english-2026',
+      name: 'Autumn Half Term (English Schools)',
+      startDate: '2026-10-16',
+      endDate: '2026-11-01',
+      nightlyRate: 215,
+      minStay: 3,
+    },
+    {
+      id: 'february-half-term-welsh-2027',
+      name: 'February Half Term (Welsh Schools)',
+      startDate: '2027-02-12',
+      endDate: '2027-02-21',
+      nightlyRate: 195,
+      minStay: 3,
+    },
+    {
+      id: 'february-half-term-english-2027',
+      name: 'February Half Term (English Schools)',
+      startDate: '2027-02-12',
+      endDate: '2027-02-28',
+      nightlyRate: 195,
+      minStay: 3,
+    },
+    {
+      id: 'whitsun-half-term-2027',
+      name: 'May / Whitsun Half Term (English & Welsh)',
+      startDate: '2027-05-21',
+      endDate: '2027-06-06',
+      nightlyRate: 225,
+      minStay: 3,
+    },
+    {
+      id: 'winter-2026',
+      name: 'Winter Season 2026 (Gaeaf)',
+      startDate: '2026-11-01',
+      endDate: '2026-12-19',
+      nightlyRate: 165,
+      minStay: 2,
+    },
+    {
+      id: 'christmas-new-year-2026',
+      name: 'Festive Season (Nadolig & Blwyddyn Newydd)',
+      startDate: '2026-12-20',
+      endDate: '2027-01-05',
+      nightlyRate: 285,
+      minStay: 4,
+    },
+    {
+      id: 'winter-2027',
+      name: 'Winter Season 2027 (Gaeaf)',
+      startDate: '2027-01-06',
+      endDate: '2027-03-25',
+      nightlyRate: 165,
+      minStay: 2,
+    },
+    {
       id: 'summer-peak-2026',
       name: 'Summer Peak (Haf)',
       startDate: '2026-06-01',
@@ -45,14 +109,6 @@ export const defaultPricingConfig: PricingConfig = {
       endDate: '2026-10-31',
       nightlyRate: 195,
       minStay: 2,
-    },
-    {
-      id: 'christmas-new-year-2026',
-      name: 'Festive Season (Nadolig & Blwyddyn Newydd)',
-      startDate: '2026-12-20',
-      endDate: '2027-01-05',
-      nightlyRate: 285,
-      minStay: 4,
     },
   ],
   discounts: [
@@ -84,6 +140,70 @@ export const bbbPricingConfig: PricingConfig = {
   petFee2Dogs: 0,
   seasons: [
     {
+      id: 'bbb-autumn-half-term-welsh-2026',
+      name: 'Autumn Half Term (Welsh Schools)',
+      startDate: '2026-10-23',
+      endDate: '2026-11-01',
+      nightlyRate: 175,
+      minStay: 3,
+    },
+    {
+      id: 'bbb-autumn-half-term-english-2026',
+      name: 'Autumn Half Term (English Schools)',
+      startDate: '2026-10-16',
+      endDate: '2026-11-01',
+      nightlyRate: 175,
+      minStay: 3,
+    },
+    {
+      id: 'bbb-february-half-term-welsh-2027',
+      name: 'February Half Term (Welsh Schools)',
+      startDate: '2027-02-12',
+      endDate: '2027-02-21',
+      nightlyRate: 160,
+      minStay: 2,
+    },
+    {
+      id: 'bbb-february-half-term-english-2027',
+      name: 'February Half Term (English Schools)',
+      startDate: '2027-02-12',
+      endDate: '2027-02-28',
+      nightlyRate: 160,
+      minStay: 2,
+    },
+    {
+      id: 'bbb-whitsun-half-term-2027',
+      name: 'May / Whitsun Half Term (English & Welsh)',
+      startDate: '2027-05-21',
+      endDate: '2027-06-06',
+      nightlyRate: 185,
+      minStay: 3,
+    },
+    {
+      id: 'bbb-winter-2026',
+      name: 'Winter Season 2026 (Gaeaf)',
+      startDate: '2026-11-01',
+      endDate: '2026-12-19',
+      nightlyRate: 135,
+      minStay: 2,
+    },
+    {
+      id: 'bbb-christmas-2026',
+      name: 'Festive Season (Nadolig & Blwyddyn Newydd)',
+      startDate: '2026-12-20',
+      endDate: '2027-01-05',
+      nightlyRate: 225,
+      minStay: 3,
+    },
+    {
+      id: 'bbb-winter-2027',
+      name: 'Winter Season 2027 (Gaeaf)',
+      startDate: '2027-01-06',
+      endDate: '2027-03-25',
+      nightlyRate: 135,
+      minStay: 2,
+    },
+    {
       id: 'bbb-summer-peak-2026',
       name: 'Summer Peak (Haf)',
       startDate: '2026-06-01',
@@ -98,14 +218,6 @@ export const bbbPricingConfig: PricingConfig = {
       endDate: '2026-10-31',
       nightlyRate: 160,
       minStay: 2,
-    },
-    {
-      id: 'bbb-christmas-2026',
-      name: 'Festive Season (Nadolig & Blwyddyn Newydd)',
-      startDate: '2026-12-20',
-      endDate: '2027-01-05',
-      nightlyRate: 225,
-      minStay: 3,
     },
   ],
   discounts: [
@@ -267,6 +379,13 @@ export const cmsClient = {
             typeof data.petFee2Dogs === 'number'
               ? data.petFee2Dogs
               : (petFee1 > 0 ? (data.petFee === 40 ? 55 : petFee1 * 2) : defaultPetFee2);
+
+          // Sort seasons so narrower periods (e.g. school half terms) take priority over broad seasonal blocks
+          seasons.sort((a: any, b: any) => {
+            const durA = Math.abs(new Date(a.endDate).getTime() - new Date(a.startDate).getTime());
+            const durB = Math.abs(new Date(b.endDate).getTime() - new Date(b.startDate).getTime());
+            return durA - durB;
+          });
 
           return {
             baseRate: data.baseRate,

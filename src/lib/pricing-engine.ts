@@ -113,6 +113,13 @@ export function calculateStayPrice(
   const nightlyBreakdown: NightDetail[] = [];
   let maxMinStay = 2; // default minimum stay
 
+  // Sort seasons by duration ascending so narrower spans (e.g. school half terms) take priority over broad seasonal blocks
+  const sortedSeasons = [...(config.seasons || [])].sort((a, b) => {
+    const durA = Math.abs(new Date(a.endDate).getTime() - new Date(a.startDate).getTime());
+    const durB = Math.abs(new Date(b.endDate).getTime() - new Date(b.startDate).getTime());
+    return durA - durB;
+  });
+
   for (let i = 0; i < totalNights; i++) {
     const currentNight = addDays(checkIn, i);
     const dateFormatted = format(currentNight, 'yyyy-MM-dd');
@@ -142,7 +149,7 @@ export function calculateStayPrice(
     let rate = config.baseRate;
     let seasonName: string | undefined = undefined;
 
-    for (const season of config.seasons) {
+    for (const season of sortedSeasons) {
       const sStart = parseISO(season.startDate);
       const sEnd = parseISO(season.endDate);
       if (
