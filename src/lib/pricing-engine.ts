@@ -24,6 +24,8 @@ export interface CalculationResult {
   depositPercentage: number;
   depositAmount: number;
   balanceDue: number;
+  requiresFullPayment?: boolean;
+  daysUntilCheckIn?: number;
   minStayRequired: number;
 }
 
@@ -242,8 +244,16 @@ export function calculateStayPrice(
   const totalPrice = Math.max(0, subtotal - discountAmount + cleaningFee + petFee);
   const depositType = config.depositType || 'fixed';
   const fixedDepositAmount = typeof config.fixedDepositAmount === 'number' ? config.fixedDepositAmount : 200;
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const daysUntilCheckIn = differenceInCalendarDays(checkIn, today);
+  const requiresFullPayment = daysUntilCheckIn <= 60;
+
   let depositAmount = 0;
-  if (depositType === 'fixed') {
+  if (requiresFullPayment) {
+    depositAmount = totalPrice;
+  } else if (depositType === 'fixed') {
     depositAmount = Math.min(fixedDepositAmount, totalPrice);
   } else {
     depositAmount = Math.round((totalPrice * (config.depositPercentage || 25)) / 100);
@@ -266,6 +276,8 @@ export function calculateStayPrice(
     depositPercentage: config.depositPercentage,
     depositAmount,
     balanceDue,
+    requiresFullPayment,
+    daysUntilCheckIn,
     minStayRequired: maxMinStay,
   };
 }

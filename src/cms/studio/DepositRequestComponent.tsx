@@ -340,13 +340,34 @@ export function DepositRequestComponent(props: DepositRequestProps) {
     }
   };
 
+  const daysUntilCheckIn = (() => {
+    if (!checkIn) return null;
+    const parts = String(checkIn).split('-');
+    const target =
+      parts.length === 3
+        ? new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]))
+        : new Date(checkIn);
+    if (isNaN(target.getTime())) return null;
+    const now = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    return Math.ceil((target.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+  })();
+
+  const isFullPaymentUpfront =
+    (daysUntilCheckIn !== null && daysUntilCheckIn <= 60) ||
+    (totalPrice > 0 && balanceDue === 0 && depositAmount >= totalPrice);
+
   const handleCopyPaymentText = () => {
-    const text = `Plas Hafod Cottage Deposit Request
+    const amountNow = isFullPaymentUpfront ? totalPrice : depositAmount;
+    const paymentLabel = isFullPaymentUpfront
+      ? `Full Payment Required (Stay within 60 days): £${amountNow}`
+      : `Deposit Required: £${amountNow}`;
+    const text = `Plas Hafod Cottage ${isFullPaymentUpfront ? 'Full Payment' : 'Deposit'} Request
 Property: ${propertyId === 'bryn-bugeiliaid-bach' ? 'Bryn Bugeiliaid Bach' : 'Plas Hafod Cottage'}
 Guest: ${guestName}
 Dates: ${formatUkDate(checkIn)} to ${formatUkDate(checkOut)} (${totalNights || 1} nights)
 Total Stay: £${totalPrice}
-Deposit Required (25%): £${depositAmount}
+${paymentLabel}
 Payment Reference: ${computedRef}
 
 Bank Transfer Details:
@@ -395,10 +416,12 @@ Please quote reference "${computedRef}" with your transfer.`;
           <span style={{ fontSize: '24px' }}>💳</span>
           <div>
             <h3 style={{ margin: 0, fontSize: '16px', fontWeight: 700, color: '#1e293b' }}>
-              Deposit Request &amp; BACS Payment Workflow
+              {isFullPaymentUpfront ? 'Full Payment (< 60 Days) & BACS Workflow' : 'Deposit Request & BACS Payment Workflow'}
             </h3>
             <p style={{ margin: '2px 0 0', fontSize: '12px', color: '#64748b' }}>
-              Review payment breakdown, bank details, and dispatch deposit request email to guest
+              {isFullPaymentUpfront
+                ? 'Stay is within 60 days — full payment (£' + totalPrice + ') is requested upfront instead of a partial deposit'
+                : 'Review payment breakdown, bank details, and dispatch deposit request email to guest'}
             </p>
           </div>
         </div>
@@ -442,12 +465,12 @@ Please quote reference "${computedRef}" with your transfer.`;
             : isConfirmed
             ? '✅ CONFIRMED BOOKING - AWAITING FULL PAYMENT'
             : isDepositRequested
-            ? '✉️ DEPOSIT REQUESTED'
+            ? (isFullPaymentUpfront ? '✉️ FULL PAYMENT REQUESTED' : '✉️ DEPOSIT REQUESTED')
             : '⏳ PENDING REVIEW'}
         </div>
       </div>
 
-      {/* Deposit Requested Banner */}
+      {/* Deposit / Full Payment Requested Banner */}
       {isDepositRequested && !isConfirmed && !isCompleted && (
         <div
           style={{
@@ -466,26 +489,47 @@ Please quote reference "${computedRef}" with your transfer.`;
           }}
         >
           <div>
-            <strong>Deposit Requested:</strong> {depositSentAt ? new Date(depositSentAt).toLocaleString('en-GB') : 'Provisional hold active'}
+            <strong>{isFullPaymentUpfront ? 'Full Payment Requested (< 60 days):' : 'Deposit Requested:'}</strong>{' '}
+            {depositSentAt ? new Date(depositSentAt).toLocaleString('en-GB') : 'Provisional hold active'}
             <span style={{ marginLeft: '12px', color: '#b45309' }}>Ref: <strong>{computedRef}</strong></span>
           </div>
-          <button
-            type="button"
-            onClick={handleMarkDepositConfirmed}
-            disabled={isSending}
-            style={{
-              background: '#15803d',
-              color: '#ffffff',
-              border: 'none',
-              borderRadius: '6px',
-              padding: '6px 14px',
-              fontSize: '12px',
-              fontWeight: 700,
-              cursor: isSending ? 'not-allowed' : 'pointer',
-            }}
-          >
-            Mark Deposit Cleared &amp; Confirmed ✓
-          </button>
+          {isFullPaymentUpfront ? (
+            <button
+              type="button"
+              onClick={handleMarkCompleteConfirmed}
+              disabled={isSending}
+              style={{
+                background: '#15803d',
+                color: '#ffffff',
+                border: 'none',
+                borderRadius: '6px',
+                padding: '6px 14px',
+                fontSize: '12px',
+                fontWeight: 700,
+                cursor: isSending ? 'not-allowed' : 'pointer',
+              }}
+            >
+              Mark Full Payment Received &amp; Send Directions ✓
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={handleMarkDepositConfirmed}
+              disabled={isSending}
+              style={{
+                background: '#15803d',
+                color: '#ffffff',
+                border: 'none',
+                borderRadius: '6px',
+                padding: '6px 14px',
+                fontSize: '12px',
+                fontWeight: 700,
+                cursor: isSending ? 'not-allowed' : 'pointer',
+              }}
+            >
+              Mark Deposit Cleared &amp; Confirmed ✓
+            </button>
+          )}
         </div>
       )}
 
@@ -614,15 +658,19 @@ Please quote reference "${computedRef}" with your transfer.`;
           <div style={{ fontSize: '16px', fontWeight: 800, color: '#0f172a', marginTop: '2px' }}>
             £{totalPrice || 0}
           </div>
-          <div style={{ fontSize: '12px', color: '#64748b' }}>Balance: £{balanceDue || 0}</div>
+          <div style={{ fontSize: '12px', color: '#64748b' }}>
+            {isFullPaymentUpfront ? 'Balance: £0 (< 60 days)' : `Balance: £${balanceDue || 0}`}
+          </div>
         </div>
 
         <div>
           <span style={{ fontSize: '11px', color: '#854d0e', fontWeight: 700, textTransform: 'uppercase' }}>
-            Deposit to Collect {totalPrice > 0 && depositAmount > 0 ? (depositAmount === 200 ? '(Fixed £200)' : `(${Math.round((depositAmount / totalPrice) * 100)}%)`) : ''}
+            {isFullPaymentUpfront
+              ? 'Full Payment (< 60 Days)'
+              : `Deposit to Collect ${totalPrice > 0 && depositAmount > 0 ? (depositAmount === 200 ? '(Fixed £200)' : `(${Math.round((depositAmount / totalPrice) * 100)}%)`) : ''}`}
           </span>
           <div style={{ fontSize: '18px', fontWeight: 800, color: '#b45309', marginTop: '2px' }}>
-            £{depositAmount || 0}
+            £{isFullPaymentUpfront ? (totalPrice || 0) : (depositAmount || 0)}
           </div>
           <div style={{ fontSize: '12px', color: '#92400e' }}>
             Ref: <strong style={{ color: '#0f172a' }}>{computedRef}</strong>
@@ -723,11 +771,11 @@ Please quote reference "${computedRef}" with your transfer.`;
           }}
         >
           {isSending ? (
-            <>⏳ Sending Deposit Request...</>
+            <>⏳ Sending Payment Request...</>
           ) : isDepositRequested ? (
-            <>📧 Re-send Deposit Request Email</>
+            <>📧 Re-send {isFullPaymentUpfront ? 'Full Payment' : 'Deposit'} Request Email</>
           ) : (
-            <>📧 Send Deposit Request Email</>
+            <>📧 Send {isFullPaymentUpfront ? 'Full Payment' : 'Deposit'} Request Email</>
           )}
         </button>
 
@@ -752,24 +800,45 @@ Please quote reference "${computedRef}" with your transfer.`;
         </button>
 
         {!isConfirmed && !isCompleted && (
-          <button
-            type="button"
-            onClick={handleMarkDepositConfirmed}
-            disabled={isSending}
-            style={{
-              background: '#f8fafc',
-              color: '#15803d',
-              border: '1px solid #86efac',
-              borderRadius: '8px',
-              padding: '12px 16px',
-              fontSize: '13px',
-              fontWeight: 700,
-              cursor: isSending ? 'not-allowed' : 'pointer',
-              marginLeft: 'auto',
-            }}
-          >
-            Mark Deposit Cleared &amp; Confirmed ✓
-          </button>
+          isFullPaymentUpfront ? (
+            <button
+              type="button"
+              onClick={handleMarkCompleteConfirmed}
+              disabled={isSending}
+              style={{
+                background: '#f0fdf4',
+                color: '#15803d',
+                border: '1px solid #86efac',
+                borderRadius: '8px',
+                padding: '12px 16px',
+                fontSize: '13px',
+                fontWeight: 700,
+                cursor: isSending ? 'not-allowed' : 'pointer',
+                marginLeft: 'auto',
+              }}
+            >
+              Mark Full Payment Received &amp; Send Directions ✓
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={handleMarkDepositConfirmed}
+              disabled={isSending}
+              style={{
+                background: '#f8fafc',
+                color: '#15803d',
+                border: '1px solid #86efac',
+                borderRadius: '8px',
+                padding: '12px 16px',
+                fontSize: '13px',
+                fontWeight: 700,
+                cursor: isSending ? 'not-allowed' : 'pointer',
+                marginLeft: 'auto',
+              }}
+            >
+              Mark Deposit Cleared &amp; Confirmed ✓
+            </button>
+          )
         )}
 
         {isConfirmed && !isCompleted && (

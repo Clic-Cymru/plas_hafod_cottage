@@ -637,7 +637,11 @@ export function LiveSiteBooking({
                         £{calculation.totalPrice}
                       </p>
                       <p className="text-xs text-[#99a0c1] font-semibold mt-0.5">
-                        {isCymraeg ? 'Blaendal: ' : 'Deposit: '}£{calculation.depositAmount}
+                        {calculation.requiresFullPayment
+                          ? (isCymraeg
+                              ? `Taliad Llawn (< 60 diwrnod): £${calculation.totalPrice}`
+                              : `Full Payment Due (< 60 days): £${calculation.totalPrice}`)
+                          : `${isCymraeg ? 'Blaendal: ' : 'Deposit: '}£${calculation.depositAmount}`}
                       </p>
                     </div>
                   </div>
@@ -651,8 +655,8 @@ export function LiveSiteBooking({
                       </h4>
                       <p className="text-sm font-sans mt-2">
                         {isCymraeg
-                          ? `Rydym wedi derbyn eich ymholiad am ${propertyNameCy} a byddwn mewn cysylltiad o fewn 24 awr gyda chadarnhad y blaendal.`
-                          : `We have received your booking inquiry for ${propertyNameEn} and will reply within 24 hours with deposit confirmation.`}
+                          ? `Rydym wedi derbyn eich ymholiad am ${propertyNameCy} ac wedi anfon manylion talu atoch trwy e-bost.`
+                          : `We have received your booking inquiry for ${propertyNameEn} and have emailed your reservation and payment details.`}
                       </p>
                       <p className="font-mono text-xs text-emerald-700 mt-2">
                         Ref: {submittedId} ({propertyId})

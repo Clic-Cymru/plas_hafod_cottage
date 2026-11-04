@@ -31,6 +31,7 @@ import {
   generateCheckoutReminderText,
   generateReviewRequestHtml,
   generateReviewRequestText,
+  isStayWithinFullPaymentWindow,
 } from './templates';
 
 export function getResendClient() {
@@ -119,9 +120,18 @@ export async function sendBookingEmails(data: BookingEmailData, isCymraeg: boole
       contactPhone: siteSettings.phone,
     };
 
-    const guestSubject = isCymraeg
-      ? `Dyddiadau ar Gael: Cais am Flaendal – ${data.propertyTitle} (${paymentReference})`
-      : `Dates Available: Deposit Request – ${data.propertyTitle} (${paymentReference})`;
+    const fullPaymentWindow = siteSettings.balanceReminderDaysBeforeArrival ?? 60;
+    const isFullPaymentRequired =
+      isStayWithinFullPaymentWindow(data.checkIn, fullPaymentWindow) ||
+      (data.totalPrice > 0 && data.balanceDue === 0 && data.depositAmount >= data.totalPrice);
+
+    const guestSubject = isFullPaymentRequired
+      ? (isCymraeg
+          ? `Dyddiadau ar Gael: Cais am Daliad Llawn – ${data.propertyTitle} (${paymentReference})`
+          : `Dates Available: Full Payment Request – ${data.propertyTitle} (${paymentReference})`)
+      : (isCymraeg
+          ? `Dyddiadau ar Gael: Cais am Flaendal – ${data.propertyTitle} (${paymentReference})`
+          : `Dates Available: Deposit Request – ${data.propertyTitle} (${paymentReference})`);
 
     const guestRes = await client.emails.send({
       from: fromEmail,
@@ -239,14 +249,20 @@ export async function sendDepositRequestEmail(data: DepositRequestEmailData) {
 
   try {
     const refHeader = data.paymentReference || data.inquiryId || `ph-dep-${Date.now()}`;
+    const fullPaymentWindow = siteSettings.balanceReminderDaysBeforeArrival ?? 60;
+    const isFullPaymentRequired =
+      isStayWithinFullPaymentWindow(data.checkIn, fullPaymentWindow) ||
+      (data.totalPrice > 0 && data.balanceDue === 0 && data.depositAmount >= data.totalPrice);
 
-    // Send Deposit Request directly to Guest (bcc owner so owner has immediate record)
+    // Send Deposit / Full Payment Request directly to Guest (bcc owner so owner has immediate record)
     const guestRes = await client.emails.send({
       from: fromEmail,
       to: data.guestEmail,
       bcc: targetBccRecipients,
       replyTo: publicReplyEmail,
-      subject: `Deposit Request – Secure Your Stay at ${data.propertyTitle} (${formatDateUK(data.checkIn)} to ${formatDateUK(data.checkOut)})`,
+      subject: isFullPaymentRequired
+        ? `Full Payment Request – Secure Your Stay at ${data.propertyTitle} (${formatDateUK(data.checkIn)} to ${formatDateUK(data.checkOut)})`
+        : `Deposit Request – Secure Your Stay at ${data.propertyTitle} (${formatDateUK(data.checkIn)} to ${formatDateUK(data.checkOut)})`,
       html: generateDepositRequestHtml(data, siteSettings),
       text: generateDepositRequestText(data, siteSettings),
       headers: {

@@ -177,11 +177,31 @@ const EMAIL_MOBILE_RESPONSIVE_CSS = `
     }
 `;
 
+export function isStayWithinFullPaymentWindow(checkInStr?: string, windowDays: number = 60): boolean {
+  if (!checkInStr) return false;
+  const parts = checkInStr.split('-');
+  const target =
+    parts.length === 3
+      ? new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]))
+      : new Date(checkInStr);
+  if (isNaN(target.getTime())) return false;
+  const now = new Date();
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const diffDays = Math.ceil((target.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+  return diffDays <= windowDays;
+}
+
 /**
  * 1. Owner Alert: Dark Theme / Dashboard Style with White Logo
  */
 export function generateOwnerBookingAlertHtml(data: BookingEmailData, settings?: Partial<SiteSettings>): string {
   const depositPct = settings?.depositPercentage || 25;
+  const fullPaymentWindow = settings?.balanceReminderDaysBeforeArrival ?? 60;
+  const isFullPaymentRequired =
+    isStayWithinFullPaymentWindow(data.checkIn, fullPaymentWindow) ||
+    (data.totalPrice > 0 && data.balanceDue === 0 && data.depositAmount >= data.totalPrice);
+  const amountToCollect = isFullPaymentRequired ? data.totalPrice : data.depositAmount;
+  const remainingBalance = isFullPaymentRequired ? 0 : data.balanceDue;
   const studioUrl = data.inquiryId
     ? `https://plashafodcottage.co.uk/studio/structure/archebion-phrisiau-booking-engine;bookingInquiry;${data.inquiryId}`
     : 'https://plashafodcottage.co.uk/studio';
@@ -227,8 +247,8 @@ export function generateOwnerBookingAlertHtml(data: BookingEmailData, settings?:
         <tr><th>Party</th><td>${data.adults} Adults, ${data.children} Children, ${data.pets || 0} Dogs</td></tr>
         ${data.appliedDiscountName ? `<tr><th>Discount Applied</th><td><span style="color: #15803d; font-weight: 600;">${data.appliedDiscountName} (-£${data.discountAmount})</span></td></tr>` : ''}
         <tr class="total-row"><th>Total Quote</th><td>£${data.totalPrice}</td></tr>
-        <tr><th>Deposit to Collect (${depositPct}%)</th><td><strong style="color: #0f172a;">£${data.depositAmount}</strong></td></tr>
-        <tr><th>Remaining Balance</th><td>£${data.balanceDue}</td></tr>
+        <tr><th>${isFullPaymentRequired ? `Full Payment Required (&le; ${fullPaymentWindow} days)` : `Deposit to Collect`}</th><td><strong style="color: #0f172a;">£${amountToCollect}</strong></td></tr>
+        <tr><th>Remaining Balance</th><td>£${remainingBalance}</td></tr>
         ${data.notes ? `<tr><th>Guest Notes</th><td><em style="color: #475569;">"${data.notes}"</em></td></tr>` : ''}
         ${data.inquiryId ? `<tr><th>Reference ID</th><td><code>${data.inquiryId}</code></td></tr>` : ''}
       </table>
@@ -654,7 +674,12 @@ export function generateOwnerBookingAlertText(
   data: BookingEmailData,
   settings?: Partial<SiteSettings>
 ): string {
-  const depositPct = settings?.depositPercentage || 25;
+  const fullPaymentWindow = settings?.balanceReminderDaysBeforeArrival ?? 60;
+  const isFullPaymentRequired =
+    isStayWithinFullPaymentWindow(data.checkIn, fullPaymentWindow) ||
+    (data.totalPrice > 0 && data.balanceDue === 0 && data.depositAmount >= data.totalPrice);
+  const amountToCollect = isFullPaymentRequired ? data.totalPrice : data.depositAmount;
+  const remainingBalance = isFullPaymentRequired ? 0 : data.balanceDue;
   const siteTitle = settings?.siteTitle || 'Plas Hafod Cottage Management System';
 
   return `NEW BOOKING INQUIRY: ${data.propertyTitle}
@@ -671,8 +696,8 @@ Stay Details:
 - Duration: ${data.totalNights} Nights
 - Guests: ${data.adults} Adults, ${data.children} Children, ${data.pets || 0} Dogs
 ${data.appliedDiscountName ? `- Special Offer: ${data.appliedDiscountName} (-£${data.discountAmount || 0})\n` : ''}- Total Price: £${data.totalPrice}
-- Deposit to Collect (${depositPct}%): £${data.depositAmount}
-- Remaining Balance: £${data.balanceDue}
+- ${isFullPaymentRequired ? `Full Payment Required (stay within ${fullPaymentWindow} days)` : 'Deposit to Collect'}: £${amountToCollect}
+- Remaining Balance: £${remainingBalance}
 ${data.notes ? `- Guest Notes: "${data.notes}"\n` : ''}
 Reference ID: ${data.inquiryId || 'N/A'}
 Dashboard: https://plashafodcottage.co.uk/studio
@@ -755,12 +780,23 @@ export function generateDepositRequestHtml(
   const checkInTime = settings?.checkInTime || '15:00';
   const checkOutTime = settings?.checkOutTime || '10:00';
   const depositPct = settings?.depositPercentage || 25;
+  const fullPaymentWindow = settings?.balanceReminderDaysBeforeArrival ?? 60;
+  const isFullPaymentRequired =
+    isStayWithinFullPaymentWindow(data.checkIn, fullPaymentWindow) ||
+    (data.totalPrice > 0 && data.balanceDue === 0 && data.depositAmount >= data.totalPrice);
+  const amountDueNow = isFullPaymentRequired ? data.totalPrice : data.depositAmount;
+  const remainingBalance = isFullPaymentRequired ? 0 : data.balanceDue;
+
   const address =
     (isCymraeg && settings?.addressCy ? settings.addressCy : settings?.address) ||
     'Bwthyn Plas Hafod, Nebo, Gwynedd, LL54 6EB';
 
-  const badgeText = isCymraeg ? 'Dyddiadau ar Gael – Cais am Flaendal' : 'Dates Available – Deposit Request';
-  const pageTitle = isCymraeg ? `Cais am Flaendal – ${data.propertyTitle}` : `Deposit Request – ${data.propertyTitle}`;
+  const badgeText = isFullPaymentRequired
+    ? (isCymraeg ? 'Dyddiadau ar Gael – Cais am Daliad Llawn' : 'Dates Available – Full Payment Request')
+    : (isCymraeg ? 'Dyddiadau ar Gael – Cais am Flaendal' : 'Dates Available – Deposit Request');
+  const pageTitle = isFullPaymentRequired
+    ? (isCymraeg ? `Cais am Daliad Llawn – ${data.propertyTitle}` : `Full Payment Request – ${data.propertyTitle}`)
+    : (isCymraeg ? `Cais am Flaendal – ${data.propertyTitle}` : `Deposit Request – ${data.propertyTitle}`);
 
   return `
 <!DOCTYPE html>
@@ -815,9 +851,13 @@ export function generateDepositRequestHtml(
       <p style="font-size: 16px; margin-top: 0; color: #1e293b;">${isCymraeg ? 'Helo' : 'Hi'} <strong>${data.guestName}</strong>,</p>
 
       <p style="font-size: 15px; line-height: 1.65; color: #334155;">
-        ${isCymraeg
-          ? `Diolch am eich diddordeb yn <strong>${data.propertyTitle}</strong>. Mae’r dyddiadau y gwnaethoch gais amdanynt ar gael ac er mwyn sicrhau eich arhosiad mae blaendal o <strong>£${data.depositAmount}</strong> yn ddyledus o fewn <strong>${holdHours} awr</strong> o’r e-bost hwn${data.depositDeadline ? ` (erbyn <strong>${data.depositDeadline}</strong>)` : ''}. Mae manylion y swm a’r dull talu isod.`
-          : `Thank you for your interest in <strong>${data.propertyTitle}</strong>. Dates you requested are available and to secure your stay a deposit of <strong>£${data.depositAmount}</strong> is payable within <strong>${holdHours} hours</strong> of this e-mail${data.depositDeadline ? ` (by <strong>${data.depositDeadline}</strong>)` : ''}. Details of the amount and payment method are below.`}
+        ${isFullPaymentRequired
+          ? (isCymraeg
+              ? `Diolch am eich diddordeb yn <strong>${data.propertyTitle}</strong>. Mae’r dyddiadau y gwnaethoch gais amdanynt ar gael! Gan fod eich dyddiad cyrraedd o fewn ${fullPaymentWindow} diwrnod, mae taliad llawn o <strong>£${amountDueNow}</strong> yn ddyledus o fewn <strong>${holdHours} awr</strong> o’r e-bost hwn${data.depositDeadline ? ` (erbyn <strong>${data.depositDeadline}</strong>)` : ''} er mwyn sicrhau eich arhosiad. Mae manylion y swm a’r dull talu isod.`
+              : `Thank you for your interest in <strong>${data.propertyTitle}</strong>. The dates you requested are available! As your arrival date is within ${fullPaymentWindow} days, full payment of <strong>£${amountDueNow}</strong> is payable within <strong>${holdHours} hours</strong> of this e-mail${data.depositDeadline ? ` (by <strong>${data.depositDeadline}</strong>)` : ''} to secure your stay. Details of the amount and payment method are below.`)
+          : (isCymraeg
+              ? `Diolch am eich diddordeb yn <strong>${data.propertyTitle}</strong>. Mae’r dyddiadau y gwnaethoch gais amdanynt ar gael ac er mwyn sicrhau eich arhosiad mae blaendal o <strong>£${amountDueNow}</strong> yn ddyledus o fewn <strong>${holdHours} awr</strong> o’r e-bost hwn${data.depositDeadline ? ` (erbyn <strong>${data.depositDeadline}</strong>)` : ''}. Mae manylion y swm a’r dull talu isod.`
+              : `Thank you for your interest in <strong>${data.propertyTitle}</strong>. Dates you requested are available and to secure your stay a deposit of <strong>£${amountDueNow}</strong> is payable within <strong>${holdHours} hours</strong> of this e-mail${data.depositDeadline ? ` (by <strong>${data.depositDeadline}</strong>)` : ''}. Details of the amount and payment method are below.`)}
       </p>
 
       ${data.customHostNote ? `
@@ -884,8 +924,11 @@ export function generateDepositRequestHtml(
               <div style="font-size: 14px; color: #334155; margin-top: 6px; line-height: 1.7;">
                 ${data.appliedDiscountName ? `<div>${isCymraeg ? 'Cynnig Arbennig' : 'Special Offer'}: <strong style="color: #15803d;">${data.appliedDiscountName} (-£${data.discountAmount})</strong></div>` : ''}
                 <div>${isCymraeg ? 'Cyfanswm Pris' : 'Total Price'} - <strong>£${data.totalPrice}</strong></div>
-                <div>${isCymraeg ? (settings?.depositType === 'percentage' ? `Blaendal (${depositPct}%)` : 'Blaendal') : (settings?.depositType === 'percentage' ? `Deposit (${depositPct}%)` : 'Deposit')} - <strong style="font-size: 16px; color: #1e1b2e;">£${data.depositAmount}</strong></div>
-                <div>${isCymraeg ? 'Gweddill y Balans' : 'Remaining Balance'} - <strong>£${data.balanceDue}</strong> (${isCymraeg ? 'dyledus 60 diwrnod cyn eich arhosiad' : 'due 60 days prior to stay'})</div>
+                ${isFullPaymentRequired
+                  ? `<div>${isCymraeg ? `Taliad Llawn yn Ddyledus Nawr (o fewn ${fullPaymentWindow} diwrnod)` : `Full Payment Due Now (stay within ${fullPaymentWindow} days)`} - <strong style="font-size: 16px; color: #1e1b2e;">£${amountDueNow}</strong></div>
+                <div>${isCymraeg ? 'Gweddill y Balans' : 'Remaining Balance'} - <strong>£0</strong></div>`
+                  : `<div>${isCymraeg ? (settings?.depositType === 'percentage' ? `Blaendal (${depositPct}%)` : 'Blaendal') : (settings?.depositType === 'percentage' ? `Deposit (${depositPct}%)` : 'Deposit')} - <strong style="font-size: 16px; color: #1e1b2e;">£${amountDueNow}</strong></div>
+                <div>${isCymraeg ? 'Gweddill y Balans' : 'Remaining Balance'} - <strong>£${remainingBalance}</strong> (${isCymraeg ? `dyledus ${fullPaymentWindow} diwrnod cyn eich arhosiad` : `due ${fullPaymentWindow} days prior to stay`})</div>`}
                 <div>${isCymraeg ? 'Cyfeirnod Archebu' : 'Booking Id'} - <strong>${data.paymentReference}</strong></div>
               </div>
             </td>
@@ -894,8 +937,8 @@ export function generateDepositRequestHtml(
 
         <p style="font-size: 14px; color: #1e293b; line-height: 1.6; margin: 14px 0 10px;">
           ${isCymraeg
-            ? `Gwnewch y taliad o <strong>£${data.depositAmount}</strong> trwy drosglwyddiad banc uniongyrchol (BACS) i’r manylion isod a chofiwch gynnwys eich <strong>Cyfeirnod Archebu</strong> fel y Cyfeirnod:`
-            : `Please make the payment of <strong>£${data.depositAmount}</strong> via direct bank transfer (BACS) to the details below and include your <strong>Booking Id</strong> as the Reference:`}
+            ? `Gwnewch y taliad o <strong>£${amountDueNow}</strong> trwy drosglwyddiad banc uniongyrchol (BACS) i’r manylion isod a chofiwch gynnwys eich <strong>Cyfeirnod Archebu</strong> fel y Cyfeirnod:`
+            : `Please make the payment of <strong>£${amountDueNow}</strong> via direct bank transfer (BACS) to the details below and include your <strong>Booking Id</strong> as the Reference:`}
         </p>
 
         <table class="bank-table">
@@ -941,8 +984,8 @@ export function generateDepositRequestHtml(
       <!-- Important Policy Notice -->
       <p style="font-size: 14px; line-height: 1.65; color: #334155; margin: 20px 0 12px;">
         ${isCymraeg
-          ? `Os na dderbynnir y blaendal o fewn yr amser penodedig, bydd eich arhosiad yn cael ei dynnu o’r calendr yn awtomatig, gan ryddhau’r dyddiadau i eraill, gan ein bod yn tybio nad oes gennych ddiddordeb bellach.`
-          : `If payment of the deposit is not received within the time specified then your stay will automatically be removed from the calendar, making the dates available to others, as we assume that you are no longer interested.`}
+          ? `Os na dderbynnir y ${isFullPaymentRequired ? 'taliad llawn' : 'blaendal'} o fewn yr amser penodedig, bydd eich arhosiad yn cael ei dynnu o’r calendr yn awtomatig, gan ryddhau’r dyddiadau i eraill, gan ein bod yn tybio nad oes gennych ddiddordeb bellach.`
+          : `If ${isFullPaymentRequired ? 'full payment' : 'payment of the deposit'} is not received within the time specified then your stay will automatically be removed from the calendar, making the dates available to others, as we assume that you are no longer interested.`}
       </p>
       <p style="font-size: 14px; line-height: 1.65; color: #334155; margin: 0 0 20px;">
         ${isCymraeg
@@ -986,17 +1029,26 @@ export function generateDepositRequestText(
   const checkInTime = settings?.checkInTime || '15:00';
   const checkOutTime = settings?.checkOutTime || '10:00';
   const depositPct = settings?.depositPercentage || 25;
+  const fullPaymentWindow = settings?.balanceReminderDaysBeforeArrival ?? 60;
+  const isFullPaymentRequired =
+    isStayWithinFullPaymentWindow(data.checkIn, fullPaymentWindow) ||
+    (data.totalPrice > 0 && data.balanceDue === 0 && data.depositAmount >= data.totalPrice);
+  const amountDueNow = isFullPaymentRequired ? data.totalPrice : data.depositAmount;
+  const remainingBalance = isFullPaymentRequired ? 0 : data.balanceDue;
+
   const siteTitle = settings?.siteTitle || 'Plas Hafod Cottage & Bryn Bugeiliaid Bach';
   const address =
     (isCymraeg && settings?.addressCy ? settings.addressCy : settings?.address) ||
     'Bwthyn Plas Hafod, Nebo, Gwynedd, LL54 6EB';
 
   if (isCymraeg) {
-    return `CAIS AM FLAENDAL – ${data.propertyTitle}
+    return `${isFullPaymentRequired ? 'CAIS AM DALIAD LLAWN' : 'CAIS AM FLAENDAL'} – ${data.propertyTitle}
 
 Helo ${data.guestName},
 
-Diolch am eich diddordeb yn ${data.propertyTitle}. Mae’r dyddiadau y gwnaethoch gais amdanynt ar gael ac er mwyn sicrhau eich arhosiad mae blaendal o £${data.depositAmount} yn ddyledus o fewn ${holdHours} awr o’r e-bost hwn${data.depositDeadline ? ` (erbyn ${data.depositDeadline})` : ''}. Mae manylion y swm a’r dull talu isod.
+${isFullPaymentRequired
+  ? `Diolch am eich diddordeb yn ${data.propertyTitle}. Mae’r dyddiadau y gwnaethoch gais amdanynt ar gael! Gan fod eich dyddiad cyrraedd o fewn ${fullPaymentWindow} diwrnod, mae taliad llawn o £${amountDueNow} yn ddyledus o fewn ${holdHours} awr o’r e-bost hwn${data.depositDeadline ? ` (erbyn ${data.depositDeadline})` : ''} er mwyn sicrhau eich arhosiad. Mae manylion y swm a’r dull talu isod.`
+  : `Diolch am eich diddordeb yn ${data.propertyTitle}. Mae’r dyddiadau y gwnaethoch gais amdanynt ar gael ac er mwyn sicrhau eich arhosiad mae blaendal o £${amountDueNow} yn ddyledus o fewn ${holdHours} awr o’r e-bost hwn${data.depositDeadline ? ` (erbyn ${data.depositDeadline})` : ''}. Mae manylion y swm a’r dull talu isod.`}
 
 ${data.customHostNote ? `NODYN GAN EICH LLETYWYR:\n"${data.customHostNote}"\n\n` : ''}BWTHYN A ARCHEBWYD: ${data.propertyTitle} (${data.adults} Oedolyn, ${data.children} Plentyn, ${data.pets || 0} Ci • ${data.totalNights} Noson)
 CYRRAEDD: ${formatDateUK(data.checkIn)} (Cyrraedd: ${checkInTime})
@@ -1004,18 +1056,19 @@ GADAEL: ${formatDateUK(data.checkOut)} (Gadael: ${checkOutTime})
 
 DADANSODDIAD O'R GOST:
 ${data.appliedDiscountName ? `Cynnig Arbennig - ${data.appliedDiscountName} (-£${data.discountAmount})\n` : ''}Cyfanswm Pris - £${data.totalPrice}
-${settings?.depositType === 'percentage' ? `Blaendal (${depositPct}%)` : 'Blaendal'} - £${data.depositAmount}
-Gweddill y Balans - £${data.balanceDue} (dyledus 60 diwrnod cyn eich arhosiad)
+${isFullPaymentRequired
+  ? `Taliad Llawn yn Ddyledus Nawr (o fewn ${fullPaymentWindow} diwrnod) - £${amountDueNow}\nGweddill y Balans - £0`
+  : `${settings?.depositType === 'percentage' ? `Blaendal (${depositPct}%)` : 'Blaendal'} - £${amountDueNow}\nGweddill y Balans - £${remainingBalance} (dyledus ${fullPaymentWindow} diwrnod cyn eich arhosiad)`}
 Cyfeirnod Archebu - ${data.paymentReference}
 
-Gwnewch y taliad o £${data.depositAmount} trwy drosglwyddiad banc uniongyrchol (BACS) i’r manylion isod a chofiwch gynnwys eich Cyfeirnod Archebu fel y cyfeirnod:
+Gwnewch y taliad o £${amountDueNow} trwy drosglwyddiad banc uniongyrchol (BACS) i’r manylion isod a chofiwch gynnwys eich Cyfeirnod Archebu fel y cyfeirnod:
 
 Enw'r Cyfrif: ${data.bankAccountName}
 Cod Didoli: ${data.bankSortCode}
 Rhif y Cyfrif: ${data.bankAccountNumber}
 ${data.bankName ? `Enw'r Banc: ${data.bankName}\n` : ''}${data.bankIban ? `IBAN: ${data.bankIban}\n` : ''}${data.bankBic ? `BIC/SWIFT: ${data.bankBic}\n` : ''}Cyfeirnod: ${data.paymentReference}
 
-Os na dderbynnir y blaendal o fewn yr amser penodedig, bydd eich arhosiad yn cael ei dynnu o’r calendr yn awtomatig, gan ryddhau’r dyddiadau i eraill.
+Os na dderbynnir y ${isFullPaymentRequired ? 'taliad llawn' : 'blaendal'} o fewn yr amser penodedig, bydd eich arhosiad yn cael ei dynnu o’r calendr yn awtomatig, gan ryddhau’r dyddiadau i eraill.
 
 Bydd cadarnhad diogel o’ch taliad yn cael ei anfon o fewn 48 awr i dderbyn y taliad.
 
@@ -1027,11 +1080,13 @@ Gwefan: https://plashafodcottage.co.uk
 Ebost: info@plashafodcottage.co.uk`;
   }
 
-  return `DEPOSIT REQUEST – ${data.propertyTitle}
+  return `${isFullPaymentRequired ? 'FULL PAYMENT REQUEST' : 'DEPOSIT REQUEST'} – ${data.propertyTitle}
 
 Hi ${data.guestName},
 
-Thank you for your interest in ${data.propertyTitle}. Dates you requested are available and to secure your stay a deposit of £${data.depositAmount} is payable within ${holdHours} hours of this e-mail${data.depositDeadline ? ` (by ${data.depositDeadline})` : ''}. Details of the amount and payment method are below.
+${isFullPaymentRequired
+  ? `Thank you for your interest in ${data.propertyTitle}. The dates you requested are available! As your arrival date is within ${fullPaymentWindow} days, full payment of £${amountDueNow} is payable within ${holdHours} hours of this e-mail${data.depositDeadline ? ` (by ${data.depositDeadline})` : ''} to secure your stay. Details of the amount and payment method are below.`
+  : `Thank you for your interest in ${data.propertyTitle}. Dates you requested are available and to secure your stay a deposit of £${amountDueNow} is payable within ${holdHours} hours of this e-mail${data.depositDeadline ? ` (by ${data.depositDeadline})` : ''}. Details of the amount and payment method are below.`}
 
 ${data.customHostNote ? `NOTE FROM YOUR HOSTS:\n"${data.customHostNote}"\n\n` : ''}COTTAGE BOOKED: ${data.propertyTitle} (${data.adults} Adults, ${data.children} Children, ${data.pets || 0} Dogs • ${data.totalNights} Nights)
 ARRIVAL: ${formatDateUK(data.checkIn)} (Check-in: ${checkInTime})
@@ -1039,18 +1094,19 @@ DEPARTURE: ${formatDateUK(data.checkOut)} (Check-out: ${checkOutTime})
 
 COST BREAKDOWN:
 ${data.appliedDiscountName ? `Special Offer - ${data.appliedDiscountName} (-£${data.discountAmount})\n` : ''}Total Price - £${data.totalPrice}
-${settings?.depositType === 'percentage' ? `Deposit (${depositPct}%)` : 'Deposit'} - £${data.depositAmount}
-Remaining Balance - £${data.balanceDue} (due 60 days prior to stay)
+${isFullPaymentRequired
+  ? `Full Payment Due Now (stay within ${fullPaymentWindow} days) - £${amountDueNow}\nRemaining Balance - £0`
+  : `${settings?.depositType === 'percentage' ? `Deposit (${depositPct}%)` : 'Deposit'} - £${amountDueNow}\nRemaining Balance - £${remainingBalance} (due ${fullPaymentWindow} days prior to stay)`}
 Booking Id - ${data.paymentReference}
 
-Please make the payment of £${data.depositAmount} via direct bank transfer to the details below and include your Booking Id as the Reference:
+Please make the payment of £${amountDueNow} via direct bank transfer to the details below and include your Booking Id as the Reference:
 
 Account Name: ${data.bankAccountName}
 Sort Code: ${data.bankSortCode}
 Account Number: ${data.bankAccountNumber}
 ${data.bankName ? `Bank Name: ${data.bankName}\n` : ''}${data.bankIban ? `IBAN: ${data.bankIban}\n` : ''}${data.bankBic ? `BIC/SWIFT: ${data.bankBic}\n` : ''}Booking Id / Reference: ${data.paymentReference}
 
-If payment of the deposit is not received within the time specified then your stay will automatically be removed from the calendar, making the dates available to others, as we assume that you are no longer interested.
+If ${isFullPaymentRequired ? 'full payment' : 'payment of the deposit'} is not received within the time specified then your stay will automatically be removed from the calendar, making the dates available to others, as we assume that you are no longer interested.
 
 Safe receipt of your payment will be forwarded within 48hrs of payment.
 
