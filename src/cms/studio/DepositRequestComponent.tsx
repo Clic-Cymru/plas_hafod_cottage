@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { useFormValue, set, PatchEvent } from 'sanity';
+import { useFormValue, useDocumentOperation, unset, PatchEvent } from 'sanity';
 
 interface BankDetailsSummary {
   bankAccountName?: string;
@@ -12,14 +12,33 @@ interface BankDetailsSummary {
 }
 
 interface DepositRequestProps {
+  value?: unknown;
   onChange?: (patch: PatchEvent) => void;
 }
 
 export function DepositRequestComponent(props: DepositRequestProps) {
-  const { onChange } = props;
+  const { value, onChange } = props;
 
   // Read current document state via Sanity Studio hook
   const docId = useFormValue(['_id']) as string;
+  const cleanDocId = (docId || '').replace(/^drafts\./, '');
+  const { patch } = useDocumentOperation(cleanDocId || 'placeholder-id', 'bookingInquiry');
+
+  // Automatically clear any legacy object value accidentally written to this string field
+  useEffect(() => {
+    if (value && typeof value === 'object' && onChange) {
+      onChange(PatchEvent.from([unset()]));
+    }
+  }, [value, onChange]);
+
+  const patchRootDocument = (fieldsToSet: Record<string, unknown>) => {
+    if (cleanDocId && patch) {
+      patch.execute([{ set: fieldsToSet, unset: ['depositWorkflow'] }]);
+    }
+    if (onChange) {
+      onChange(PatchEvent.from([unset()]));
+    }
+  };
   const inquiryRefId = useFormValue(['id']) as string;
   const status = useFormValue(['status']) as string;
   const guestName = useFormValue(['guestName']) as string;
@@ -127,23 +146,19 @@ export function DepositRequestComponent(props: DepositRequestProps) {
         throw new Error(result.error || 'Failed to send deposit email.');
       }
 
-      // Update Sanity Studio fields in the active form
+      // Update Sanity Studio root document fields in the active form
       const now = new Date().toISOString();
-      if (onChange) {
-        onChange(
-          PatchEvent.from([
-            set('deposit_requested', ['status']),
-            set(result.paymentReference || computedRef, ['paymentReference']),
-            set(now, ['depositSentAt']),
-            set('sent', ['depositEmailStatus']),
-            set(customNote, ['customDepositNote']),
-          ])
-        );
-      }
+      patchRootDocument({
+        status: 'deposit_requested',
+        paymentReference: result.paymentReference || computedRef,
+        depositSentAt: now,
+        depositEmailStatus: 'sent',
+        customDepositNote: customNote,
+      });
 
       setStatusMessage({
         type: 'success',
-        text: `Deposit request sent to ${guestEmail} (Ref: ${result.paymentReference || computedRef})!`,
+        text: `${isFullPaymentUpfront ? 'Full payment' : 'Deposit'} request sent to ${guestEmail} (Ref: ${result.paymentReference || computedRef})!`,
       });
     } catch (err: unknown) {
       console.error(err);
@@ -183,25 +198,21 @@ export function DepositRequestComponent(props: DepositRequestProps) {
         }),
       });
 
-      const data = await res.json();
+      await res.json();
       const now = new Date().toISOString();
-      if (onChange) {
-        onChange(
-          PatchEvent.from([
-            set('confirmed', ['status']),
-            set(now, ['depositPaidAt']),
-          ])
-        );
-      }
+      patchRootDocument({
+        status: 'confirmed',
+        depositPaidAt: now,
+      });
       setStatusMessage({
         type: 'success',
         text: '✓ Deposit cleared! Status updated to "Confirmed Booking - Awaiting Full Payment" and confirmation receipt sent to guest.',
       });
     } catch (err: unknown) {
       console.error(err);
-      if (onChange) {
-        onChange(PatchEvent.from([set('confirmed', ['status'])]));
-      }
+      patchRootDocument({
+        status: 'confirmed',
+      });
       setStatusMessage({
         type: 'info',
         text: 'Status marked as "Confirmed Booking - Awaiting Full Payment".',
@@ -246,18 +257,14 @@ export function DepositRequestComponent(props: DepositRequestProps) {
       }
 
       const now = new Date().toISOString();
-      if (onChange) {
-        onChange(
-          PatchEvent.from([
-            set('completed', ['status']),
-            set(true, ['finalBalancePaid']),
-            set(now, ['finalBalancePaidAt']),
-            set(now, ['finalPaymentReceiptSentAt']),
-            set('sent', ['checkInEmailStatus']),
-            set(now, ['checkInEmailSentAt']),
-          ])
-        );
-      }
+      patchRootDocument({
+        status: 'completed',
+        finalBalancePaid: true,
+        finalBalancePaidAt: now,
+        finalPaymentReceiptSentAt: now,
+        checkInEmailStatus: 'sent',
+        checkInEmailSentAt: now,
+      });
       setStatusMessage({
         type: 'success',
         text: '🎉 Booking marked as Complete & Confirmed! Full payment receipt, directions and check-in instructions have been emailed to the guest.',
@@ -272,21 +279,17 @@ export function DepositRequestComponent(props: DepositRequestProps) {
   };
 
   const handleToggleFinalBalance = () => {
-    if (onChange) {
-      const nextVal = !finalBalancePaid;
-      onChange(
-        PatchEvent.from([
-          set(nextVal, ['finalBalancePaid']),
-          set(nextVal ? new Date().toISOString() : null, ['finalBalancePaidAt']),
-        ])
-      );
-      setStatusMessage({
-        type: 'success',
-        text: nextVal
-          ? '✓ Final balance marked as Paid! Check-in instructions can now be released.'
-          : 'Final balance marked as Unpaid.',
-      });
-    }
+    const nextVal = !finalBalancePaid;
+    patchRootDocument({
+      finalBalancePaid: nextVal,
+      finalBalancePaidAt: nextVal ? new Date().toISOString() : null,
+    });
+    setStatusMessage({
+      type: 'success',
+      text: nextVal
+        ? '✓ Final balance marked as Paid! Check-in instructions can now be released.'
+        : 'Final balance marked as Unpaid.',
+    });
   };
 
   const handleDispatchAction = async (actionType: 'checkin' | 'balance') => {
@@ -304,25 +307,19 @@ export function DepositRequestComponent(props: DepositRequestProps) {
           text:
             actionType === 'checkin'
               ? '✓ Check-in Guide & Key Safe Code successfully emailed to guest!'
-              : '✓ 14-Day Balance Reminder successfully emailed to guest!',
+              : '✓ Balance Reminder successfully emailed to guest!',
         });
-        if (onChange) {
-          const sentAt = new Date().toISOString();
-          if (actionType === 'checkin') {
-            onChange(
-              PatchEvent.from([
-                set('sent', ['checkInEmailStatus']),
-                set(sentAt, ['checkInEmailSentAt']),
-              ])
-            );
-          } else {
-            onChange(
-              PatchEvent.from([
-                set('sent', ['balanceReminderStatus']),
-                set(sentAt, ['balanceReminderSentAt']),
-              ])
-            );
-          }
+        const sentAt = new Date().toISOString();
+        if (actionType === 'checkin') {
+          patchRootDocument({
+            checkInEmailStatus: 'sent',
+            checkInEmailSentAt: sentAt,
+          });
+        } else {
+          patchRootDocument({
+            balanceReminderStatus: 'sent',
+            balanceReminderSentAt: sentAt,
+          });
         }
       } else {
         setStatusMessage({

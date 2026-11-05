@@ -77,7 +77,7 @@ export function SubpageHero({
       </div>
 
       {/* Exact Elementor Wave-Brush SVG Bottom Divider */}
-      <div className="relative z-20 w-full overflow-hidden leading-none -mb-[1px]">
+      <div className="relative z-20 w-full shrink-0 overflow-hidden leading-none -mb-[1px]">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 283.5 27.8"

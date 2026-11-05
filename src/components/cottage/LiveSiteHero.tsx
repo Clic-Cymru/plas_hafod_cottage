@@ -77,7 +77,13 @@ export function LiveSiteHero({
 
   return (
     <>
-      <div className="relative h-[540px] sm:h-[575px] md:h-[595px] lg:h-[600px] max-h-[610px] flex flex-col justify-between overflow-hidden bg-stone-950">
+      <div
+        className={`relative flex flex-col justify-between overflow-hidden bg-stone-950 ${
+          showBanner
+            ? 'h-[580px] sm:h-[620px] md:h-[645px] lg:h-[655px]'
+            : 'h-[540px] sm:h-[575px] md:h-[595px] lg:h-[600px]'
+        }`}
+      >
         {/* Cinematic, prominent Ken Burns keyframes for each slide */}
         <style
           dangerouslySetInnerHTML={{
@@ -177,9 +183,9 @@ export function LiveSiteHero({
         </div>
 
         {/* Main Content & Center Watermark Logo */}
-        <div className={`relative z-20 flex-1 flex flex-col items-center justify-center px-4 pb-4 text-center ${showBanner ? 'pt-24 sm:pt-28' : 'pt-16 sm:pt-20'}`}>
+        <div className={`relative z-20 flex-1 min-h-0 flex flex-col items-center justify-center px-4 pb-3 text-center ${showBanner ? 'pt-24 sm:pt-28' : 'pt-16 sm:pt-20'}`}>
           {/* Bigger White Watermark Logo */}
-          <div className="relative w-full max-w-[680px] sm:max-w-[800px] md:max-w-[900px] lg:max-w-[960px] h-[320px] sm:h-[380px] md:h-[425px] lg:h-[450px] select-none pointer-events-none drop-shadow-2xl">
+          <div className="relative w-full max-w-[680px] sm:max-w-[800px] md:max-w-[900px] lg:max-w-[960px] h-[290px] sm:h-[345px] md:h-[385px] lg:h-[405px] select-none pointer-events-none drop-shadow-2xl">
             <Image
               src="/images/wp/logo-white.png"
               alt="Bwthyn Plas Hafod Cottage"
@@ -191,7 +197,7 @@ export function LiveSiteHero({
         </div>
 
       {/* Exact Elementor Wave-Brush SVG Bottom Divider */}
-      <div className="relative z-20 w-full overflow-hidden leading-none -mb-[1px]">
+      <div className="relative z-20 w-full shrink-0 overflow-hidden leading-none -mb-[1px]">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 283.5 27.8"
