@@ -141,6 +141,7 @@ export async function POST(request: Request) {
     if (action === 'deposit-confirmed') {
       const emailResult = await sendDepositReceiptEmail({
         propertyTitle,
+        propertyId: inquiry.propertyId,
         guestName: inquiry.guestName,
         guestEmail: inquiry.guestEmail,
         guestPhone: inquiry.guestPhone,
@@ -210,6 +211,7 @@ export async function POST(request: Request) {
     if (action === 'complete-confirmed' || action === 'resend-full-payment') {
       const emailResult = await sendFullPaymentReceiptEmail({
         propertyTitle,
+        propertyId: inquiry.propertyId,
         guestName: inquiry.guestName,
         guestEmail: inquiry.guestEmail,
         guestPhone: inquiry.guestPhone,

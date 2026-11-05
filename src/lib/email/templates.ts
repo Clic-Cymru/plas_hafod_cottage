@@ -1118,6 +1118,26 @@ Website: https://plashafodcottage.co.uk
 Email: info@plashafodcottage.co.uk`;
 }
 
+function resolvePropertyDirections(rawDirections: string, isBBB: boolean, isCymraeg: boolean = false): string {
+  if (!isBBB) return rawDirections;
+
+  let resolved = rawDirections
+    .replace(
+      /The property name is PLAS HAFOD COTTAGE which is the long white cottage\./gi,
+      'The property name is BRYN BUGEILIAID BACH which is down the steps and around the corner - NOT the long white cottage! '
+    )
+    .replace(/\/\/\/perfume\.punctuate\.ready/gi, '///skills.shorts.aced');
+
+  if (isCymraeg) {
+    resolved = resolved.replace(
+      /Enw['’]r eiddo yw BWTHYN PLAS HAFOD sef y bwthyn gwyn hir\./gi,
+      "Enw'r eiddo yw BRYN BUGEILIAID BACH sydd i lawr y grisiau ac o amgylch y gornel - NID y bwthyn gwyn hir!"
+    );
+  }
+
+  return resolved;
+}
+
 /**
  * 6. Guest Check-in Guide & Arrival Directions (Sent 30 Days Prior to Stay)
  */
@@ -1135,33 +1155,31 @@ export function generateCheckInGuideHtml(
     (isCymraeg && settings?.addressCy ? settings.addressCy : settings?.address) ||
     'Plas Hafod Cottage, Nebo, Penygroes, Caernarfon, Gwynedd, LL54 6EB';
 
-  const isBBB = data.propertyId === 'bryn-bugeiliaid-bach';
+  const isBBB = data.propertyId === 'bryn-bugeiliaid-bach' || data.propertyTitle.toLowerCase().includes('bryn bugeiliaid');
   const propertyWhat3Words = isBBB ? '///skills.shorts.aced' : '///perfume.punctuate.ready';
   const defaultKeySafe = isBBB ? (settings?.bbbKeySafe || 'Unlocked (Key inside)') : (settings?.plasHafodKeySafe || 'Unlocked (Key inside)');
   const keySafeCode = data.keySafeCode || defaultKeySafe;
   const isUnlockedEntry = /unlocked|key inside/i.test(keySafeCode);
 
-  const cottageGuidanceEn = isBBB
-    ? 'Drive across the track and bear left, keep following the lane until you see the cottage ahead of you.\nWhat 3 words ///skills.shorts.aced'
-    : 'Drive across the track and bear right, you will see the cottage ahead of you.\nWhat 3 words ///perfume.punctuate.ready';
+  const propertyFooterEn = isBBB
+    ? `The property name is BRYN BUGEILIAID BACH which is down the steps and around the corner - NOT the long white cottage! \n(Post Code of the property is LL54 6EB but this will take you via Nebo so please do follow directions as above)\nIf you use the What Three Words App this combination marks the entrance of the property: ///skills.shorts.aced`
+    : `The property name is PLAS HAFOD COTTAGE which is the long white cottage.\n(Post Code of the property is LL54 6EB but this will take you via Nebo so please do follow directions as above)\nIf you use the What Three Words App this combination marks the entrance of the property: ///perfume.punctuate.ready`;
 
-  const defaultDirectionsEn = `From the A55 follow the A487 heading towards Porthmadog. Once past Penygroes look for signs to NEBO. Do not turn towards Nebo. Follow the A487 for another mile. You will see a sign for a left turning ahead. Please indicate left and slow down. The turning is a very narrow lane opposite the entrance to TG Cefn Graianog (Quarry) - signage in cream with red writing.\n\nFollow the lane up the hill to the T-junction by the white farm house. Turn left. Follow the lane up the hill and take the first right turning. Follow the steep lane up around the bend approx. 1 mile. The entrance to Bwthyn Plas Hafod Cottage and Bryn Bugeiliaid will be sign posted on your left. Drive across track in the field and you will have reached your destination! There is a designated parking area for your accommodation.\n\n${cottageGuidanceEn}\n\nShould you travel through Porthmadog towards Caernarfon you will pass via the Villages of Bryncir and Pant Glas. Just after Pant Glas the signs for TG Cefn Graianog will be on your left and you need to take the narrow lane opposite on your right. Then follow the directions as above.\n\n(Caernarfon to Nebo = Approx. 11 miles / Porthmadog to Nebo = Approx. 11 miles)\nPostcode: LL54 6EB (Note: Sat Nav will take you via Nebo, so please follow the directions above).\nWhat3Words entrance: ${propertyWhat3Words}`;
+  const defaultDirectionsEn = `From the A55 follow the A487 heading towards Porthmadog. Once past Penygroes look for signs to NEBO. Do not turn towards Nebo. Follow the A487 for another mile. You will see a sign for a left turning ahead. Please indicate left and slow down. The turning is a very narrow lane opposite the entrance to TG Cefn Graianog (Quarry) - signage in cream with red writing.\n\nFollow the lane up the hill to the T-junction by the white farm house. Turn left. Follow the lane up the hill and take the first right turning. Follow the steep lane up around the bend approx. 1 mile. The entrance to Bwthyn Plas Hafod Cottage and Bryn Bugeiliaid will be sign posted on your left. Drive across track in the field and you will have reached your destination! There is a designated parking area for your accommodation.\n\nShould you travel through Porthmadog towards Caernarfon you will pass via the Villages of Bryncir and Pant Glas. Just after Pant Glas the signs for TG Cefn Graianog will be on your left and you need to take the narrow lane opposite on your right. Then follow the directions as above .....\n\n(Caernarfon to Nebo = Approx. 11 miles / Porthmadog to Nebo = Approx. 11 miles)\n${propertyFooterEn}`;
 
-  const cottageGuidanceCy = isBBB
-    ? 'Gyrrwch ar draws y trac a throi i’r chwith, daliwch i ddilyn y lôn nes i chi weld y bwthyn o’ch blaen.\nWhat 3 words ///skills.shorts.aced'
-    : 'Gyrrwch ar draws y trac a throi i’r dde, byddwch yn gweld y bwthyn o’ch blaen.\nWhat 3 words ///perfume.punctuate.ready';
+  const propertyFooterCy = isBBB
+    ? `Enw'r eiddo yw BRYN BUGEILIAID BACH sydd i lawr y grisiau ac o amgylch y gornel - NID y bwthyn gwyn hir!\n(Cod Post yr eiddo yw LL54 6EB ond bydd Sat Nav yn mynd â chi trwy Nebo felly dilynwch y cyfarwyddiadau uchod)\nOs ydych yn defnyddio ap What Three Words mae'r cyfuniad hwn yn nodi mynedfa'r eiddo: ///skills.shorts.aced`
+    : `Enw'r eiddo yw BWTHYN PLAS HAFOD sef y bwthyn gwyn hir.\n(Cod Post yr eiddo yw LL54 6EB ond bydd Sat Nav yn mynd â chi trwy Nebo felly dilynwch y cyfarwyddiadau uchod)\nOs ydych yn defnyddio ap What Three Words mae'r cyfuniad hwn yn nodi mynedfa'r eiddo: ///perfume.punctuate.ready`;
 
-  const defaultDirectionsCy = `O'r A55 dilynwch yr A487 gan anelu tuag at Borthmadog. Ar ôl pasio Pen-y-groes edrychwch am arwyddion i NEBO. Peidiwch â throi tuag at Nebo. Dilynwch yr A487 am filltir arall. Byddwch yn gweld arwydd ar gyfer troi i'r chwith o'ch blaen. Rhowch eich dangosydd ymlaen ac arafwch. Mae'r troad yn lôn gul iawn gyferbyn â mynfa Chwarel TG Cefn Graianog (arwydd hufen gydag ysgrifen goch).\n\nDilynwch y lôn i fyny'r rhiw i'r gyffordd-T wrth y ffermdy gwyn. Trowch i'r chwith. Dilynwch y lôn i fyny'r rhiw a chymryd y troad cyntaf i'r dde. Dilynwch y lôn serth i fyny rownd y tro am oddeutu milltir. Bydd y fynedfa i Fwthyn Plas Hafod a Bryn Bugeiliaid wedi'i harwyddo ar eich chwith. Gyrrwch ar draws y trac yn y cae a byddwch wedi cyrraedd! Mae man parcio dynodedig ar gyfer eich llety.\n\n${cottageGuidanceCy}\n\nOs ydych yn teithio trwy Borthmadog tuag at Gaernarfon byddwch yn mynd trwy bentrefi Bryncir a Phant Glas. Yn syth ar ôl Pant Glas bydd yr arwyddion ar gyfer TG Cefn Graianog ar eich chwith ac mae angen i chi gymryd y lôn gul gyferbyn ar eich dde. Yna dilynwch y cyfarwyddiadau uchod.\n\n(Caernarfon i Nebo = Tua 11 milltir / Porthmadog i Nebo = Tua 11 milltir)\nCôd Post: LL54 6EB (Nodyn: Bydd Sat Nav yn eich tywys trwy Nebo, felly dilynwch y cyfarwyddiadau uchod).\nWhat3Words y fynedfa: ${propertyWhat3Words}`;
+  const defaultDirectionsCy = `O'r A55 dilynwch yr A487 gan anelu tuag at Borthmadog. Ar ôl pasio Pen-y-groes edrychwch am arwyddion i NEBO. Peidiwch â throi tuag at Nebo. Dilynwch yr A487 am filltir arall. Byddwch yn gweld arwydd ar gyfer troi i'r chwith o'ch blaen. Rhowch eich dangosydd ymlaen ac arafwch. Mae'r troad yn lôn gul iawn gyferbyn â mynfa Chwarel TG Cefn Graianog (arwydd hufen gydag ysgrifen goch).\n\nDilynwch y lôn i fyny'r rhiw i'r gyffordd-T wrth y ffermdy gwyn. Trowch i'r chwith. Dilynwch y lôn i fyny'r rhiw a chymryd y troad cyntaf i'r dde. Dilynwch y lôn serth i fyny rownd y tro am oddeutu milltir. Bydd y fynedfa i Fwthyn Plas Hafod a Bryn Bugeiliaid wedi'i harwyddo ar eich chwith. Gyrrwch ar draws y trac yn y cae a byddwch wedi cyrraedd! Mae man parcio dynodedig ar gyfer eich llety.\n\nOs ydych yn teithio trwy Borthmadog tuag at Gaernarfon byddwch yn mynd trwy bentrefi Bryncir a Phant Glas. Yn syth ar ôl Pant Glas bydd yr arwyddion ar gyfer TG Cefn Graianog ar eich chwith ac mae angen i chi gymryd y lôn gul gyferbyn ar eich dde. Yna dilynwch y cyfarwyddiadau uchod.\n\n(Caernarfon i Nebo = Tua 11 milltir / Porthmadog i Nebo = Tua 11 milltir)\n${propertyFooterCy}`;
 
-  const directions = data.directions || (isCymraeg ? settings?.checkInDirectionsCy || defaultDirectionsCy : settings?.checkInDirectionsEn || defaultDirectionsEn);
+  const rawDirections = data.directions || (isCymraeg ? settings?.checkInDirectionsCy || defaultDirectionsCy : settings?.checkInDirectionsEn || defaultDirectionsEn);
+  const directions = resolvePropertyDirections(rawDirections, isBBB, isCymraeg);
 
   const directionsHtml = directions
     .split(/\n\n+/)
     .map((p) => `<p style="font-size: 13px; line-height: 1.6; color: #475569; margin: 0 0 10px;">${p.replace(/\n/g, '<br>')}</p>`)
     .join('');
-
-  const wasteInfo = data.wasteInstructions || (isCymraeg ? settings?.wasteBinInstructionsCy : settings?.wasteBinInstructionsEn) ||
-    'General refuse (black bin) and mixed recycling (blue/green caddies) are located beside the timber woodshed. Collection is early Wednesday morning.';
 
   const badgeText = isCymraeg ? 'CYFARWYDDIADAU CYRRAEDD A CHROESO' : 'DIRECTIONS & ARRIVAL GUIDE';
   const bannerHeading = isCymraeg ? 'Eich Gwyliau yn Eryri – Cyfarwyddiadau Cyrraedd' : 'Your Holiday in Eryri / Snowdonia – Directions & Arrival Guide';
@@ -1278,16 +1296,6 @@ export function generateCheckInGuideHtml(
         ${directionsHtml}
       </div>
 
-      <!-- Bins & Care Info -->
-      <div class="info-card">
-        <strong style="font-size: 14px; color: #0f172a; display: block; margin-bottom: 4px;">
-          ♻️ ${isCymraeg ? 'Ailgylchu a Sbwriel' : 'Waste & Recycling'}
-        </strong>
-        <p style="font-size: 13px; line-height: 1.55; color: #475569; margin: 0;">
-          ${wasteInfo}
-        </p>
-      </div>
-
       <p style="font-size: 13px; color: #64748b; line-height: 1.6; margin-top: 24px;">
         ${isCymraeg
           ? `Os oes gennych unrhyw gwestiynau peidiwch ag oedi i ffonio neu anfon e-bost atom: <strong>${phone}</strong>.`
@@ -1331,25 +1339,26 @@ export function generateCheckInGuideText(
     (isCymraeg && settings?.addressCy ? settings.addressCy : settings?.address) ||
     'Plas Hafod Cottage, Nebo, Penygroes, Caernarfon, Gwynedd, LL54 6EB';
 
-  const isBBB = data.propertyId === 'bryn-bugeiliaid-bach';
+  const isBBB = data.propertyId === 'bryn-bugeiliaid-bach' || data.propertyTitle.toLowerCase().includes('bryn bugeiliaid');
   const propertyWhat3Words = isBBB ? '///skills.shorts.aced' : '///perfume.punctuate.ready';
   const defaultKeySafe = isBBB ? (settings?.bbbKeySafe || 'Unlocked (Key inside)') : (settings?.plasHafodKeySafe || 'Unlocked (Key inside)');
   const keySafeCode = data.keySafeCode || defaultKeySafe;
   const isUnlockedEntry = /unlocked|key inside/i.test(keySafeCode);
 
-  const cottageGuidanceEn = isBBB
-    ? 'Drive across the track and bear left, keep following the lane until you see the cottage ahead of you.\nWhat 3 words ///skills.shorts.aced'
-    : 'Drive across the track and bear right, you will see the cottage ahead of you.\nWhat 3 words ///perfume.punctuate.ready';
+  const propertyFooterEn = isBBB
+    ? `The property name is BRYN BUGEILIAID BACH which is down the steps and around the corner - NOT the long white cottage! \n(Post Code of the property is LL54 6EB but this will take you via Nebo so please do follow directions as above)\nIf you use the What Three Words App this combination marks the entrance of the property: ///skills.shorts.aced`
+    : `The property name is PLAS HAFOD COTTAGE which is the long white cottage.\n(Post Code of the property is LL54 6EB but this will take you via Nebo so please do follow directions as above)\nIf you use the What Three Words App this combination marks the entrance of the property: ///perfume.punctuate.ready`;
 
-  const defaultDirectionsEn = `From the A55 follow the A487 heading towards Porthmadog. Once past Penygroes look for signs to NEBO. Do not turn towards Nebo. Follow the A487 for another mile. You will see a sign for a left turning ahead. Please indicate left and slow down. The turning is a very narrow lane opposite the entrance to TG Cefn Graianog (Quarry) - signage in cream with red writing.\n\nFollow the lane up the hill to the T-junction by the white farm house. Turn left. Follow the lane up the hill and take the first right turning. Follow the steep lane up around the bend approx. 1 mile. The entrance to Bwthyn Plas Hafod Cottage and Bryn Bugeiliaid will be sign posted on your left. Drive across track in the field and you will have reached your destination! There is a designated parking area for your accommodation.\n\n${cottageGuidanceEn}\n\nShould you travel through Porthmadog towards Caernarfon you will pass via the Villages of Bryncir and Pant Glas. Just after Pant Glas the signs for TG Cefn Graianog will be on your left and you need to take the narrow lane opposite on your right. Then follow the directions as above.\n\n(Caernarfon to Nebo = Approx. 11 miles / Porthmadog to Nebo = Approx. 11 miles)\nPostcode: LL54 6EB (Note: Sat Nav will take you via Nebo, so please follow the directions above).\nWhat3Words entrance: ${propertyWhat3Words}`;
+  const defaultDirectionsEn = `From the A55 follow the A487 heading towards Porthmadog. Once past Penygroes look for signs to NEBO. Do not turn towards Nebo. Follow the A487 for another mile. You will see a sign for a left turning ahead. Please indicate left and slow down. The turning is a very narrow lane opposite the entrance to TG Cefn Graianog (Quarry) - signage in cream with red writing.\n\nFollow the lane up the hill to the T-junction by the white farm house. Turn left. Follow the lane up the hill and take the first right turning. Follow the steep lane up around the bend approx. 1 mile. The entrance to Bwthyn Plas Hafod Cottage and Bryn Bugeiliaid will be sign posted on your left. Drive across track in the field and you will have reached your destination! There is a designated parking area for your accommodation.\n\nShould you travel through Porthmadog towards Caernarfon you will pass via the Villages of Bryncir and Pant Glas. Just after Pant Glas the signs for TG Cefn Graianog will be on your left and you need to take the narrow lane opposite on your right. Then follow the directions as above .....\n\n(Caernarfon to Nebo = Approx. 11 miles / Porthmadog to Nebo = Approx. 11 miles)\n${propertyFooterEn}`;
 
-  const cottageGuidanceCy = isBBB
-    ? 'Gyrrwch ar draws y trac a throi i’r chwith, daliwch i ddilyn y lôn nes i chi weld y bwthyn o’ch blaen.\nWhat 3 words ///skills.shorts.aced'
-    : 'Gyrrwch ar draws y trac a throi i’r dde, byddwch yn gweld y bwthyn o’ch blaen.\nWhat 3 words ///perfume.punctuate.ready';
+  const propertyFooterCy = isBBB
+    ? `Enw'r eiddo yw BRYN BUGEILIAID BACH sydd i lawr y grisiau ac o amgylch y gornel - NID y bwthyn gwyn hir!\n(Cod Post yr eiddo yw LL54 6EB ond bydd Sat Nav yn mynd â chi trwy Nebo felly dilynwch y cyfarwyddiadau uchod)\nOs ydych yn defnyddio ap What Three Words mae'r cyfuniad hwn yn nodi mynedfa'r eiddo: ///skills.shorts.aced`
+    : `Enw'r eiddo yw BWTHYN PLAS HAFOD sef y bwthyn gwyn hir.\n(Cod Post yr eiddo yw LL54 6EB ond bydd Sat Nav yn mynd â chi trwy Nebo felly dilynwch y cyfarwyddiadau uchod)\nOs ydych yn defnyddio ap What Three Words mae'r cyfuniad hwn yn nodi mynedfa'r eiddo: ///perfume.punctuate.ready`;
 
-  const defaultDirectionsCy = `O'r A55 dilynwch yr A487 gan anelu tuag at Borthmadog. Ar ôl pasio Pen-y-groes edrychwch am arwyddion i NEBO. Peidiwch â throi tuag at Nebo. Dilynwch yr A487 am filltir arall. Byddwch yn gweld arwydd ar gyfer troi i'r chwith o'ch blaen. Rhowch eich dangosydd ymlaen ac arafwch. Mae'r troad yn lôn gul iawn gyferbyn â mynfa Chwarel TG Cefn Graianog (arwydd hufen gydag ysgrifen goch).\n\nDilynwch y lôn i fyny'r rhiw i'r gyffordd-T wrth y ffermdy gwyn. Trowch i'r chwith. Dilynwch y lôn i fyny'r rhiw a chymryd y troad cyntaf i'r dde. Dilynwch y lôn serth i fyny rownd y tro am oddeutu milltir. Bydd y fynedfa i Fwthyn Plas Hafod a Bryn Bugeiliaid wedi'i harwyddo ar eich chwith. Gyrrwch ar draws y trac yn y cae a byddwch wedi cyrraedd! Mae man parcio dynodedig ar gyfer eich llety.\n\n${cottageGuidanceCy}\n\nOs ydych yn teithio trwy Borthmadog tuag at Gaernarfon byddwch yn mynd trwy bentrefi Bryncir a Phant Glas. Yn syth ar ôl Pant Glas bydd yr arwyddion ar gyfer TG Cefn Graianog ar eich chwith ac mae angen i chi gymryd y lôn gul gyferbyn ar eich dde. Yna dilynwch y cyfarwyddiadau uchod.\n\n(Caernarfon i Nebo = Tua 11 milltir / Porthmadog i Nebo = Tua 11 milltir)\nCôd Post: LL54 6EB (Nodyn: Bydd Sat Nav yn eich tywys trwy Nebo, felly dilynwch y cyfarwyddiadau uchod).\nWhat3Words y fynedfa: ${propertyWhat3Words}`;
+  const defaultDirectionsCy = `O'r A55 dilynwch yr A487 gan anelu tuag at Borthmadog. Ar ôl pasio Pen-y-groes edrychwch am arwyddion i NEBO. Peidiwch â throi tuag at Nebo. Dilynwch yr A487 am filltir arall. Byddwch yn gweld arwydd ar gyfer troi i'r chwith o'ch blaen. Rhowch eich dangosydd ymlaen ac arafwch. Mae'r troad yn lôn gul iawn gyferbyn â mynfa Chwarel TG Cefn Graianog (arwydd hufen gydag ysgrifen goch).\n\nDilynwch y lôn i fyny'r rhiw i'r gyffordd-T wrth y ffermdy gwyn. Trowch i'r chwith. Dilynwch y lôn i fyny'r rhiw a chymryd y troad cyntaf i'r dde. Dilynwch y lôn serth i fyny rownd y tro am oddeutu milltir. Bydd y fynedfa i Fwthyn Plas Hafod a Bryn Bugeiliaid wedi'i harwyddo ar eich chwith. Gyrrwch ar draws y trac yn y cae a byddwch wedi cyrraedd! Mae man parcio dynodedig ar gyfer eich llety.\n\nOs ydych yn teithio trwy Borthmadog tuag at Gaernarfon byddwch yn mynd trwy bentrefi Bryncir a Phant Glas. Yn syth ar ôl Pant Glas bydd yr arwyddion ar gyfer TG Cefn Graianog ar eich chwith ac mae angen i chi gymryd y lôn gul gyferbyn ar eich dde. Yna dilynwch y cyfarwyddiadau uchod.\n\n(Caernarfon i Nebo = Tua 11 milltir / Porthmadog i Nebo = Tua 11 milltir)\n${propertyFooterCy}`;
 
-  const directions = data.directions || (isCymraeg ? settings?.checkInDirectionsCy || defaultDirectionsCy : settings?.checkInDirectionsEn || defaultDirectionsEn);
+  const rawDirections = data.directions || (isCymraeg ? settings?.checkInDirectionsCy || defaultDirectionsCy : settings?.checkInDirectionsEn || defaultDirectionsEn);
+  const directions = resolvePropertyDirections(rawDirections, isBBB, isCymraeg);
 
   const googleMapsUrl = "https://www.google.com/maps/place/53%C2%B001'20.7%22N+4%C2%B016'05.2%22W/@53.0224173,-4.2681046,925m/data=!3m2!1e3!4b1!4m5!3m4!1s0x0:0xd26a6eeb24eac6fd!8m2!3d53.0224173!4d-4.2681046?hl=en";
 
@@ -1885,27 +1894,22 @@ export function generateFullPaymentReceiptHtml(
   const keySafeCode = (data as any).keySafeCode || defaultKeySafe;
   const isUnlockedEntry = /unlocked|key inside/i.test(keySafeCode);
 
-  const cottageGuidanceEn = isBBB
-    ? '** The property name is BRYN BUGEILIAID BACH which is down the steps and around the corner - NOT the long white cottage!\nDrive across the track in the field and bear left, keep following the lane until you see the cottage ahead of you.\nWhat3Words: ///skills.shorts.aced'
-    : '** The property name is PLAS HAFOD COTTAGE which is the long white cottage.\nDrive across the track in the field and bear right, you will see the cottage ahead of you.\nWhat3Words: ///perfume.punctuate.ready';
+  const propertyFooterEn = isBBB
+    ? `The property name is BRYN BUGEILIAID BACH which is down the steps and around the corner - NOT the long white cottage! \n(Post Code of the property is LL54 6EB but this will take you via Nebo so please do follow directions as above)\nIf you use the What Three Words App this combination marks the entrance of the property: ///skills.shorts.aced`
+    : `The property name is PLAS HAFOD COTTAGE which is the long white cottage.\n(Post Code of the property is LL54 6EB but this will take you via Nebo so please do follow directions as above)\nIf you use the What Three Words App this combination marks the entrance of the property: ///perfume.punctuate.ready`;
 
-  const cottageGuidanceCy = isBBB
-    ? '** Enw\'r eiddo yw BRYN BUGEILIAID BACH sydd i lawr y grisiau ac o amgylch y gornel - NID y bwthyn gwyn hir!\nGyrrwch ar draws y trac yn y cae a throi i’r chwith, daliwch i ddilyn y lôn nes i chi weld y bwthyn o’ch blaen.\nWhat3Words: ///skills.shorts.aced'
-    : '** Enw\'r eiddo yw BWTHYN PLAS HAFOD sef y bwthyn gwyn hir.\nGyrrwch ar draws y trac yn y cae a throi i’r dde, byddwch yn gweld y bwthyn o’ch blaen.\nWhat3Words: ///perfume.punctuate.ready';
+  const propertyFooterCy = isBBB
+    ? `Enw'r eiddo yw BRYN BUGEILIAID BACH sydd i lawr y grisiau ac o amgylch y gornel - NID y bwthyn gwyn hir!\n(Cod Post yr eiddo yw LL54 6EB ond bydd Sat Nav yn mynd â chi trwy Nebo felly dilynwch y cyfarwyddiadau uchod)\nOs ydych yn defnyddio ap What Three Words mae'r cyfuniad hwn yn nodi mynedfa'r eiddo: ///skills.shorts.aced`
+    : `Enw'r eiddo yw BWTHYN PLAS HAFOD sef y bwthyn gwyn hir.\n(Cod Post yr eiddo yw LL54 6EB ond bydd Sat Nav yn mynd â chi trwy Nebo felly dilynwch y cyfarwyddiadau uchod)\nOs ydych yn defnyddio ap What Three Words mae'r cyfuniad hwn yn nodi mynedfa'r eiddo: ///perfume.punctuate.ready`;
 
-  const defaultDirectionsEn = `From the A55 follow the A487 heading towards Porthmadog. Once past Penygroes the village of Nebo will be signposted on your left - do not take this turning. Carry on for approx half a mile. You will see a sign for a left turning ahead. Please indicate left and slow down. The turning is a very narrow lane opposite the entrance to TG Cefn Graianog (Quarry) - signage in cream with red writing.
+  const defaultDirectionsEn = `From the A55 follow the A487 heading towards Porthmadog. Once past Penygroes look for signs to NEBO. Do not turn towards Nebo. Follow the A487 for another mile. You will see a sign for a left turning ahead. Please indicate left and slow down. The turning is a very narrow lane opposite the entrance to TG Cefn Graianog (Quarry) - signage in cream with red writing.
 
-Follow the lane up the hill to the T-junction by the white farm house. Turn left. Follow the lane up the hill and take the first right turning. Follow the steep lane up around the bend approx. 1 mile. The entrance to Bwthyn Plas Hafod Cottage and Bryn Bugeiliaid will be sign posted on your left by the double gates with two green wheelie bins.
+Follow the lane up the hill to the T-junction by the white farm house. Turn left. Follow the lane up the hill and take the first right turning. Follow the steep lane up around the bend approx. 1 mile. The entrance to Bwthyn Plas Hafod Cottage and Bryn Bugeiliaid will be sign posted on your left. Drive across track in the field and you will have reached your destination! There is a designated parking area for your accommodation.
 
-Drive across track in the field and you will have reached your destination!
-There is a designated parking area for your accommodation - see slate on fencing!
-
-${cottageGuidanceEn}
-
-Should you travel through Porthmadog towards Caernarfon you will pass via the Villages of Bryncir and Pant Glas. Just after Pant Glas the signs for TG Cefn Graianog will be on your left and you need to take the narrow lane opposite on your right. Then follow the directions as above...
+Should you travel through Porthmadog towards Caernarfon you will pass via the Villages of Bryncir and Pant Glas. Just after Pant Glas the signs for TG Cefn Graianog will be on your left and you need to take the narrow lane opposite on your right. Then follow the directions as above .....
 
 (Caernarfon to Nebo = Approx. 11 miles / Porthmadog to Nebo = Approx. 11 miles)
-Postcode: LL54 6EB (Please note: Sat Nav will take you via Nebo so please follow the directions above).`;
+${propertyFooterEn}`;
 
   const defaultDirectionsCy = `O’r A55 dilynwch yr A487 tuag at Borthmadog. Ar ôl mynd heibio Pen-y-groes bydd pentref Nebo wedi’i arwyddo ar eich chwith - peidiwch â chymryd y troad hwn. Daliwch ymlaen am oddeutu hanner milltir. Fe welwch arwydd am droad i’r chwith o’ch blaen. Rhowch eich dangosydd ymlaen ac arafwch. Mae’r troad yn lôn gul iawn gyferbyn â mynedfa TG Cefn Graianog (Chwarel) - arwydd hufen gydag ysgrifen goch.
 
@@ -1914,21 +1918,17 @@ Dilynwch y lôn i fyny’r bryn at y gyffordd T wrth y ffermdy gwyn. Trowch i’
 Gyrrwch ar draws y trac yn y cae a byddwch wedi cyrraedd eich cyrchfan!
 Mae man parcio dynodedig ar gyfer eich llety - gweler y llechen ar y ffens!
 
-${cottageGuidanceCy}
-
 Os ydych yn teithio trwy Borthmadog tuag at Gaernarfon byddwch yn mynd heibio pentrefi Bryncir a Phant Glas. Yn syth ar ôl Pant Glas bydd yr arwyddion ar gyfer TG Cefn Graianog ar eich chwith ac mae angen i chi gymryd y lôn gul gyferbyn ar eich dde. Yna dilynwch y cyfarwyddiadau uchod...
 
 (Caernarfon i Nebo = Oddeutu 11 milltir / Porthmadog i Nebo = Oddeutu 11 milltir)
-Cod Post: LL54 6EB (Noder: Bydd Sat Nav yn mynd â chi trwy Nebo, felly dilynwch y cyfarwyddiadau uchod).`;
+${propertyFooterCy}`;
 
-  const directions = isCymraeg ? settings?.checkInDirectionsCy || defaultDirectionsCy : settings?.checkInDirectionsEn || defaultDirectionsEn;
+  const rawDirections = isCymraeg ? settings?.checkInDirectionsCy || defaultDirectionsCy : settings?.checkInDirectionsEn || defaultDirectionsEn;
+  const directions = resolvePropertyDirections(rawDirections, isBBB, isCymraeg);
   const directionsHtml = directions
     .split(/\n\n+/)
     .map((p) => `<p style="font-size: 13px; line-height: 1.6; color: #475569; margin: 0 0 10px;">${p.replace(/\n/g, '<br>')}</p>`)
     .join('');
-
-  const wasteInfo = (isCymraeg ? settings?.wasteBinInstructionsCy : settings?.wasteBinInstructionsEn) ||
-    'General refuse (black bin) and mixed recycling (blue/green caddies) are located beside the timber woodshed. Collection is early Wednesday morning.';
 
   const googleMapsUrl = "https://www.google.com/maps/place/53%C2%B001'20.7%22N+4%C2%B016'05.2%22W/@53.0224173,-4.2681046,925m/data=!3m2!1e3!4b1!4m5!3m4!1s0x0:0xd26a6eeb24eac6fd!8m2!3d53.0224173!4d-4.2681046?hl=en";
 
@@ -2102,16 +2102,6 @@ Cod Post: LL54 6EB (Noder: Bydd Sat Nav yn mynd â chi trwy Nebo, felly dilynwch
         </div>
       </div>
 
-      <!-- Waste & Recycling Card -->
-      <div class="summary-card">
-        <strong style="font-size: 13px; color: #0f172a; display: block; margin-bottom: 4px;">
-          ♻️ ${isCymraeg ? 'Ailgylchu a Sbwriel' : 'Waste & Recycling'}
-        </strong>
-        <p style="font-size: 13px; line-height: 1.55; color: #475569; margin: 0;">
-          ${wasteInfo}
-        </p>
-      </div>
-
       <!-- Contact Numbers Card -->
       <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; margin: 16px 0;">
         <strong style="font-size: 13px; color: #1e293b; display: block; margin-bottom: 6px;">
@@ -2168,23 +2158,21 @@ export function generateFullPaymentReceiptText(
 
   const isBBB = data.propertyTitle.toLowerCase().includes('bryn bugeiliaid') || (data as any).propertyId === 'bryn-bugeiliaid-bach';
   const propertyWhat3Words = isBBB ? '///skills.shorts.aced' : '///perfume.punctuate.ready';
-  const cottageGuidance = isBBB
-    ? '** The property name is BRYN BUGEILIAID BACH which is down the steps and around the corner - NOT the long white cottage!\nWhat3Words: ///skills.shorts.aced'
-    : '** The property name is PLAS HAFOD COTTAGE which is the long white cottage.\nWhat3Words: ///perfume.punctuate.ready';
+  const propertyFooterEn = isBBB
+    ? `The property name is BRYN BUGEILIAID BACH which is down the steps and around the corner - NOT the long white cottage! \n(Post Code of the property is LL54 6EB but this will take you via Nebo so please do follow directions as above)\nIf you use the What Three Words App this combination marks the entrance of the property: ///skills.shorts.aced`
+    : `The property name is PLAS HAFOD COTTAGE which is the long white cottage.\n(Post Code of the property is LL54 6EB but this will take you via Nebo so please do follow directions as above)\nIf you use the What Three Words App this combination marks the entrance of the property: ///perfume.punctuate.ready`;
 
-  const directions = `From the A55 follow the A487 heading towards Porthmadog. Once past Penygroes the village of Nebo will be signposted on your left - do not take this turning. Carry on for approx half a mile. You will see a sign for a left turning ahead. Please indicate left and slow down. The turning is a very narrow lane opposite the entrance to TG Cefn Graianog (Quarry) - signage in cream with red writing.
+  const defaultDirectionsEn = `From the A55 follow the A487 heading towards Porthmadog. Once past Penygroes look for signs to NEBO. Do not turn towards Nebo. Follow the A487 for another mile. You will see a sign for a left turning ahead. Please indicate left and slow down. The turning is a very narrow lane opposite the entrance to TG Cefn Graianog (Quarry) - signage in cream with red writing.
 
-Follow the lane up the hill to the T-junction by the white farm house. Turn left. Follow the lane up the hill and take the first right turning. Follow the steep lane up around the bend approx. 1 mile. The entrance to Bwthyn Plas Hafod Cottage and Bryn Bugeiliaid will be sign posted on your left by the double gates with two green wheelie bins.
+Follow the lane up the hill to the T-junction by the white farm house. Turn left. Follow the lane up the hill and take the first right turning. Follow the steep lane up around the bend approx. 1 mile. The entrance to Bwthyn Plas Hafod Cottage and Bryn Bugeiliaid will be sign posted on your left. Drive across track in the field and you will have reached your destination! There is a designated parking area for your accommodation.
 
-Drive across track in the field and you will have reached your destination!
-There is a designated parking area for your accommodation - see slate on fencing!
-
-${cottageGuidance}
-
-Should you travel through Porthmadog towards Caernarfon you will pass via the Villages of Bryncir and Pant Glas. Just after Pant Glas the signs for TG Cefn Graianog will be on your left and you need to take the narrow lane opposite on your right. Then follow the directions as above...
+Should you travel through Porthmadog towards Caernarfon you will pass via the Villages of Bryncir and Pant Glas. Just after Pant Glas the signs for TG Cefn Graianog will be on your left and you need to take the narrow lane opposite on your right. Then follow the directions as above .....
 
 (Caernarfon to Nebo = Approx. 11 miles / Porthmadog to Nebo = Approx. 11 miles)
-Post Code: LL54 6EB (Note: Sat Nav will take you via Nebo, so please follow the directions above).`;
+${propertyFooterEn}`;
+
+  const rawDirections = settings?.checkInDirectionsEn || defaultDirectionsEn;
+  const directions = resolvePropertyDirections(rawDirections, isBBB, isCymraeg);
 
   return `FULL PAYMENT RECEIPT & ARRIVAL GUIDE – ${data.propertyTitle}
 
