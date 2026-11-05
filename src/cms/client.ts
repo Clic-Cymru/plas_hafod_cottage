@@ -1246,7 +1246,7 @@ export const defaultSiteSettings: SiteSettings = {
   fixedDepositAmount: 200,
   depositPercentage: 25,
   emergencyHostPhone: 'Siwsan: 07748 635273 / Neil: 07785 522890',
-  notificationRecipients: 'bob@clic.cymru',
+  notificationRecipients: 'plashafodcottage@gmail.com',
   guestBookingEmailWelcomeEn:
     'Your booking for {property} was successful and is now pending. We will send you a confirmation of the booking within 24-48 hours.',
   guestBookingEmailWelcomeCy:

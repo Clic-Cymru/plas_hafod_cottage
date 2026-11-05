@@ -16,7 +16,7 @@
     "NEXT_PUBLIC_SANITY_PROJECT_ID": "iji5mij0",
     "NEXT_PUBLIC_SANITY_DATASET": "production",
     "RESEND_FROM_EMAIL": "Plas Hafod Cottage <info@plashafodcottage.co.uk>",
-    "NOTIFICATION_EMAIL": "bob@clic.cymru",
+    "NOTIFICATION_EMAIL": "plashafodcottage@gmail.com",
     "PUBLIC_REPLY_EMAIL": "info@plashafodcottage.co.uk",
     "CRON_SECRET": "plas-hafod-cron-2026"
   },

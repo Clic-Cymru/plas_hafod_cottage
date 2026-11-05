@@ -321,8 +321,8 @@ export const siteSettingsSchema = {
       title: 'Notification Alert Recipients',
       type: 'string',
       fieldset: 'emailCopy',
-      initialValue: 'info@plashafodcottage.co.uk',
-      description: 'Comma-separated email addresses to receive new booking alerts and website inquiries (e.g. "info@plashafodcottage.co.uk, host@example.com")',
+      initialValue: 'plashafodcottage@gmail.com',
+      description: 'Comma-separated email addresses to receive new booking alerts and website inquiries (e.g. "plashafodcottage@gmail.com, info@plashafodcottage.co.uk")',
     },
     {
       name: 'depositType',
