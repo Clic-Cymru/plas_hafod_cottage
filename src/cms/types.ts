@@ -3,7 +3,8 @@ export interface Season {
   name: string;
   startDate: string; // YYYY-MM-DD
   endDate: string;   // YYYY-MM-DD
-  nightlyRate: number; // in GBP (£)
+  nightlyRate: number; // in GBP (£) (Midweek / standard nightly rate)
+  weekendRate?: number; // in GBP (£) (Optional Friday & Saturday night rate)
   minStay: number;    // minimum nights
 }
 
@@ -27,7 +28,8 @@ export interface BlockedDateRange {
 }
 
 export interface PricingConfig {
-  baseRate: number; // default nightly rate in GBP
+  baseRate: number; // default midweek/standard nightly rate in GBP
+  weekendBaseRate?: number; // optional default Friday/Saturday nightly rate in GBP
   depositType?: 'fixed' | 'percentage';
   fixedDepositAmount?: number;
   depositPercentage: number; // e.g. 25%

@@ -24,10 +24,17 @@ export const pricingSchema = {
     },
     {
       name: 'baseRate',
-      title: 'Standard Nightly Base Rate (£)',
+      title: 'Standard Midweek / Base Rate (£)',
       type: 'number',
       validation: (Rule: any) => Rule.required().min(50).positive(),
-      description: 'Default price per night when no specific seasonal rate applies.',
+      description: 'Default price per night (Sun–Thu) when no specific seasonal rate applies.',
+    },
+    {
+      name: 'weekendBaseRate',
+      title: 'Standard Weekend Base Rate — Fri & Sat (£)',
+      type: 'number',
+      validation: (Rule: any) => Rule.min(50).positive(),
+      description: 'Optional default Friday & Saturday price per night when no specific seasonal rate applies.',
     },
     {
       name: 'minStayDefault',
@@ -109,9 +116,17 @@ export const pricingSchema = {
             },
             {
               name: 'nightlyRate',
-              title: 'Nightly Rate (£)',
+              title: 'Nightly Rate / Midweek Rate (£)',
               type: 'number',
               validation: (Rule: any) => Rule.required().positive(),
+              description: 'Standard nightly rate for this season (or Sun–Thu midweek rate if a Weekend Rate is also set).',
+            },
+            {
+              name: 'weekendRate',
+              title: 'Weekend Nightly Rate — Fri & Sat (£) (Optional)',
+              type: 'number',
+              validation: (Rule: any) => Rule.positive(),
+              description: 'Optional Friday & Saturday rate (£) for this season. Leave blank if the same nightly rate applies all week.',
             },
             {
               name: 'minStay',
@@ -132,17 +147,21 @@ export const pricingSchema = {
               start: 'season.startDate',
               end: 'season.endDate',
               rate: 'nightlyRate',
+              weekendRate: 'weekendRate',
               minStay: 'minStay',
             },
-            prepare({ seasonName, start, end, rate, minStay }: any) {
+            prepare({ seasonName, start, end, rate, weekendRate, minStay }: any) {
               const formatUk = (d: string) => {
                 if (!d) return '';
                 const m = String(d).match(/^(\d{4})-(\d{2})-(\d{2})/);
                 return m ? `${m[3]}/${m[2]}/${m[1]}` : d;
               };
               const dateRange = start && end ? `${formatUk(start)} → ${formatUk(end)}` : 'Dates pending';
+              const rateLabel = weekendRate && weekendRate !== rate
+                ? `£${rate || 0} midweek / £${weekendRate} weekend`
+                : `£${rate || 0}/night`;
               return {
-                title: `${seasonName || 'Season'}: £${rate || 0}/night`,
+                title: `${seasonName || 'Season'}: ${rateLabel}`,
                 subtitle: `${dateRange} • Min stay: ${minStay || 1} nights`,
               };
             },

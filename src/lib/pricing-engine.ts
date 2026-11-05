@@ -170,8 +170,13 @@ export function calculateStayPrice(
       };
     }
 
-    // 2. Identify seasonal rate matching this night
-    let rate = config.baseRate;
+    // 2. Identify seasonal rate matching this night (Fri & Sat = weekend rate if configured)
+    const dayOfWeek = currentNight.getDay(); // 0 = Sun, 5 = Fri, 6 = Sat
+    const isWeekendNight = dayOfWeek === 5 || dayOfWeek === 6;
+
+    let rate = isWeekendNight && typeof config.weekendBaseRate === 'number'
+      ? config.weekendBaseRate
+      : config.baseRate;
     let seasonName: string | undefined = undefined;
 
     for (const season of sortedSeasons) {
@@ -181,8 +186,12 @@ export function calculateStayPrice(
         (isAfter(currentNight, sStart) || currentNight.getTime() === sStart.getTime()) &&
         (isBefore(currentNight, sEnd) || currentNight.getTime() === sEnd.getTime())
       ) {
-        rate = season.nightlyRate;
-        seasonName = season.name;
+        const hasDistinctWeekendRate =
+          isWeekendNight &&
+          typeof season.weekendRate === 'number' &&
+          season.weekendRate !== season.nightlyRate;
+        rate = hasDistinctWeekendRate ? season.weekendRate! : season.nightlyRate;
+        seasonName = hasDistinctWeekendRate ? `${season.name} (Weekend)` : season.name;
         if (season.minStay > maxMinStay) {
           maxMinStay = season.minStay;
         }
