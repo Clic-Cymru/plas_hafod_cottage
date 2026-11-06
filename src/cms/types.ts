@@ -30,6 +30,7 @@ export interface BlockedDateRange {
 export interface PricingConfig {
   baseRate: number; // default midweek/standard nightly rate in GBP
   weekendBaseRate?: number; // optional default Friday/Saturday nightly rate in GBP
+  minStayDefault?: number; // standard minimum stay in nights (e.g. 3 for Plas Hafod, 2 for BBB)
   depositType?: 'fixed' | 'percentage';
   fixedDepositAmount?: number;
   depositPercentage: number; // e.g. 25%

@@ -46,6 +46,39 @@ export function isDateBlocked(dateStr: string, blockedDates: BlockedDateRange[])
 }
 
 /**
+ * Returns the minimum stay required (in nights) for a given check-in date (YYYY-MM-DD).
+ */
+export function getMinStayForDate(dateStr: string, config: PricingConfig): number {
+  const baseMinStay =
+    typeof config.minStayDefault === 'number' && config.minStayDefault >= 1
+      ? config.minStayDefault
+      : 2;
+  if (!dateStr) return baseMinStay;
+
+  const target = parseISO(dateStr);
+  if (isNaN(target.getTime())) return baseMinStay;
+
+  const sortedSeasons = [...(config.seasons || [])].sort((a, b) => {
+    const durA = Math.abs(new Date(a.endDate).getTime() - new Date(a.startDate).getTime());
+    const durB = Math.abs(new Date(b.endDate).getTime() - new Date(b.startDate).getTime());
+    return durA - durB;
+  });
+
+  for (const season of sortedSeasons) {
+    const sStart = parseISO(season.startDate);
+    const sEnd = parseISO(season.endDate);
+    if (
+      (isAfter(target, sStart) || target.getTime() === sStart.getTime()) &&
+      (isBefore(target, sEnd) || target.getTime() === sEnd.getTime())
+    ) {
+      return Math.max(baseMinStay, season.minStay || baseMinStay);
+    }
+  }
+
+  return baseMinStay;
+}
+
+/**
  * Calculates pricing breakdown, seasonal rates, discounts, and deposit for a stay.
  */
 export function calculateStayPrice(
@@ -55,6 +88,11 @@ export function calculateStayPrice(
   blockedDates: BlockedDateRange[] = [],
   pets: number = 0
 ): CalculationResult {
+  const baseMinStay =
+    typeof config.minStayDefault === 'number' && config.minStayDefault >= 1
+      ? config.minStayDefault
+      : 2;
+
   let petFee = 0;
   if (pets === 1) {
     petFee = typeof config.petFee === 'number' ? config.petFee : 40;
@@ -81,7 +119,7 @@ export function calculateStayPrice(
       depositPercentage: config.depositPercentage,
       depositAmount: 0,
       balanceDue: 0,
-      minStayRequired: 2,
+      minStayRequired: baseMinStay,
     };
   }
 
@@ -107,7 +145,7 @@ export function calculateStayPrice(
       depositPercentage: config.depositPercentage,
       depositAmount: 0,
       balanceDue: 0,
-      minStayRequired: 2,
+      minStayRequired: baseMinStay,
     };
   }
 
@@ -130,13 +168,13 @@ export function calculateStayPrice(
       depositPercentage: config.depositPercentage,
       depositAmount: 0,
       balanceDue: 0,
-      minStayRequired: 2,
+      minStayRequired: baseMinStay,
     };
   }
 
   // Iterate each night of the stay
   const nightlyBreakdown: NightDetail[] = [];
-  let maxMinStay = 2; // default minimum stay
+  let maxMinStay = baseMinStay; // default minimum stay for this property
 
   // Sort seasons by duration ascending so narrower spans (e.g. school half terms) take priority over broad seasonal blocks
   const sortedSeasons = [...(config.seasons || [])].sort((a, b) => {

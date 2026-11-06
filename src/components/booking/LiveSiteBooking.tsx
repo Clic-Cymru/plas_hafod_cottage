@@ -2,7 +2,7 @@
 
 import React, { useState, useMemo } from 'react';
 import { PricingConfig, BlockedDateRange } from '@/cms/types';
-import { calculateStayPrice } from '@/lib/pricing-engine';
+import { calculateStayPrice, getMinStayForDate } from '@/lib/pricing-engine';
 import {
   format,
   addDays,
@@ -17,6 +17,7 @@ import {
   isSameDay,
   parseISO,
   isWithinInterval,
+  differenceInCalendarDays,
 } from 'date-fns';
 import { cy } from 'date-fns/locale/cy';
 import {
@@ -281,13 +282,14 @@ function BookingDateInput({
 export function LiveSiteBooking({
   propertyId = 'plas-hafod',
   isCymraeg = false,
-  pricingConfig,
+  pricingConfig: initialPricingConfig,
   blockedDates: initialBlockedDates,
 }: LiveSiteBookingProps) {
   const isBBB = propertyId === 'bryn-bugeiliaid-bach';
   const propertyNameEn = isBBB ? 'Bryn Bugeiliaid Bach' : 'Bwthyn Plas Hafod Cottage';
   const propertyNameCy = isBBB ? 'Bryn Bugeiliaid Bach' : 'Fwthyn Plas Hafod';
 
+  const [pricingConfig, setPricingConfig] = useState<PricingConfig>(initialPricingConfig);
   const [blockedDates, setBlockedDates] = useState<BlockedDateRange[]>(initialBlockedDates || []);
 
   React.useEffect(() => {
@@ -295,7 +297,11 @@ export function LiveSiteBooking({
     fetch(`/api/booking?propertyId=${propertyId}`)
       .then((res) => (res.ok ? res.json() : null))
       .then((data) => {
-        if (isMounted && data?.blockedDates && Array.isArray(data.blockedDates)) {
+        if (!isMounted || !data) return;
+        if (data.pricingConfig && typeof data.pricingConfig.baseRate === 'number') {
+          setPricingConfig(data.pricingConfig);
+        }
+        if (Array.isArray(data.blockedDates)) {
           setBlockedDates(data.blockedDates);
         }
       })
@@ -344,6 +350,19 @@ export function LiveSiteBooking({
     });
   };
 
+  const defaultMinStay = pricingConfig?.minStayDefault ?? (isBBB ? 2 : 3);
+  const activeMinStay = useMemo(() => {
+    if (!checkIn) return defaultMinStay;
+    return getMinStayForDate(checkIn, pricingConfig);
+  }, [checkIn, pricingConfig, defaultMinStay]);
+
+  // Exclusive minimum date for Check-out picker: checkOut must be >= checkIn + activeMinStay days
+  const checkOutExclusiveMin = useMemo(() => {
+    const baseDate = checkIn ? parseISO(checkIn) : parseISO(minSelectableDate);
+    if (isNaN(baseDate.getTime())) return minSelectableDate;
+    return format(addDays(baseDate, Math.max(1, activeMinStay - 1)), 'yyyy-MM-dd');
+  }, [checkIn, minSelectableDate, activeMinStay]);
+
   const renderMonth = (monthDate: Date) => {
     const monthStart = startOfMonth(monthDate);
     const monthEnd = endOfMonth(monthDate);
@@ -385,6 +404,9 @@ export function LiveSiteBooking({
             const occupied = isOccupied(d);
             const formatted = format(d, 'yyyy-MM-dd');
             const isPastOrToday = formatted < minSelectableDate;
+            const isTooShortForCheckout =
+              Boolean(checkIn && !checkOut && formatted > checkIn) &&
+              differenceInCalendarDays(d, parseISO(checkIn)) < activeMinStay;
             const isSelected =
               formatted === checkIn ||
               formatted === checkOut ||
@@ -397,9 +419,16 @@ export function LiveSiteBooking({
               <button
                 key={i}
                 type="button"
-                disabled={!inMonth || occupied || isPastOrToday}
+                disabled={!inMonth || occupied || isPastOrToday || isTooShortForCheckout}
+                title={
+                  isTooShortForCheckout
+                    ? isCymraeg
+                      ? `Isafswm arhosiad: ${activeMinStay} noson`
+                      : `Minimum stay: ${activeMinStay} nights`
+                    : undefined
+                }
                 onClick={() => {
-                  if (!inMonth || occupied || isPastOrToday) return;
+                  if (!inMonth || occupied || isPastOrToday || isTooShortForCheckout) return;
                   if (!checkIn || (checkIn && checkOut)) {
                     setCheckIn(formatted);
                     setCheckOut('');
@@ -416,7 +445,7 @@ export function LiveSiteBooking({
                     ? 'text-stone-300 bg-stone-50 cursor-default'
                     : occupied
                     ? 'bg-[#efda07] text-stone-900 font-semibold cursor-not-allowed'
-                    : isPastOrToday
+                    : isPastOrToday || isTooShortForCheckout
                     ? 'text-stone-300 bg-stone-50/60 cursor-not-allowed'
                     : isSelected
                     ? 'bg-[#99a0c1] text-white font-bold'
@@ -536,8 +565,12 @@ export function LiveSiteBooking({
               value={checkIn}
               onChange={(val) => {
                 setCheckIn(val);
-                if (checkOut && val && checkOut <= val) {
-                  setCheckOut('');
+                if (checkOut && val) {
+                  const reqMin = getMinStayForDate(val, pricingConfig);
+                  const minCheckoutDate = format(addDays(parseISO(val), reqMin), 'yyyy-MM-dd');
+                  if (checkOut < minCheckoutDate) {
+                    setCheckOut('');
+                  }
                 }
               }}
               isCymraeg={isCymraeg}
@@ -547,7 +580,7 @@ export function LiveSiteBooking({
             <BookingDateInput
               label={isCymraeg ? 'Gadael (dd/mm/bbbb)' : 'Check-out (dd/mm/yyyy)'}
               value={checkOut}
-              min={checkIn || minSelectableDate}
+              min={checkOutExclusiveMin}
               onChange={setCheckOut}
               isCymraeg={isCymraeg}
               isOccupied={isOccupied}

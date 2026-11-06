@@ -161,13 +161,14 @@ const sharedLiveSeasons = [
 export const defaultPricingConfig: PricingConfig = {
   baseRate: 150,
   weekendBaseRate: 165,
+  minStayDefault: 3,
   depositType: 'fixed',
   fixedDepositAmount: 200,
   depositPercentage: 25,
   cleaningFee: 0,
   petFee: 40, // 1 dog = £40
   petFee2Dogs: 55, // 2 dogs = £55
-  seasons: sharedLiveSeasons,
+  seasons: sharedLiveSeasons.map((s) => ({ ...s, minStay: Math.max(3, s.minStay) })),
   discounts: [],
 };
 
@@ -175,6 +176,7 @@ export const defaultPricingConfig: PricingConfig = {
 export const bbbPricingConfig: PricingConfig = {
   baseRate: 150,
   weekendBaseRate: 165,
+  minStayDefault: 2,
   depositType: 'fixed',
   fixedDepositAmount: 200,
   depositPercentage: 25,
@@ -287,6 +289,13 @@ export const cmsClient = {
         }`;
         const data = await sanityClient.fetch(query, { propertyId });
         if (data && typeof data.baseRate === 'number') {
+          const defaultMinStay =
+            typeof data.minStayDefault === 'number' && data.minStayDefault >= 1
+              ? data.minStayDefault
+              : propertyId === 'bryn-bugeiliaid-bach'
+              ? 2
+              : 3;
+
           let seasons = data.seasons || [];
           if (Array.isArray(data.resolvedRates) && data.resolvedRates.length > 0) {
             seasons = data.resolvedRates
@@ -297,7 +306,10 @@ export const cmsClient = {
                 endDate: r.seasonDoc.endDate,
                 nightlyRate: r.nightlyRate,
                 weekendRate: typeof r.weekendRate === 'number' ? r.weekendRate : undefined,
-                minStay: r.minStay ?? r.seasonDoc.minStayDefault ?? 3,
+                minStay: Math.max(
+                  defaultMinStay,
+                  r.minStay ?? r.seasonDoc.minStayDefault ?? defaultMinStay
+                ),
               }));
           }
 
@@ -338,6 +350,7 @@ export const cmsClient = {
           return {
             baseRate: data.baseRate,
             weekendBaseRate: typeof data.weekendBaseRate === 'number' ? data.weekendBaseRate : undefined,
+            minStayDefault: defaultMinStay,
             depositType: data.depositType ?? 'fixed',
             fixedDepositAmount: data.fixedDepositAmount ?? 200,
             depositPercentage: data.depositPercentage ?? 25,
