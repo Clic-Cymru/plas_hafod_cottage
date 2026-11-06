@@ -1894,6 +1894,8 @@ export function generateFullPaymentReceiptHtml(
   const keySafeCode = (data as any).keySafeCode || defaultKeySafe;
   const isUnlockedEntry = /unlocked|key inside/i.test(keySafeCode);
 
+  const finalPaymentReceived = data.balanceDue > 0 ? data.balanceDue : (data.totalPrice || data.depositAmount || 0);
+
   const propertyFooterEn = isBBB
     ? `The property name is BRYN BUGEILIAID BACH which is down the steps and around the corner - NOT the long white cottage! \n(Post Code of the property is LL54 6EB but this will take you via Nebo so please do follow directions as above)\nIf you use the What Three Words App this combination marks the entrance of the property: ///skills.shorts.aced`
     : `The property name is PLAS HAFOD COTTAGE which is the long white cottage.\n(Post Code of the property is LL54 6EB but this will take you via Nebo so please do follow directions as above)\nIf you use the What Three Words App this combination marks the entrance of the property: ///perfume.punctuate.ready`;
@@ -1980,8 +1982,8 @@ ${propertyFooterCy}`;
 
       <p style="font-size: 15px; line-height: 1.65; color: #334155;">
         ${isCymraeg
-          ? `Gallwn gadarnhau ein bod wedi derbyn eich trosglwyddiad banc yn ddiogel am y swm o <strong>£${data.balanceDue}</strong> fel y taliad terfynol ar gyfer rhentu <strong>${data.propertyTitle}</strong>. Mae eich archeb bellach wedi’i chadarnhau’n llawn.`
-          : `We can confirm that we have safely received your bank transfer in the sum of <strong>£${data.balanceDue}</strong> as the final payment for rental of <strong>${data.propertyTitle}</strong>. Your booking is now fully confirmed.`}
+          ? `Gallwn gadarnhau ein bod wedi derbyn eich trosglwyddiad banc yn ddiogel am y swm o <strong>£${finalPaymentReceived}</strong> fel y taliad terfynol ar gyfer rhentu <strong>${data.propertyTitle}</strong>. Mae eich archeb bellach wedi’i chadarnhau’n llawn.`
+          : `We can confirm that we have safely received your bank transfer in the sum of <strong>£${finalPaymentReceived}</strong> as the final payment for rental of <strong>${data.propertyTitle}</strong>. Your booking is now fully confirmed.`}
       </p>
 
       <p style="font-size: 15px; line-height: 1.65; color: #334155;">
@@ -2045,7 +2047,7 @@ ${propertyFooterCy}`;
             <td valign="middle">
               <div style="font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px; color: #166534;">${isCymraeg ? 'PRIS (WEDI’I DALU’N LLAWN)' : 'PRICE (PAID IN FULL)'}</div>
               <div style="font-size: 20px; font-weight: 800; color: #14532d; margin-top: 4px;">
-                £${data.totalPrice} <span style="font-size: 13px; font-weight: 600; color: #15803d;">(£${data.balanceDue} ${isCymraeg ? 'taliad terfynol wedi’i dderbyn' : 'final payment received'})</span>
+                £${data.totalPrice} <span style="font-size: 13px; font-weight: 600; color: #15803d;">(£${finalPaymentReceived} ${isCymraeg ? 'taliad terfynol wedi’i dderbyn' : 'final payment received'})</span>
               </div>
             </td>
           </tr>
@@ -2173,12 +2175,13 @@ ${propertyFooterEn}`;
 
   const rawDirections = settings?.checkInDirectionsEn || defaultDirectionsEn;
   const directions = resolvePropertyDirections(rawDirections, isBBB, isCymraeg);
+  const finalPaymentReceived = data.balanceDue > 0 ? data.balanceDue : (data.totalPrice || data.depositAmount || 0);
 
   return `FULL PAYMENT RECEIPT & ARRIVAL GUIDE – ${data.propertyTitle}
 
 ${isCymraeg ? 'Helo' : 'Hi'} ${data.guestName},
 
-We can confirm that we have safely received your bank transfer in the sum of £${data.balanceDue} as the final payment for rental of ${data.propertyTitle}. Your booking is now fully confirmed.
+We can confirm that we have safely received your bank transfer in the sum of £${finalPaymentReceived} as the final payment for rental of ${data.propertyTitle}. Your booking is now fully confirmed.
 
 Your full arrival directions and check-in instructions are provided below so that you have everything you need for your holiday in Eryri / Snowdonia.
 
