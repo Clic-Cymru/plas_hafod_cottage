@@ -19,7 +19,7 @@ const bbbSliderImages = [
   { id: 1, src: '/images/wp/bbb-slide-4.jpg', alt: 'Bryn Bugeiliaid Bach Bedroom Comfort' },
   { id: 2, src: '/images/wp/bbb-slide-1.jpg', alt: 'Bryn Bugeiliaid Bach Conservatory and Grounds' },
   { id: 3, src: '/images/wp/bbb-slide-2.jpg', alt: 'Bryn Bugeiliaid Bach Cozy Living Area with Log Fire' },
-  { id: 4, src: '/images/wp/bbb-slide-3.jpg', alt: 'Bryn Bugeiliaid Bach Farmhouse Kitchen and Dining' },
+  { id: 4, src: '/images/wp/bbb-slide-3.jpg', alt: 'Bryn Bugeiliaid Bach Galley Style Kitchen and Dining' },
 ];
 
 const plasHafodSliderImages = [
@@ -214,8 +214,8 @@ export function LiveSiteSisterPropertyAndAccreditations({
                   : 'Our traditional 5-star detached Welsh stone cottage with inglenook fireplace, panoramic mountain & sea views, and dog-friendly garden.'
               ) : (
                 isCymraeg
-                  ? 'Llety 2 wely wedi’i adfer yn hyfryd yn edrych dros Ddyffryn Nantlle ac yn swatio ychydig o dan Grib Nantlle drawiadol yn Eryri hardd.'
-                  : 'A beautifully restored 2 bed accommodation overlooking Dyffryn Nantlle and nestled just below the impressive Nantlle Ridge in beautiful Snowdonia.'
+                  ? 'Llety 2 ystafell wely ddwbl (yn cysgu 4) gyda chegin arddull galley wedi’i adfer yn hyfryd yn edrych dros Ddyffryn Nantlle ac yn swatio ychydig o dan Grib Nantlle drawiadol yn Eryri hardd.'
+                  : 'A beautifully restored 2 double bedroom accommodation (sleeps 4) with a galley style kitchen, overlooking Dyffryn Nantlle and nestled just below the impressive Nantlle Ridge in beautiful Snowdonia.'
               )}
             </p>
           </div>

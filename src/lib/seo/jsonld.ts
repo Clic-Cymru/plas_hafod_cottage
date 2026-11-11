@@ -121,8 +121,8 @@ export function generateCottageJsonLd({ locale, siteUrl = SITE_URL }: CottageJso
         '@type': 'Accommodation',
         name: 'Bryn Bugeiliaid Bach',
         description: isWelsh
-          ? 'Llety moethus hunangynhwysol 2 wely gyda llosgwr coed, ystafell wydr, a gwres o dan y llawr yn edrych dros Ddyffryn Nantlle, cysgu 2-4.'
-          : 'Luxury 2-bedroom self-contained annexe overlooking Dyffryn Nantlle with cozy log burner, conservatory, underfloor heating, sleeps 2-4.',
+          ? 'Llety moethus hunangynhwysol gyda 2 ystafell wely ddwbl, cegin arddull galley, ac yn cysgu 4, gyda llosgwr coed, ystafell wydr, a gwres o dan y llawr yn edrych dros Ddyffryn Nantlle.'
+          : 'Luxury self-contained annexe overlooking Dyffryn Nantlle with 2 double bedrooms, galley style kitchen, sleeps 4, cozy log burner, conservatory, and underfloor heating.',
         occupancy: {
           '@type': 'QuantitativeValue',
           maxValue: 4,

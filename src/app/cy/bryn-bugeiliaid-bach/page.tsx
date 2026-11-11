@@ -7,7 +7,7 @@ import { SubpageHero } from '@/components/navigation/SubpageHero';
 import { BrynBugeiliaidBachAccreditations } from '@/components/cottage/BrynBugeiliaidBachAccreditations';
 import { BrynBugeiliaidBachGallery } from '@/components/cottage/BrynBugeiliaidBachGallery';
 import { cmsClient } from '@/cms/client';
-import { Sparkles, Flame, Bed, Bath, Coffee, Ban } from 'lucide-react';
+import { Sparkles, Flame, Bed, Bath, Coffee, Ban, Users } from 'lucide-react';
 
 
 import { generateBreadcrumbJsonLd, COTTAGE_ADDRESS, COTTAGE_GEO, SITE_URL } from '@/lib/seo/jsonld';
@@ -15,7 +15,7 @@ import { generateBreadcrumbJsonLd, COTTAGE_ADDRESS, COTTAGE_GEO, SITE_URL } from
 export const metadata: Metadata = {
   title: 'Bryn Bugeiliaid Bach | Llety Moethus 2 Wely yn Nebo, Dyffryn Nantlle',
   description:
-    'Llety gwyliau moethus 5 seren Croeso Cymru yn Nebo ger Penygroes yn edrych dros Ddyffryn Nantlle. Llosgwr coed, ystafell wydr, gwres dan lawr, golygfeydd godidog o Eryri.',
+    'Llety gwyliau moethus 5 seren Croeso Cymru yn Nebo ger Penygroes yn edrych dros Ddyffryn Nantlle. 2 ystafell wely ddwbl, cegin arddull galley, yn cysgu 4.',
   alternates: {
     canonical: 'https://plashafodcottage.co.uk/cy/bryn-bugeiliaid-bach',
     languages: {
@@ -26,7 +26,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Bryn Bugeiliaid Bach | Llety Moethus 2 Wely yn Nebo, Dyffryn Nantlle',
     description:
-      'Llety gwyliau moethus 5 seren Croeso Cymru yn Nebo ger Penygroes yn edrych dros Ddyffryn Nantlle. Llosgwr coed, ystafell wydr, gwres dan lawr, golygfeydd godidog o Eryri.',
+      'Llety gwyliau moethus 5 seren Croeso Cymru yn Nebo ger Penygroes yn edrych dros Ddyffryn Nantlle. 2 ystafell wely ddwbl, cegin arddull galley, yn cysgu 4.',
     url: 'https://plashafodcottage.co.uk/cy/bryn-bugeiliaid-bach',
     siteName: 'Bwthyn Plas Hafod a Bryn Bugeiliaid Bach',
     images: [
@@ -147,17 +147,17 @@ export default async function WelshBrynBugeiliaidBachPage() {
               ) : (
                 <>
                   <p>
-                    Llety 2 ystafell wely wedi’i adnewyddu’n hyfryd yn edrych dros Ddyffryn Nantlle ac yn
+                    Llety 2 ystafell wely ddwbl (yn cysgu 4) wedi’i adnewyddu’n hyfryd yn edrych dros Ddyffryn Nantlle ac yn
                     swatio ychydig o dan Grib Nantlle drawiadol yn Eryri hardd. Mwynhewch olygfeydd heb eu hail
                     o arfordir Gogledd Cymru yn edrych drosodd i Ynys Môn a thu hwnt o’r ystafell wydr braf.
                   </p>
                   <p>
                     Mae’r eiddo’n cynnwys tân coed clyd yn y brif ardal fyw, gan gynnwys gwres dan y llawr ar
-                    y llawr gwaelod a gwres canolog ar y llawr 1af lle mae 2 ystafell wely gyda gwelyau dwbl
-                    cyfforddus ac ystafell gawod fawr.
+                    y llawr gwaelod a gwres canolog ar y llawr 1af lle mae 2 ystafell wely ddwbl gyda gwelyau dwbl
+                    cyfforddus (yn cysgu 4) ac ystafell gawod fawr.
                   </p>
                   <p>
-                    Mae’r gegin wedi’i chyfarparu’n dda ac yn cynnwys ardal fwyta ar gyfer 4 person neu beth
+                    Mae’r gegin arddull galley wedi’i chyfarparu’n dda ac yn cynnwys ardal fwyta ar gyfer 4 person, neu beth
                     am fwynhau’r awyr agored ac ymlacio gyda’r nos wrth ymyl y pwll tân yn yr ardd lechi a glaswellt
                     sy’n cynnwys ardal fwyta ac ardal eistedd ar wahân i werthfawrogi’r golygfeydd syfrdanol.
                   </p>
@@ -176,32 +176,28 @@ export default async function WelshBrynBugeiliaidBachPage() {
               {/* Key Features Icons */}
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 pt-4">
                 <div className="flex items-center gap-3 bg-white p-3.5 rounded-xl border border-stone-200/80 shadow-xs">
+                  <Bed className="w-5 h-5 text-[#99a0c1]" />
+                  <span className="text-xs font-semibold text-stone-800">2 Ystafell Wely Ddwbl</span>
+                </div>
+                <div className="flex items-center gap-3 bg-white p-3.5 rounded-xl border border-stone-200/80 shadow-xs">
+                  <Coffee className="w-5 h-5 text-[#99a0c1]" />
+                  <span className="text-xs font-semibold text-stone-800">Cegin Arddull Galley</span>
+                </div>
+                <div className="flex items-center gap-3 bg-white p-3.5 rounded-xl border border-stone-200/80 shadow-xs">
+                  <Users className="w-5 h-5 text-[#99a0c1]" />
+                  <span className="text-xs font-semibold text-stone-800">Yn Cysgu 4</span>
+                </div>
+                <div className="flex items-center gap-3 bg-white p-3.5 rounded-xl border border-stone-200/80 shadow-xs">
                   <Flame className="w-5 h-5 text-[#efda07]" />
                   <span className="text-xs font-semibold text-stone-800">Tân Coed a Gwres</span>
                 </div>
                 <div className="flex items-center gap-3 bg-white p-3.5 rounded-xl border border-stone-200/80 shadow-xs">
-                  <Bed className="w-5 h-5 text-[#99a0c1]" />
-                  <span className="text-xs font-semibold text-stone-800">
-                    {propertyDetails?.bedrooms ? `${propertyDetails.bedrooms} Ystafell Wely Ddwbl` : '2 Ystafell Wely Ddwbl'}
-                  </span>
-                </div>
-                <div className="flex items-center gap-3 bg-white p-3.5 rounded-xl border border-stone-200/80 shadow-xs">
                   <Bath className="w-5 h-5 text-[#99a0c1]" />
-                  <span className="text-xs font-semibold text-stone-800">
-                    {propertyDetails?.bathrooms ? `${propertyDetails.bathrooms} Ystafell Ymolchi` : 'Cawod Eang'}
-                  </span>
-                </div>
-                <div className="flex items-center gap-3 bg-white p-3.5 rounded-xl border border-stone-200/80 shadow-xs">
-                  <Coffee className="w-5 h-5 text-[#99a0c1]" />
-                  <span className="text-xs font-semibold text-stone-800">Cegin Fferm Gyflawn</span>
+                  <span className="text-xs font-semibold text-stone-800">Cawod Eang</span>
                 </div>
                 <div className="flex items-center gap-3 bg-white p-3.5 rounded-xl border border-stone-200/80 shadow-xs">
                   <Sparkles className="w-5 h-5 text-[#efda07]" />
                   <span className="text-xs font-semibold text-stone-800">Ystafell Wydr</span>
-                </div>
-                <div className="flex items-center gap-3 bg-white p-3.5 rounded-xl border border-stone-200/80 shadow-xs">
-                  <Sparkles className="w-5 h-5 text-[#efda07]" />
-                  <span className="text-xs font-semibold text-stone-800">Pwll Tân ac Ardd</span>
                 </div>
               </div>
             </div>

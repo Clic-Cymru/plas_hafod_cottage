@@ -7,7 +7,7 @@ import { SubpageHero } from '@/components/navigation/SubpageHero';
 import { BrynBugeiliaidBachAccreditations } from '@/components/cottage/BrynBugeiliaidBachAccreditations';
 import { BrynBugeiliaidBachGallery } from '@/components/cottage/BrynBugeiliaidBachGallery';
 import { cmsClient } from '@/cms/client';
-import { Sparkles, Flame, Bed, Bath, Coffee, Ban } from 'lucide-react';
+import { Sparkles, Flame, Bed, Bath, Coffee, Ban, Users } from 'lucide-react';
 
 
 import { generateBreadcrumbJsonLd, COTTAGE_ADDRESS, COTTAGE_GEO, SITE_URL } from '@/lib/seo/jsonld';
@@ -15,7 +15,7 @@ import { generateBreadcrumbJsonLd, COTTAGE_ADDRESS, COTTAGE_GEO, SITE_URL } from
 export const metadata: Metadata = {
   title: 'Bryn Bugeiliaid Bach | Luxury 2-Bed Cottage Annexe in Nebo, Dyffryn Nantlle',
   description:
-    'Peaceful 5-star Visit Wales annexe in Nebo near Penygroes overlooking Dyffryn Nantlle. Log burner, conservatory, underfloor heating, breathtaking Snowdonia views.',
+    'Peaceful 5-star Visit Wales annexe in Nebo near Penygroes overlooking Dyffryn Nantlle. 2 double bedrooms, galley style kitchen, sleeps 4, log burner & conservatory.',
   alternates: {
     canonical: 'https://plashafodcottage.co.uk/bryn-bugeiliaid-bach',
     languages: {
@@ -26,7 +26,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Bryn Bugeiliaid Bach | Luxury 2-Bed Cottage Annexe in Nebo, Dyffryn Nantlle',
     description:
-      'Peaceful 5-star Visit Wales annexe in Nebo near Penygroes overlooking Dyffryn Nantlle. Log burner, conservatory, underfloor heating, breathtaking Snowdonia views.',
+      'Peaceful 5-star Visit Wales annexe in Nebo near Penygroes overlooking Dyffryn Nantlle. 2 double bedrooms, galley style kitchen, sleeps 4, log burner & conservatory.',
     url: 'https://plashafodcottage.co.uk/bryn-bugeiliaid-bach',
     siteName: 'Plas Hafod Cottage & Bryn Bugeiliaid Bach',
     images: [
@@ -147,20 +147,20 @@ export default async function BrynBugeiliaidBachPage() {
               ) : (
                 <>
                   <p>
-                    A beautifully restored 2 bed accommodation overlooking Dyffryn Nantlle and nestled just
+                    A beautifully restored 2 double bedroom accommodation (sleeps 4) overlooking Dyffryn Nantlle and nestled just
                     below the impressive Nantlle Ridge in beautiful Snowdonia. Enjoy unrivalled views of the
                     North Wales coast looking over to Anglesey and beyond from the impressive addition of a well
                     appointed conservatory.
                   </p>
                   <p>
                     The property boasts a cozy log fire in the main living area, including underfloor heating on
-                    the ground floor and central heating on the 1st floor where there are 2 bedrooms with comfortable
-                    double beds and a spacious shower room.
+                    the ground floor and central heating on the 1st floor where there are 2 double bedrooms with comfortable
+                    double beds (sleeps 4) and a spacious shower room.
                   </p>
                   <p>
-                    The kitchen is well equipped and includes dining area for 4 persons or why not enjoy the great
+                    The galley style kitchen is well equipped and includes a dining area for 4 persons, or why not enjoy the great
                     outdoors and relax in the evening by the fire pit in the slated and grassed garden which includes
-                    dining area and separate seating area to appreciate the breathtaking views.
+                    a dining area and separate seating area to appreciate the breathtaking views.
                   </p>
                 </>
               )}
@@ -177,32 +177,28 @@ export default async function BrynBugeiliaidBachPage() {
               {/* Key Features Icons */}
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 pt-4">
                 <div className="flex items-center gap-3 bg-white p-3.5 rounded-xl border border-stone-200/80 shadow-xs">
+                  <Bed className="w-5 h-5 text-[#99a0c1]" />
+                  <span className="text-xs font-semibold text-stone-800">2 Double Bedrooms</span>
+                </div>
+                <div className="flex items-center gap-3 bg-white p-3.5 rounded-xl border border-stone-200/80 shadow-xs">
+                  <Coffee className="w-5 h-5 text-[#99a0c1]" />
+                  <span className="text-xs font-semibold text-stone-800">Galley Style Kitchen</span>
+                </div>
+                <div className="flex items-center gap-3 bg-white p-3.5 rounded-xl border border-stone-200/80 shadow-xs">
+                  <Users className="w-5 h-5 text-[#99a0c1]" />
+                  <span className="text-xs font-semibold text-stone-800">Sleeps 4</span>
+                </div>
+                <div className="flex items-center gap-3 bg-white p-3.5 rounded-xl border border-stone-200/80 shadow-xs">
                   <Flame className="w-5 h-5 text-[#efda07]" />
                   <span className="text-xs font-semibold text-stone-800">Log Fire &amp; Heating</span>
                 </div>
                 <div className="flex items-center gap-3 bg-white p-3.5 rounded-xl border border-stone-200/80 shadow-xs">
-                  <Bed className="w-5 h-5 text-[#99a0c1]" />
-                  <span className="text-xs font-semibold text-stone-800">
-                    {propertyDetails?.bedrooms ? `${propertyDetails.bedrooms} Double Bedrooms` : '2 Double Bedrooms'}
-                  </span>
-                </div>
-                <div className="flex items-center gap-3 bg-white p-3.5 rounded-xl border border-stone-200/80 shadow-xs">
                   <Bath className="w-5 h-5 text-[#99a0c1]" />
-                  <span className="text-xs font-semibold text-stone-800">
-                    {propertyDetails?.bathrooms ? `${propertyDetails.bathrooms} Bathrooms` : 'Spacious Shower'}
-                  </span>
-                </div>
-                <div className="flex items-center gap-3 bg-white p-3.5 rounded-xl border border-stone-200/80 shadow-xs">
-                  <Coffee className="w-5 h-5 text-[#99a0c1]" />
-                  <span className="text-xs font-semibold text-stone-800">Farmhouse Kitchen</span>
+                  <span className="text-xs font-semibold text-stone-800">Spacious Shower</span>
                 </div>
                 <div className="flex items-center gap-3 bg-white p-3.5 rounded-xl border border-stone-200/80 shadow-xs">
                   <Sparkles className="w-5 h-5 text-[#efda07]" />
                   <span className="text-xs font-semibold text-stone-800">Glass Conservatory</span>
-                </div>
-                <div className="flex items-center gap-3 bg-white p-3.5 rounded-xl border border-stone-200/80 shadow-xs">
-                  <Sparkles className="w-5 h-5 text-[#efda07]" />
-                  <span className="text-xs font-semibold text-stone-800">Fire Pit &amp; Garden</span>
                 </div>
               </div>
             </div>
