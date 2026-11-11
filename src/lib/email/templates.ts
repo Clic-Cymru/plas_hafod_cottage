@@ -1362,6 +1362,34 @@ export function generateCheckInGuideText(
 
   const googleMapsUrl = "https://www.google.com/maps/place/53%C2%B001'20.7%22N+4%C2%B016'05.2%22W/@53.0224173,-4.2681046,925m/data=!3m2!1e3!4b1!4m5!3m4!1s0x0:0xd26a6eeb24eac6fd!8m2!3d53.0224173!4d-4.2681046?hl=en";
 
+  if (isCymraeg) {
+    return `EICH GWYLIAU YN ERYRI – CYFARWYDDIADAU CYRRAEDD: ${data.propertyTitle}
+
+Helo ${data.guestName},
+
+Diolch yn fawr am archebu ${data.propertyTitle} ar gyfer eich gwyliau (${formatDateUK(data.checkIn)} i ${formatDateUK(data.checkOut)}). Rydym yn siŵr y cewch amser gwych yn ystod eich arhosiad yma yn Eryri.
+
+MYNEDIAD AC ALLWEDD:
+${isUnlockedEntry ? 'Bydd y Bwthyn wedi’i adael heb ei gloi gyda’r allwedd y tu mewn — gwnewch eich hun yn gartrefol pan fyddwch yn cyrraedd!' : `Côd Blwch Allweddi: ${keySafeCode}`}
+Mae mynediad i’r Bwthyn ar ôl ${checkInTime}. Ar ddiwedd eich arhosiad gofynnwn yn garedig i chi adael erbyn ${checkOutTime} fan bellaf fel bod gennym ddigon o amser i baratoi’r Bwthyn ar gyfer ein gwesteion nesaf.
+Byddem yn gwerthfawrogi pe gallech anfon e-bost neu ffonio ni ychydig ddyddiau cyn eich arhosiad i roi syniad o’ch amser cyrraedd amcangyfrifedig.
+
+CYFARWYDDIADAU:
+${directions}
+Dolen Google Maps: ${googleMapsUrl}
+
+MANYLION CYSWLLT:
+${phone}
+Ebost: info@plashafodcottage.co.uk
+
+Diolch eto am eich archeb ac edrychwn ymlaen at eich croesawu i'r rhan hon o Gymru!
+
+Cofion Cynnes / Warmest Regards,
+${hosts}
+${siteTitle}
+Gwefan: https://plashafodcottage.co.uk`;
+  }
+
   return `YOUR HOLIDAY IN ERYRI / SNOWDONIA – DIRECTIONS & ARRIVAL GUIDE: ${data.propertyTitle}
 
 Hi ${data.guestName},
@@ -1591,6 +1619,38 @@ export function generateBalanceReminderText(
   const phone = data.emergencyPhone || settings?.emergencyHostPhone || settings?.phone || 'Siwsan: 07748 635273 / Neil: 07785 522890';
   const siteTitle = settings?.siteTitle || 'Bwthyn Plas Hafod Cottage & Bryn Bugeiliaid Bach';
   const daysNotice = settings?.balanceReminderDaysBeforeArrival || 60;
+
+  if (isCymraeg) {
+    return `GWEDDILL DYLEDUS: ${data.propertyTitle}
+
+Helo ${data.guestName},
+
+Mae eich arhosiad yn ${data.propertyTitle} ymhen ${daysNotice} diwrnod. Gofynnwn yn garedig i chi nawr dalu’r balans sy’n weddill o £${data.balanceDue}. Mae manylion dadansoddiad y gost a’r dull talu isod.
+
+BWTHYN A ARCHEBWYD: ${data.propertyTitle}
+CYRRAEDD: ${formatDateUK(data.checkIn)}
+GADAEL: ${formatDateUK(data.checkOut)}
+
+GWEDDILL DYLEDUS:
+- Cyfanswm Pris: £${data.totalPrice}
+- Eisoes wedi'i Dalu: £${data.depositPaid}
+- Swm sy'n Weddill: £${data.balanceDue}
+- Cyfeirnod Archeb (Booking ID): ${data.paymentReference}
+
+Gwnewch y taliad o £${data.balanceDue} trwy drosglwyddiad banc uniongyrchol i’r manylion isod a chynnwys eich Cyfeirnod Archeb fel y Cyfeirnod:
+
+Enw'r Cyfrif: ${data.bankAccountName}
+Cod Didoli: ${data.bankSortCode}
+Rhif y Cyfrif: ${data.bankAccountNumber}
+${data.bankIban ? `IBAN: ${data.bankIban}\n` : ''}${data.bankBic ? `BIC / SWIFT: ${data.bankBic}\n` : ''}Cyfeirnod: ${data.paymentReference}
+
+Os oes gennych unrhyw ymholiadau ynglŷn â’ch archeb cysylltwch â ni ar info@plashafodcottage.co.uk neu ${phone}.
+
+Gyda Diolch / With Thanks,
+${hosts}
+${siteTitle}
+Gwefan: https://plashafodcottage.co.uk`;
+  }
 
   return `OUTSTANDING BALANCE DUE: ${data.propertyTitle}
 
@@ -1846,6 +1906,31 @@ export function generateDepositReceiptText(
   const address =
     (isCymraeg && settings?.addressCy ? settings.addressCy : settings?.address) ||
     'Bwthyn Plas Hafod, Nebo, Gwynedd, LL54 6EB';
+
+  if (isCymraeg) {
+    return `CADARNHAD BLAENDAL – ${data.propertyTitle}
+
+Helo ${data.guestName},
+
+Gallwn gadarnhau ein bod wedi derbyn eich trosglwyddiad banc yn ddiogel am y swm o £${data.depositAmount} fel blaendal ar gyfer rhentu ${data.propertyTitle}. Diolch yn fawr iawn am eich taliad prydlon!
+
+Anfonir nodyn atgoffa am y balans sy’n weddill ${balanceDays} diwrnod cyn eich arhosiad.
+
+Edrychwn ymlaen at eich croesawu i ${data.propertyTitle}!
+
+Manylion eich archeb:
+- BWTHYN A ARCHEBWYD: ${data.propertyTitle}
+- CYFEIRIAD: ${address}
+- CYRRAEDD: ${formatDateUK(data.checkIn)} (Cyrraedd: ${checkInTime})
+- GADAEL: ${formatDateUK(data.checkOut)} (Gadael: ${checkOutTime})
+- PRIS: £${data.totalPrice} (Blaendal Wedi'i Dalu: £${data.depositAmount} | Gweddill yn Ddyledus: £${data.balanceDue})
+
+Gyda Diolch / With Thanks
+${hosts}
+${siteTitle}
+Gwefan: https://plashafodcottage.co.uk
+Ebost: info@plashafodcottage.co.uk`;
+  }
 
   return `DEPOSIT RECEIPT – ${data.propertyTitle}
 
@@ -2173,9 +2258,66 @@ Should you travel through Porthmadog towards Caernarfon you will pass via the Vi
 (Caernarfon to Nebo = Approx. 11 miles / Porthmadog to Nebo = Approx. 11 miles)
 ${propertyFooterEn}`;
 
-  const rawDirections = settings?.checkInDirectionsEn || defaultDirectionsEn;
+  const propertyFooterCy = isBBB
+    ? `Enw'r eiddo yw BRYN BUGEILIAID BACH sydd i lawr y grisiau ac o amgylch y gornel - NID y bwthyn gwyn hir!\n(Cod Post yr eiddo yw LL54 6EB ond bydd Sat Nav yn mynd â chi trwy Nebo felly dilynwch y cyfarwyddiadau uchod)\nOs ydych yn defnyddio ap What Three Words mae'r cyfuniad hwn yn nodi mynedfa'r eiddo: ///skills.shorts.aced`
+    : `Enw'r eiddo yw BWTHYN PLAS HAFOD sef y bwthyn gwyn hir.\n(Cod Post yr eiddo yw LL54 6EB ond bydd Sat Nav yn mynd â chi trwy Nebo felly dilynwch y cyfarwyddiadau uchod)\nOs ydych yn defnyddio ap What Three Words mae'r cyfuniad hwn yn nodi mynedfa'r eiddo: ///perfume.punctuate.ready`;
+
+  const defaultDirectionsCy = `O’r A55 dilynwch yr A487 tuag at Borthmadog. Ar ôl mynd heibio Pen-y-groes bydd pentref Nebo wedi’i arwyddo ar eich chwith - peidiwch â chymryd y troad hwn. Daliwch ymlaen am oddeutu hanner milltir. Fe welwch arwydd am droad i’r chwith o’ch blaen. Rhowch eich dangosydd ymlaen ac arafwch. Mae’r troad yn lôn gul iawn gyferbyn â mynedfa TG Cefn Graianog (Chwarel) - arwydd hufen gydag ysgrifen goch.
+
+Dilynwch y lôn i fyny’r bryn at y gyffordd T wrth y ffermdy gwyn. Trowch i’r chwith. Dilynwch y lôn i fyny’r bryn a chymerwch y troad cyntaf i’r dde. Dilynwch y lôn serth i fyny am oddeutu 1 filltir. Bydd y fynedfa i Fwthyn Plas Hafod a Bryn Bugeiliaid wedi’i harwyddo ar eich chwith wrth y gatiau dwbl gyda dau fin olwynion gwyrdd.
+
+Gyrrwch ar draws y trac yn y cae a byddwch wedi cyrraedd eich cyrchfan!
+Mae man parcio dynodedig ar gyfer eich llety - gweler y llechen ar y ffens!
+
+Os ydych yn teithio trwy Borthmadog tuag at Gaernarfon byddwch yn mynd heibio pentrefi Bryncir a Phant Glas. Yn syth ar ôl Pant Glas bydd yr arwyddion ar gyfer TG Cefn Graianog ar eich chwith ac mae angen i chi gymryd y lôn gul gyferbyn ar eich dde. Yna dilynwch y cyfarwyddiadau uchod...
+
+(Caernarfon i Nebo = Oddeutu 11 milltir / Porthmadog i Nebo = Oddeutu 11 milltir)
+${propertyFooterCy}`;
+
+  const rawDirections = isCymraeg ? settings?.checkInDirectionsCy || defaultDirectionsCy : settings?.checkInDirectionsEn || defaultDirectionsEn;
   const directions = resolvePropertyDirections(rawDirections, isBBB, isCymraeg);
   const finalPaymentReceived = data.balanceDue > 0 ? data.balanceDue : (data.totalPrice || data.depositAmount || 0);
+
+  if (isCymraeg) {
+    return `TALIAD LLAWN WEDI'I DDERBYN A CHYFARWYDDIADAU CYRRAEDD – ${data.propertyTitle}
+
+Helo ${data.guestName},
+
+Gallwn gadarnhau ein bod wedi derbyn eich trosglwyddiad banc yn ddiogel am y swm o £${finalPaymentReceived} fel y taliad terfynol ar gyfer rhentu ${data.propertyTitle}. Mae eich archeb bellach wedi’i chadarnhau’n llawn.
+
+Mae eich cyfarwyddiadau cyrraedd llawn a’r wybodaeth ar gyfer mewngofnodi wedi’u cynnwys isod fel bod gennych bopeth sydd ei angen ar gyfer eich gwyliau yn Eryri.
+
+MANYLION EICH ARCHEB:
+- BWTHYN A ARCHEBWYD: ${data.propertyTitle} (${data.adults} Oedolyn, ${data.children} Plentyn, ${data.pets || 0} Ci • ${data.totalNights} Noson)
+- CYFEIRIAD: ${address}
+- CYRRAEDD: ${formatDateUK(data.checkIn)} (Cyrraedd ar ôl: ${checkInTime})
+- GADAEL: ${formatDateUK(data.checkOut)} (Gadael erbyn: ${checkOutTime})
+- CYFANSWM ARHOSIAD: £${data.totalPrice} (Wedi'i dalu'n llawn)
+
+CYFARWYDDIADAU CYRRAEDD A MYNEDIAD:
+Bydd y llety wedi’i adael heb ei gloi gyda’r allwedd y tu mewn — gwnewch eich hun yn gartrefol pan fyddwch yn cyrraedd!
+Mae mynediad ar ôl ${checkInTime}. Ar ddiwedd eich arhosiad gofynnwn yn garedig i chi adael erbyn ${checkOutTime} fan bellaf er mwyn i ni gael yr eiddo'n barod ar gyfer ein gwesteion nesaf.
+Argymhellwn eich bod yn cymryd amser i edrych ar y Llyfr Gwybodaeth i Westeion, a all fod o gymorth yn ystod eich arhosiad.
+
+CYFARWYDDIADAU:
+${directions}
+Mynedfa What3Words: ${propertyWhat3Words}
+Google Maps Pin: https://www.google.com/maps/place/53%C2%B001'20.7%22N+4%C2%B016'05.2%22W/@53.0224173,-4.2681046,925m/data=!3m2!1e3!4b1!4m5!3m4!1s0x0:0xd26a6eeb24eac6fd!8m2!3d53.0224173!4d-4.2681046?hl=en
+
+MANYLION CYSWLLT:
+Siwsan: 07748 635273
+Neil: 07785 522890
+Ebost: info@plashafodcottage.co.uk
+
+Byddem yn gwerthfawrogi pe gallech anfon e-bost/neges destun atom ychydig ddyddiau cyn eich arhosiad os ydych yn cyrraedd yn hwyrach yn y nos.
+
+Diolch eto am eich archeb ac edrychwn ymlaen at eich croesawu i'r rhan hon o Gymru!
+
+Gyda Diolch / With Thanks
+${hosts}
+${siteTitle}
+Gwefan: https://plashafodcottage.co.uk`;
+  }
 
   return `FULL PAYMENT RECEIPT & ARRIVAL GUIDE – ${data.propertyTitle}
 

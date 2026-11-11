@@ -48,6 +48,7 @@ export function DepositRequestComponent(props: DepositRequestProps) {
   const checkOut = (useFormValue(['checkOut']) as string) || '';
   const totalNights = Number(useFormValue(['totalNights']) || 1);
   const propertyId = (useFormValue(['propertyId']) as string) || 'plas-hafod';
+  const isCymraeg = Boolean(useFormValue(['isCymraeg']));
   const rawCalculatedTotal = useFormValue(['calculatedTotal']);
   const rawTotalPrice = useFormValue(['totalPrice']);
   const totalPrice = Number(rawCalculatedTotal ?? rawTotalPrice ?? 0);
@@ -131,6 +132,7 @@ export function DepositRequestComponent(props: DepositRequestProps) {
             checkOut,
             totalNights,
             propertyId,
+            isCymraeg,
             totalPrice,
             calculatedTotal: totalPrice,
             depositAmount,
@@ -189,6 +191,7 @@ export function DepositRequestComponent(props: DepositRequestProps) {
             checkOut,
             totalNights,
             propertyId,
+            isCymraeg,
             totalPrice,
             calculatedTotal: totalPrice,
             depositAmount,
@@ -242,6 +245,7 @@ export function DepositRequestComponent(props: DepositRequestProps) {
             checkOut,
             totalNights,
             propertyId,
+            isCymraeg,
             totalPrice,
             calculatedTotal: totalPrice,
             depositAmount,

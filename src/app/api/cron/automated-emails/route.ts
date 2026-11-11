@@ -151,11 +151,13 @@ async function handleAutomatedEmails(request: Request) {
       const daysUntil = daysUntilCheckIn;
       const isPlasHafod = booking.propertyId !== 'bryn-bugeiliaid-bach';
       const propertyTitle = isPlasHafod ? 'Plas Hafod Cottage' : 'Bryn Bugeiliaid Bach';
+      const isCymraeg = Boolean(booking.isCymraeg);
 
       const logEntry: Record<string, any> = {
         id: docId,
         guest: booking.guestName,
         email: booking.guestEmail,
+        isCymraeg,
         checkIn: booking.checkIn,
         checkOut: booking.checkOut,
         daysUntilCheckIn,
@@ -190,8 +192,8 @@ async function handleAutomatedEmails(request: Request) {
           children: booking.children || 0,
           pets: booking.pets || 0,
           keySafeCode,
-          directions: siteSettings.checkInDirectionsEn,
-          wasteInstructions: siteSettings.wasteBinInstructionsEn,
+          directions: isCymraeg ? (siteSettings.checkInDirectionsCy || siteSettings.checkInDirectionsEn) : siteSettings.checkInDirectionsEn,
+          wasteInstructions: isCymraeg ? (siteSettings.wasteBinInstructionsCy || siteSettings.wasteBinInstructionsEn) : siteSettings.wasteBinInstructionsEn,
           checkInTime: siteSettings.checkInTime || '3:00 PM',
           checkOutTime: siteSettings.checkOutTime || '10:00 AM',
           emergencyPhone: siteSettings.emergencyHostPhone || siteSettings.phone,
@@ -200,7 +202,7 @@ async function handleAutomatedEmails(request: Request) {
         };
 
         if (!dryRun) {
-          const sendResult = await sendCheckInGuideEmail(emailData, false);
+          const sendResult = await sendCheckInGuideEmail(emailData, isCymraeg);
           if (sendResult.success) {
             const sentAt = new Date().toISOString();
             await patchSanityBooking(docId, {
@@ -268,7 +270,7 @@ async function handleAutomatedEmails(request: Request) {
         };
 
         if (!dryRun) {
-          const sendResult = await sendBalanceReminderEmail(emailData, false);
+          const sendResult = await sendBalanceReminderEmail(emailData, isCymraeg);
           if (sendResult.success) {
             const sentAt = new Date().toISOString();
             await patchSanityBooking(docId, {
@@ -322,7 +324,7 @@ async function handleAutomatedEmails(request: Request) {
         };
 
         if (!dryRun) {
-          const sendResult = await sendCheckoutReminderEmail(emailData, false);
+          const sendResult = await sendCheckoutReminderEmail(emailData, isCymraeg);
           if (sendResult.success) {
             const sentAt = new Date().toISOString();
             await patchSanityBooking(docId, {
@@ -387,7 +389,7 @@ async function handleAutomatedEmails(request: Request) {
           };
 
           if (!dryRun) {
-            const sendResult = await sendReviewRequestEmail(emailData, false);
+            const sendResult = await sendReviewRequestEmail(emailData, isCymraeg);
             if (sendResult.success) {
               const sentAt = new Date().toISOString();
               await patchSanityBooking(docId, {

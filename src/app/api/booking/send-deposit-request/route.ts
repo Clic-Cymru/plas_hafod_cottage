@@ -88,7 +88,8 @@ export async function POST(request: Request) {
     }
 
     // 2. Fetch Global Site Settings (Bank Details)
-    const siteSettings = await cmsClient.getSiteSettings(false);
+    const isCymraeg = Boolean(inquiry.isCymraeg || directData?.isCymraeg);
+    const siteSettings = await cmsClient.getSiteSettings(isCymraeg);
 
     const bankAccountName =
       bankDetailsOverride?.bankAccountName ||
@@ -139,26 +140,29 @@ export async function POST(request: Request) {
 
     // ACTION A: Deposit Cleared & Confirmed
     if (action === 'deposit-confirmed') {
-      const emailResult = await sendDepositReceiptEmail({
-        propertyTitle,
-        propertyId: inquiry.propertyId,
-        guestName: inquiry.guestName,
-        guestEmail: inquiry.guestEmail,
-        guestPhone: inquiry.guestPhone,
-        checkIn: inquiry.checkIn,
-        checkOut: inquiry.checkOut,
-        totalNights: inquiry.totalNights || 1,
-        adults: Number(inquiry.adults || 2),
-        children: Number(inquiry.children || 0),
-        pets: Number(inquiry.pets || 0),
-        totalPrice: Number(inquiry.calculatedTotal || inquiry.totalPrice || 0),
-        depositAmount: Number(inquiry.depositAmount || 0),
-        balanceDue: Number(inquiry.balanceDue || 0),
-        appliedDiscountName: inquiry.appliedDiscountName,
-        discountAmount: inquiry.discountAmount,
-        inquiryId: inquiry.id || inquiryId,
-        paymentReference,
-      });
+      const emailResult = await sendDepositReceiptEmail(
+        {
+          propertyTitle,
+          propertyId: inquiry.propertyId,
+          guestName: inquiry.guestName,
+          guestEmail: inquiry.guestEmail,
+          guestPhone: inquiry.guestPhone,
+          checkIn: inquiry.checkIn,
+          checkOut: inquiry.checkOut,
+          totalNights: inquiry.totalNights || 1,
+          adults: Number(inquiry.adults || 2),
+          children: Number(inquiry.children || 0),
+          pets: Number(inquiry.pets || 0),
+          totalPrice: Number(inquiry.calculatedTotal || inquiry.totalPrice || 0),
+          depositAmount: Number(inquiry.depositAmount || 0),
+          balanceDue: Number(inquiry.balanceDue || 0),
+          appliedDiscountName: inquiry.appliedDiscountName,
+          discountAmount: inquiry.discountAmount,
+          inquiryId: inquiry.id || inquiryId,
+          paymentReference,
+        },
+        isCymraeg
+      );
 
       if (!emailResult.success) {
         return NextResponse.json(
@@ -209,26 +213,29 @@ export async function POST(request: Request) {
 
     // ACTION B: Complete and Confirmed (Full Payment Received -> Send Receipt & Directions Guide)
     if (action === 'complete-confirmed' || action === 'resend-full-payment') {
-      const emailResult = await sendFullPaymentReceiptEmail({
-        propertyTitle,
-        propertyId: inquiry.propertyId,
-        guestName: inquiry.guestName,
-        guestEmail: inquiry.guestEmail,
-        guestPhone: inquiry.guestPhone,
-        checkIn: inquiry.checkIn,
-        checkOut: inquiry.checkOut,
-        totalNights: inquiry.totalNights || 1,
-        adults: Number(inquiry.adults || 2),
-        children: Number(inquiry.children || 0),
-        pets: Number(inquiry.pets || 0),
-        totalPrice: Number(inquiry.calculatedTotal || inquiry.totalPrice || 0),
-        depositAmount: Number(inquiry.depositAmount || 0),
-        balanceDue: Number(inquiry.balanceDue || 0),
-        appliedDiscountName: inquiry.appliedDiscountName,
-        discountAmount: inquiry.discountAmount,
-        inquiryId: inquiry.id || inquiryId,
-        paymentReference,
-      });
+      const emailResult = await sendFullPaymentReceiptEmail(
+        {
+          propertyTitle,
+          propertyId: inquiry.propertyId,
+          guestName: inquiry.guestName,
+          guestEmail: inquiry.guestEmail,
+          guestPhone: inquiry.guestPhone,
+          checkIn: inquiry.checkIn,
+          checkOut: inquiry.checkOut,
+          totalNights: inquiry.totalNights || 1,
+          adults: Number(inquiry.adults || 2),
+          children: Number(inquiry.children || 0),
+          pets: Number(inquiry.pets || 0),
+          totalPrice: Number(inquiry.calculatedTotal || inquiry.totalPrice || 0),
+          depositAmount: Number(inquiry.depositAmount || 0),
+          balanceDue: Number(inquiry.balanceDue || 0),
+          appliedDiscountName: inquiry.appliedDiscountName,
+          discountAmount: inquiry.discountAmount,
+          inquiryId: inquiry.id || inquiryId,
+          paymentReference,
+        },
+        isCymraeg
+      );
 
       if (!emailResult.success) {
         return NextResponse.json(
@@ -286,38 +293,41 @@ export async function POST(request: Request) {
     }
 
     // ACTION C: Default — Send / Re-send Deposit Request Email
-    const emailResult = await sendDepositRequestEmail({
-      propertyTitle,
-      propertyId: inquiry.propertyId,
-      guestName: inquiry.guestName,
-      guestEmail: inquiry.guestEmail,
-      guestPhone: inquiry.guestPhone,
-      checkIn: inquiry.checkIn,
-      checkOut: inquiry.checkOut,
-      totalNights: inquiry.totalNights || 1,
-      adults: Number(inquiry.adults || 2),
-      children: Number(inquiry.children || 0),
-      pets: Number(inquiry.pets || 0),
-      totalPrice: Number(inquiry.calculatedTotal || inquiry.totalPrice || 0),
-      depositAmount: Number(inquiry.depositAmount || 0),
-      balanceDue: Number(inquiry.balanceDue || 0),
-      appliedDiscountName: inquiry.appliedDiscountName,
-      discountAmount: inquiry.discountAmount,
-      inquiryId: inquiry.id || inquiryId,
-      paymentReference,
-      bankAccountName,
-      bankName,
-      bankSortCode,
-      bankAccountNumber,
-      bankIban,
-      bankBic,
-      holdHours,
-      depositDeadline,
-      depositInstructions: siteSettings.depositInstructions,
-      customHostNote: customNote || inquiry.customDepositNote || undefined,
-      hostNames: siteSettings.hostNames,
-      contactPhone: siteSettings.phone,
-    });
+    const emailResult = await sendDepositRequestEmail(
+      {
+        propertyTitle,
+        propertyId: inquiry.propertyId,
+        guestName: inquiry.guestName,
+        guestEmail: inquiry.guestEmail,
+        guestPhone: inquiry.guestPhone,
+        checkIn: inquiry.checkIn,
+        checkOut: inquiry.checkOut,
+        totalNights: inquiry.totalNights || 1,
+        adults: Number(inquiry.adults || 2),
+        children: Number(inquiry.children || 0),
+        pets: Number(inquiry.pets || 0),
+        totalPrice: Number(inquiry.calculatedTotal || inquiry.totalPrice || 0),
+        depositAmount: Number(inquiry.depositAmount || 0),
+        balanceDue: Number(inquiry.balanceDue || 0),
+        appliedDiscountName: inquiry.appliedDiscountName,
+        discountAmount: inquiry.discountAmount,
+        inquiryId: inquiry.id || inquiryId,
+        paymentReference,
+        bankAccountName,
+        bankName,
+        bankSortCode,
+        bankAccountNumber,
+        bankIban,
+        bankBic,
+        holdHours,
+        depositDeadline,
+        depositInstructions: isCymraeg ? siteSettings.depositInstructionsCy : siteSettings.depositInstructions,
+        customHostNote: customNote || inquiry.customDepositNote || undefined,
+        hostNames: siteSettings.hostNames,
+        contactPhone: siteSettings.phone,
+      },
+      isCymraeg
+    );
 
     if (!emailResult.success) {
       return NextResponse.json(

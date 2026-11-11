@@ -62,6 +62,7 @@ export interface PageContent {
 export interface BookingInquiry {
   id?: string;
   propertyId?: 'plas-hafod' | 'bryn-bugeiliaid-bach';
+  isCymraeg?: boolean;
   guestName: string;
   guestEmail: string;
   guestPhone: string;

@@ -491,6 +491,7 @@ export function LiveSiteBooking({
           children,
           pets: isBBB ? 0 : pets,
           notes,
+          isCymraeg,
         }),
       });
 

@@ -217,7 +217,7 @@ export async function sendContactEmails(data: ContactEmailData, isCymraeg: boole
   }
 }
 
-export async function sendDepositRequestEmail(data: DepositRequestEmailData) {
+export async function sendDepositRequestEmail(data: DepositRequestEmailData, isCymraeg: boolean = false) {
   const client = getResendClient();
   const { fromEmail, ownerEmail, publicReplyEmail } = getEmailConfig();
 
@@ -227,7 +227,7 @@ export async function sendDepositRequestEmail(data: DepositRequestEmailData) {
     return { success: false, simulated: true, error: new Error(errMsg) };
   }
 
-  const siteSettings = await cmsClient.getSiteSettings(false);
+  const siteSettings = await cmsClient.getSiteSettings(isCymraeg);
   if (data.propertyId) {
     try {
       const propPricing = await cmsClient.getPricingConfig(data.propertyId);
@@ -254,17 +254,23 @@ export async function sendDepositRequestEmail(data: DepositRequestEmailData) {
       isStayWithinFullPaymentWindow(data.checkIn, fullPaymentWindow) ||
       (data.totalPrice > 0 && data.balanceDue === 0 && data.depositAmount >= data.totalPrice);
 
+    const subject = isFullPaymentRequired
+      ? (isCymraeg
+          ? `Cais am Daliad Llawn – Cadarnhewch Eich Arhosiad yn ${data.propertyTitle} (${formatDateUK(data.checkIn)} i ${formatDateUK(data.checkOut)})`
+          : `Full Payment Request – Secure Your Stay at ${data.propertyTitle} (${formatDateUK(data.checkIn)} to ${formatDateUK(data.checkOut)})`)
+      : (isCymraeg
+          ? `Cais am Flaendal – Cadarnhewch Eich Arhosiad yn ${data.propertyTitle} (${formatDateUK(data.checkIn)} i ${formatDateUK(data.checkOut)})`
+          : `Deposit Request – Secure Your Stay at ${data.propertyTitle} (${formatDateUK(data.checkIn)} to ${formatDateUK(data.checkOut)})`);
+
     // Send Deposit / Full Payment Request directly to Guest (bcc owner so owner has immediate record)
     const guestRes = await client.emails.send({
       from: fromEmail,
       to: data.guestEmail,
       bcc: targetBccRecipients,
       replyTo: publicReplyEmail,
-      subject: isFullPaymentRequired
-        ? `Full Payment Request – Secure Your Stay at ${data.propertyTitle} (${formatDateUK(data.checkIn)} to ${formatDateUK(data.checkOut)})`
-        : `Deposit Request – Secure Your Stay at ${data.propertyTitle} (${formatDateUK(data.checkIn)} to ${formatDateUK(data.checkOut)})`,
-      html: generateDepositRequestHtml(data, siteSettings),
-      text: generateDepositRequestText(data, siteSettings),
+      subject,
+      html: generateDepositRequestHtml(data, siteSettings, isCymraeg),
+      text: generateDepositRequestText(data, siteSettings, isCymraeg),
       headers: {
         'X-Entity-Ref-ID': refHeader,
       },

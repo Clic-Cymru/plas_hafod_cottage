@@ -62,6 +62,7 @@ export async function POST(request: Request) {
     // Action 1: Save Inquiry to CMS via Mutation API
     const inquiryRecord = await cmsClient.createBookingInquiry({
       propertyId: validatedPropertyId,
+      isCymraeg: Boolean(isCymraeg),
       guestName,
       guestEmail,
       guestPhone,

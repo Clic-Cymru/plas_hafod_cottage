@@ -32,6 +32,13 @@ export const bookingInquirySchema = {
       validation: (Rule: any) => Rule.required(),
     },
     {
+      name: 'isCymraeg',
+      title: 'Guest Language (Booked via Welsh / Cymraeg Site)',
+      type: 'boolean',
+      initialValue: false,
+      description: 'Automatically set to Yes when a guest books via the Welsh (/cy) pages so all emails are sent in Welsh. Leave unchecked for English.',
+    },
+    {
       name: 'status',
       title: 'Status',
       type: 'string',
