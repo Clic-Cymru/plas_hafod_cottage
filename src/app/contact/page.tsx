@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import Image from 'next/image';
 import { LiveSiteNavbar } from '@/components/navigation/LiveSiteNavbar';
 import { LiveSiteFooter } from '@/components/navigation/LiveSiteFooter';
 import { SubpageHero } from '@/components/navigation/SubpageHero';
@@ -9,7 +10,7 @@ import { Mail, Phone, MapPin, Clock, Compass, ShieldCheck } from 'lucide-react';
 import { generateBreadcrumbJsonLd, generateContactJsonLd, SITE_URL } from '@/lib/seo/jsonld';
 
 export const metadata: Metadata = {
-  title: 'Contact & Directions | Plas Hafod Cottage, Nebo, Penygroes LL54 6EB',
+  title: 'Contact & Location | Plas Hafod Cottage, Nebo, Penygroes LL54 6EB',
   description:
     'Contact Siwsan & Neil at Plas Hafod & Bryn Bugeiliaid Bach in Nebo near Penygroes, Gwynedd. Call 01286 880620 or enquire online for direct booking availability.',
   alternates: {
@@ -20,7 +21,7 @@ export const metadata: Metadata = {
     },
   },
   openGraph: {
-    title: 'Contact & Directions | Plas Hafod Cottage, Nebo, Penygroes LL54 6EB',
+    title: 'Contact & Location | Plas Hafod Cottage, Nebo, Penygroes LL54 6EB',
     description:
       'Contact Siwsan & Neil at Plas Hafod & Bryn Bugeiliaid Bach in Nebo near Penygroes, Gwynedd. Call 01286 880620 or enquire online for direct booking availability.',
     url: 'https://plashafodcottage.co.uk/contact',
@@ -38,7 +39,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Contact & Directions | Plas Hafod Cottage, Nebo, Penygroes LL54 6EB',
+    title: 'Contact & Location | Plas Hafod Cottage, Nebo, Penygroes LL54 6EB',
     description:
       'Contact Siwsan & Neil at Plas Hafod & Bryn Bugeiliaid Bach in Nebo near Penygroes, Gwynedd.',
     images: ['/images/wp/hero-bg.jpg'],
@@ -50,7 +51,7 @@ export default async function ContactPage() {
 
   const breadcrumbsJsonLd = generateBreadcrumbJsonLd([
     { name: 'Home', url: SITE_URL },
-    { name: 'Contact & Directions', url: `${SITE_URL}/contact` },
+    { name: 'Contact & Location', url: `${SITE_URL}/contact` },
   ]);
 
   const contactJsonLd = generateContactJsonLd({ locale: 'en' });
@@ -178,7 +179,7 @@ export default async function ContactPage() {
                 className="text-2xl sm:text-4xl font-architects uppercase tracking-wide text-stone-900"
                 style={{ fontFamily: "'Architects Daughter', cursive, sans-serif" }}
               >
-                HOW TO <span className="text-[#99a0c1]">FIND US</span>
+                LOCATION OF <span className="text-[#99a0c1]">COTTAGES</span>
               </h2>
               <div className="w-16 h-1 bg-[#efda07] mx-auto mt-3 mb-4" />
               <p className="text-stone-600 text-sm max-w-xl mx-auto">
@@ -188,27 +189,22 @@ export default async function ContactPage() {
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-              {/* Directions Details */}
-              <div className="lg:col-span-5 space-y-4 text-stone-700 text-sm leading-relaxed">
-                <div className="p-5 rounded-2xl bg-stone-50 border border-stone-200">
-                  <h4 className="font-bold text-stone-900 mb-1">From Caernarfon (A487 Southbound):</h4>
-                  <p className="text-xs sm:text-sm text-stone-600">
-                    Follow the A487 south towards Porthmadog. At the roundabout for Penygroes, take the exit
-                    towards Llanllyfni/Nebo. Follow the mountain road uphill into Nebo village.
+              {/* Panoramic View Side Panel */}
+              <div className="lg:col-span-5 h-[380px] sm:h-[420px] rounded-3xl overflow-hidden shadow-md border border-stone-200 relative group">
+                <Image
+                  src="/images/wp/hero-slide-1.jpg"
+                  alt="Panoramic view from Plas Hafod Cottage over Caernarfon Bay and Anglesey"
+                  fill
+                  sizes="(max-width: 1024px) 100vw, 42vw"
+                  className="object-cover transition-transform duration-700 group-hover:scale-105"
+                />
+                <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent p-6">
+                  <p className="text-white font-architects text-sm sm:text-base tracking-wide">
+                    Panoramic Views from the Cottages
                   </p>
-                </div>
-
-                <div className="p-5 rounded-2xl bg-stone-50 border border-stone-200">
-                  <h4 className="font-bold text-stone-900 mb-1">From Porthmadog & A55:</h4>
-                  <p className="text-xs sm:text-sm text-stone-600">
-                    Travelling from the south, join the A487 north through Tremadog. Turn right onto the B4418
-                    towards Talysarn and follow signs uphill to Nebo.
+                  <p className="text-white/85 text-xs mt-1">
+                    Looking across Caernarfon Bay towards the Isle of Anglesey
                   </p>
-                </div>
-
-                <div className="p-4 rounded-xl bg-amber-50/60 border border-amber-200/60 text-amber-900 text-xs">
-                  <strong>Scenic Mountain Lane:</strong> The final approach is via a tranquil rural country lane.
-                  Detailed arrival directions and key safe codes are sent in your final booking pack 7 days prior to check-in.
                 </div>
               </div>
 

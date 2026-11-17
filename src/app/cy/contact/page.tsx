@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import Image from 'next/image';
 import { LiveSiteNavbar } from '@/components/navigation/LiveSiteNavbar';
 import { LiveSiteFooter } from '@/components/navigation/LiveSiteFooter';
 import { SubpageHero } from '@/components/navigation/SubpageHero';
@@ -9,7 +10,7 @@ import { Mail, Phone, MapPin, Clock, Compass, ShieldCheck } from 'lucide-react';
 import { generateBreadcrumbJsonLd, generateContactJsonLd, SITE_URL } from '@/lib/seo/jsonld';
 
 export const metadata: Metadata = {
-  title: 'Cysylltu a Chyfarwyddiadau | Bwthyn Plas Hafod, Nebo, Pen-y-groes',
+  title: 'Cysylltu a Lleoliad | Bwthyn Plas Hafod, Nebo, Pen-y-groes',
   description:
     'Cysylltwch â Siwsan a Neil ym Mhlas Hafod a Bryn Bugeiliaid Bach yn Nebo ger Pen-y-groes, Gwynedd. Ffoniwch 01286 880620 neu anfonwch ymholiad ar-lein.',
   alternates: {
@@ -20,7 +21,7 @@ export const metadata: Metadata = {
     },
   },
   openGraph: {
-    title: 'Cysylltu a Chyfarwyddiadau | Bwthyn Plas Hafod, Nebo, Pen-y-groes',
+    title: 'Cysylltu a Lleoliad | Bwthyn Plas Hafod, Nebo, Pen-y-groes',
     description:
       'Cysylltwch â Siwsan a Neil ym Mhlas Hafod a Bryn Bugeiliaid Bach yn Nebo ger Pen-y-groes, Gwynedd. Ffoniwch 01286 880620 neu anfonwch ymholiad ar-lein.',
     url: 'https://plashafodcottage.co.uk/cy/contact',
@@ -38,7 +39,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Cysylltu a Chyfarwyddiadau | Bwthyn Plas Hafod, Nebo, Pen-y-groes',
+    title: 'Cysylltu a Lleoliad | Bwthyn Plas Hafod, Nebo, Pen-y-groes',
     description:
       'Cysylltwch â Siwsan a Neil ym Mhlas Hafod a Bryn Bugeiliaid Bach yn Nebo ger Pen-y-groes, Gwynedd.',
     images: ['/images/wp/hero-bg.jpg'],
@@ -50,7 +51,7 @@ export default async function WelshContactPage() {
 
   const breadcrumbsJsonLd = generateBreadcrumbJsonLd([
     { name: 'Hafan', url: `${SITE_URL}/cy` },
-    { name: 'Cysylltu a Chyfarwyddiadau', url: `${SITE_URL}/cy/contact` },
+    { name: 'Cysylltu a Lleoliad', url: `${SITE_URL}/cy/contact` },
   ]);
 
   const contactJsonLd = generateContactJsonLd({ locale: 'cy' });
@@ -178,7 +179,7 @@ export default async function WelshContactPage() {
                 className="text-2xl sm:text-4xl font-architects uppercase tracking-wide text-stone-900"
                 style={{ fontFamily: "'Architects Daughter', cursive, sans-serif" }}
               >
-                SUT I <span className="text-[#99a0c1]">GYRRAEDD ATOM</span>
+                LLEOLIAD Y <span className="text-[#99a0c1]">BYTHYNNOEDD</span>
               </h2>
               <div className="w-16 h-1 bg-[#efda07] mx-auto mt-3 mb-4" />
               <p className="text-stone-600 text-sm max-w-xl mx-auto">
@@ -188,29 +189,22 @@ export default async function WelshContactPage() {
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-              {/* Directions Details */}
-              <div className="lg:col-span-5 space-y-4 text-stone-700 text-sm leading-relaxed">
-                <div className="p-5 rounded-2xl bg-stone-50 border border-stone-200">
-                  <h4 className="font-bold text-stone-900 mb-1">O Gaernarfon (A487 i’r De):</h4>
-                  <p className="text-xs sm:text-sm text-stone-600">
-                    Dilynwch yr A487 i’r de tuag at Borthmadog. Wrth y gylchfan ar gyfer Pen-y-groes,
-                    cymerwch yr allanfa tuag at Lanllyfni/Nebo. Dilynwch y ffordd fynydd i fyny’r allt i
-                    bentref Nebo.
+              {/* Panoramic View Side Panel */}
+              <div className="lg:col-span-5 h-[380px] sm:h-[420px] rounded-3xl overflow-hidden shadow-md border border-stone-200 relative group">
+                <Image
+                  src="/images/wp/hero-slide-1.jpg"
+                  alt="Golygfa banoramig o Fwthyn Plas Hafod dros Fae Caernarfon ac Ynys Môn"
+                  fill
+                  sizes="(max-width: 1024px) 100vw, 42vw"
+                  className="object-cover transition-transform duration-700 group-hover:scale-105"
+                />
+                <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent p-6">
+                  <p className="text-white font-architects text-sm sm:text-base tracking-wide">
+                    Golygfeydd Panoramig o’r Bythynnod
                   </p>
-                </div>
-
-                <div className="p-5 rounded-2xl bg-stone-50 border border-stone-200">
-                  <h4 className="font-bold text-stone-900 mb-1">O Borthmadog a’r A55:</h4>
-                  <p className="text-xs sm:text-sm text-stone-600">
-                    Wrth deithio o’r de, ymunwch â’r A487 i’r gogledd trwy Dremadog. Trowch i’r dde ar
-                    y B4418 tuag at Dalysarn a dilynwch yr arwyddion i fyny’r allt i Nebo.
+                  <p className="text-white/85 text-xs mt-1">
+                    Yn edrych dros Fae Caernarfon tuag at Ynys Môn
                   </p>
-                </div>
-
-                <div className="p-4 rounded-xl bg-amber-50/60 border border-amber-200/60 text-amber-900 text-xs">
-                  <strong>Lôn Fynydd Hardd:</strong> Mae’r dull olaf o gyrraedd ar hyd lôn wledig dawel.
-                  Anfonir cyfarwyddiadau cyrraedd manwl a chodau clo allwedd yn eich pecyn archebu terfynol
-                  7 diwrnod cyn cyrraedd.
                 </div>
               </div>
 
