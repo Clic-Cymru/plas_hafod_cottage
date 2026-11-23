@@ -159,7 +159,10 @@ export default async function WelshContactPage() {
                   </div>
                   <div className="flex items-center gap-3">
                     <Compass className="w-4 h-4 text-[#99a0c1] shrink-0" />
-                    <span>What3Words: <strong>///scout.crusaders.shins</strong></span>
+                    <span>
+                      What3Words: <strong>///hunt.suddenly.hence</strong>{' '}
+                      <span className="text-stone-500 text-xs">(Maes parcio ar gyfer y ddau fwthyn)</span>
+                    </span>
                   </div>
                   <div className="flex items-center gap-3">
                     <ShieldCheck className="w-4 h-4 text-[#99a0c1] shrink-0" />
