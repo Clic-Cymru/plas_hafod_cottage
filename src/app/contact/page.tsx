@@ -12,7 +12,7 @@ import { generateBreadcrumbJsonLd, generateContactJsonLd, SITE_URL } from '@/lib
 export const metadata: Metadata = {
   title: 'Contact & Location | Plas Hafod Cottage, Nebo, Penygroes LL54 6EB',
   description:
-    'Contact Siwsan & Neil at Plas Hafod & Bryn Bugeiliaid Bach in Nebo near Penygroes, Gwynedd. Call 01286 880620 or enquire online for direct booking availability.',
+    'Contact Siwsan & Neil at Plas Hafod & Bryn Bugeiliaid Bach in Nebo near Penygroes, Gwynedd. Call 07748 635273 (Siwsan) or 07785 522890 (Neil), or enquire online for direct booking availability.',
   alternates: {
     canonical: 'https://plashafodcottage.co.uk/contact',
     languages: {
@@ -23,7 +23,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Contact & Location | Plas Hafod Cottage, Nebo, Penygroes LL54 6EB',
     description:
-      'Contact Siwsan & Neil at Plas Hafod & Bryn Bugeiliaid Bach in Nebo near Penygroes, Gwynedd. Call 01286 880620 or enquire online for direct booking availability.',
+      'Contact Siwsan & Neil at Plas Hafod & Bryn Bugeiliaid Bach in Nebo near Penygroes, Gwynedd. Call 07748 635273 (Siwsan) or 07785 522890 (Neil), or enquire online for direct booking availability.',
     url: 'https://plashafodcottage.co.uk/contact',
     siteName: 'Plas Hafod Cottage & Bryn Bugeiliaid Bach',
     images: [
@@ -118,9 +118,13 @@ export default async function ContactPage() {
                       <Phone className="w-5 h-5" />
                     </div>
                     <div>
-                      <p className="text-xs uppercase font-bold text-stone-400">Telephone / Mobile</p>
-                      <p className="text-stone-900 font-medium">01286 880620</p>
-                      <p className="text-stone-600 text-xs mt-0.5">Mobile: 07917 843187</p>
+                      <p className="text-xs uppercase font-bold text-stone-400">Mobile</p>
+                      <p className="text-stone-900 font-medium">
+                        Neil: <a href="tel:07785522890" className="hover:text-[#99a0c1] transition">07785 522890</a>
+                      </p>
+                      <p className="text-stone-900 font-medium mt-0.5">
+                        Siwsan: <a href="tel:07748635273" className="hover:text-[#99a0c1] transition">07748 635273</a>
+                      </p>
                     </div>
                   </div>
 

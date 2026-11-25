@@ -37,7 +37,7 @@ export function generateCottageJsonLd({ locale, siteUrl = SITE_URL }: CottageJso
     name,
     description,
     url: `${siteUrl}${isWelsh ? '/cy' : ''}`,
-    telephone: '+44 1286 880620',
+    telephone: '+44 7748 635273',
     priceRange: '££',
     currenciesAccepted: 'GBP',
     paymentAccepted: 'Credit Card, Debit Card, Bank Transfer',
@@ -183,7 +183,7 @@ export function generateContactJsonLd({ locale, siteUrl = SITE_URL }: CottageJso
     mainEntity: {
       '@type': 'LodgingBusiness',
       name: 'Plas Hafod Cottage & Bryn Bugeiliaid Bach',
-      telephone: '+44 1286 880620',
+      telephone: '+44 7748 635273',
       address: COTTAGE_ADDRESS,
       geo: {
         '@type': 'GeoCoordinates',
