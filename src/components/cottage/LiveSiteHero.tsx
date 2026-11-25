@@ -89,27 +89,11 @@ export function LiveSiteHero({
             : 'h-[540px] sm:h-[575px] md:h-[595px] lg:h-[600px]'
         }`}
       >
-        {/* Cinematic, prominent Ken Burns keyframes for each slide */}
+        {/* Cinematic Ken Burns zoom-in keyframes shared uniformly across all slides */}
         <style
           dangerouslySetInnerHTML={{
             __html: `
-              @keyframes heroKenBurns0 {
-                0% {
-                  transform: scale(1.0) translate3d(0, 0, 0);
-                }
-                100% {
-                  transform: scale(1.15) translate3d(-1.5%, -1%, 0);
-                }
-              }
-              @keyframes heroKenBurns1 {
-                0% {
-                  transform: scale(1.15) translate3d(1%, 0.5%, 0);
-                }
-                100% {
-                  transform: scale(1.02) translate3d(-1%, -0.5%, 0);
-                }
-              }
-              @keyframes heroKenBurns2 {
+              @keyframes heroKenBurns {
                 0% {
                   transform: scale(1.03) translate3d(0, 1%, 0);
                 }
@@ -117,18 +101,8 @@ export function LiveSiteHero({
                   transform: scale(1.16) translate3d(1.5%, -1%, 0);
                 }
               }
-              .ken-burns-anim-0 {
-                animation: heroKenBurns0 11000ms cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
-                transform-origin: 50% 60%;
-                will-change: transform;
-              }
-              .ken-burns-anim-1 {
-                animation: heroKenBurns1 11000ms cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
-                transform-origin: 40% 50%;
-                will-change: transform;
-              }
-              .ken-burns-anim-2 {
-                animation: heroKenBurns2 11000ms cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+              .ken-burns-anim {
+                animation: heroKenBurns 11000ms cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
                 transform-origin: 50% 50%;
                 will-change: transform;
               }
@@ -136,17 +110,11 @@ export function LiveSiteHero({
           }}
         />
 
-        {/* 3-Image Background Slider with Seamless Dissolve Cross-Fade */}
+        {/* Background Slider with Seamless Dissolve Cross-Fade */}
         <div className="absolute inset-0 z-0 overflow-hidden">
           {activeSlides.map((slide, index) => {
             const isCurrent = index === currentSlide;
             const isPrevious = index === prevSlide;
-            const animClass =
-              index === 0
-                ? 'ken-burns-anim-0'
-                : index === 1
-                ? 'ken-burns-anim-1'
-                : 'ken-burns-anim-2';
 
             return (
               <div
@@ -162,7 +130,7 @@ export function LiveSiteHero({
                 {/* Ken Burns drift wrapper - keep stable DOM node (no dynamic key) so Image never remounts or flashes */}
                 <div
                   className={`relative w-full h-full ${
-                    isCurrent || isPrevious ? animClass : 'scale-100'
+                    isCurrent || isPrevious ? 'ken-burns-anim' : 'scale-100'
                   }`}
                 >
                   <Image
