@@ -30,8 +30,12 @@ export function LiveSiteHero({
         alt: isCymraeg && s.altCy ? s.altCy : s.altEn,
       }));
 
-  const [currentSlide, setCurrentSlide] = useState(0);
-  const [prevSlide, setPrevSlide] = useState<number | null>(null);
+  const [slideState, setSlideState] = useState<{ current: number; prev: number | null }>({
+    current: 0,
+    prev: null,
+  });
+  const currentSlide = slideState.current;
+  const prevSlide = slideState.prev;
 
   // Offer Display Mode: 'banner' | 'popup' | 'both' | 'none'
   const mode = siteSettings.offerDisplayMode || (siteSettings.bannerEnabled !== false ? 'banner' : 'none');
@@ -58,22 +62,23 @@ export function LiveSiteHero({
   useEffect(() => {
     if (activeSlides.length <= 1) return;
     const timer = setInterval(() => {
-      setCurrentSlide((curr) => {
-        setPrevSlide(curr);
-        return (curr + 1) % activeSlides.length;
-      });
+      setSlideState((s) => ({
+        current: (s.current + 1) % activeSlides.length,
+        prev: s.current,
+      }));
     }, 8500);
     return () => clearInterval(timer);
   }, [activeSlides.length]);
 
-  // Clear prevSlide after cross-fade duration completes (2200ms)
+  // Clear prevSlide after cross-fade duration completes (2100ms)
   useEffect(() => {
     if (prevSlide === null) return;
+    const prevToClear = prevSlide;
     const timeout = setTimeout(() => {
-      setPrevSlide(null);
-    }, 2200);
+      setSlideState((s) => (s.prev === prevToClear ? { ...s, prev: null } : s));
+    }, 2100);
     return () => clearTimeout(timeout);
-  }, [prevSlide, currentSlide]);
+  }, [prevSlide]);
 
   return (
     <>
@@ -113,17 +118,17 @@ export function LiveSiteHero({
                 }
               }
               .ken-burns-anim-0 {
-                animation: heroKenBurns0 10000ms cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+                animation: heroKenBurns0 11000ms cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
                 transform-origin: 50% 60%;
                 will-change: transform;
               }
               .ken-burns-anim-1 {
-                animation: heroKenBurns1 10000ms cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+                animation: heroKenBurns1 11000ms cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
                 transform-origin: 40% 50%;
                 will-change: transform;
               }
               .ken-burns-anim-2 {
-                animation: heroKenBurns2 10000ms cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+                animation: heroKenBurns2 11000ms cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
                 transform-origin: 50% 50%;
                 will-change: transform;
               }
@@ -154,22 +159,18 @@ export function LiveSiteHero({
                     : 'opacity-0 z-0 pointer-events-none'
                 }`}
               >
-                {/* Ken Burns drift wrapper */}
+                {/* Ken Burns drift wrapper - keep stable DOM node (no dynamic key) so Image never remounts or flashes */}
                 <div
-                  key={isCurrent ? `anim-${currentSlide}` : undefined}
                   className={`relative w-full h-full ${
-                    isCurrent
-                      ? animClass
-                      : isPrevious
-                      ? `${animClass} [animation-play-state:paused]`
-                      : 'scale-100'
+                    isCurrent || isPrevious ? animClass : 'scale-100'
                   }`}
                 >
                   <Image
                     src={slide.src}
                     alt={slide.alt}
                     fill
-                    priority={index === 0}
+                    priority
+                    loading="eager"
                     sizes="100vw"
                     className="object-cover object-center"
                   />
